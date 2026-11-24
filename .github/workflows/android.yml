@@ -1,0 +1,33 @@
+name: Android CI
+
+on:
+  push:
+    branches: [kotlin]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      # No gradle-wrapper.jar is checked in, so use a pinned Gradle directly.
+      # If you later run `gradle wrapper` and commit the wrapper, change gradle-version
+      # to `wrapper` and run ./gradlew instead.
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: 8.9
+
+      - name: Build debug APK
+        run: gradle assembleDebug --stacktrace
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: overload-debug-apk
+          path: app/build/outputs/apk/debug/*.apk
