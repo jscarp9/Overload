@@ -1,5 +1,5 @@
 /* Overload offline helper. © 2026 Jake Scarpa. All rights reserved. */
-const CACHE = 'overload-v2';
+const CACHE = 'overload-v3';
 const SHELL = ['./', './index.html', './icon.png'];
 
 self.addEventListener('install', e => {
@@ -56,4 +56,41 @@ self.addEventListener('fetch', e => {
       })
     );
   }
+});
+
+/* Lock-screen rest alerts */
+function pushMsg() {
+  return new Promise(res => {
+    try {
+      const q = indexedDB.open('overload', 1);
+      q.onupgradeneeded = () => { if (!q.result.objectStoreNames.contains('kv')) q.result.createObjectStore('kv'); };
+      q.onsuccess = () => {
+        try {
+          const g = q.result.transaction('kv').objectStore('kv').get('pushmsg');
+          g.onsuccess = () => res(g.result || null);
+          g.onerror = () => res(null);
+        } catch (e) { res(null); }
+      };
+      q.onerror = () => res(null);
+    } catch (e) { res(null); }
+  });
+}
+
+self.addEventListener('push', e => {
+  e.waitUntil(pushMsg().then(m => self.registration.showNotification((m && m.title) || 'Rest is over ⏱️', {
+    body: (m && m.body) || 'Time for your next set 💪',
+    icon: './icon.png',
+    badge: './icon.png',
+    tag: 'overload-rest',
+    renotify: true,
+    vibrate: [200, 100, 200],
+  })));
+});
+
+self.addEventListener('notificationclick', e => {
+  e.notification.close();
+  e.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
+    const w = list.find(c => 'focus' in c);
+    return w ? w.focus() : self.clients.openWindow('./');
+  }));
 });
