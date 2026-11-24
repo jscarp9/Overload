@@ -1,5 +1,5 @@
 /* Overload offline helper. © 2026 Jake Scarpa. All rights reserved. */
-const CACHE = 'overload-v1';
+const CACHE = 'overload-v2';
 const SHELL = ['./', './index.html', './icon.png'];
 
 self.addEventListener('install', e => {
