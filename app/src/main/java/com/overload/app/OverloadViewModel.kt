@@ -262,6 +262,7 @@ class OverloadViewModel(app: Application) : AndroidViewModel(app) {
         val r = ui.value.rest ?: return
         if (!r.buzzed && System.currentTimeMillis() >= r.endAt) {
             ui.update { it.copy(rest = it.rest?.copy(buzzed = true)) }
+            if (alertPending) return // app is in the background: the notification does the alerting
             val st = data.value.settings
             if (st.sound) try { ToneGenerator(AudioManager.STREAM_ALARM, 80).startTone(ToneGenerator.TONE_PROP_BEEP2, 500) } catch (_: Exception) {}
             if (st.vibe) try {
@@ -287,7 +288,12 @@ class OverloadViewModel(app: Application) : AndroidViewModel(app) {
         if (!data.value.settings.restAlerts || r.endAt - System.currentTimeMillis() <= 3000) return
         RestAlerts.schedule(appCtx, r.endAt, r.next); alertPending = true
     }
-    fun onForeground() { if (alertPending) { alertPending = false; RestAlerts.cancel(appCtx) } }
+    fun onForeground() {
+        if (!alertPending) return
+        alertPending = false; RestAlerts.cancel(appCtx)
+        // rest ended while away: the notification already pinged, so don't beep again on return
+        ui.update { u -> u.copy(rest = u.rest?.let { if (System.currentTimeMillis() >= it.endAt) it.copy(buzzed = true) else it }) }
+    }
 
     // ---------- notes / settings ----------
     fun editNote(n: Note?) = ui.update { it.copy(editNote = n) }
