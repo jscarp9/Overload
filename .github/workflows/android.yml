@@ -17,14 +17,16 @@ jobs:
         with:
           fetch-depth: 0   # need tags to find the last release number
 
-      # Next version = last release tag (v0.N) + 1, so releases go 0.1, 0.2, 0.3, ...
+      # Version = the web app's version (overloadVersion in gradle.properties) + a build number:
+      # 0.13.1, 0.13.2, ... The count restarts at .1 when overloadVersion changes.
       - name: Work out version
         id: ver
         run: |
-          last=$(git tag -l 'v0.*' | sed 's/^v0\.//' | grep -E '^[0-9]+$' | sort -n | tail -1)
+          base=$(grep -E '^overloadVersion=' gradle.properties | cut -d= -f2 | tr -d ' \r')
+          last=$(git tag -l "v$base.*" | sed "s/^v$base\.//" | grep -E '^[0-9]+$' | sort -n | tail -1)
           n=$(( ${last:-0} + 1 ))
           echo "BUILD_NUMBER=$n" >> "$GITHUB_ENV"
-          echo "name=0.$n" >> "$GITHUB_OUTPUT"
+          echo "name=$base.$n" >> "$GITHUB_OUTPUT"
 
       - uses: actions/setup-java@v4
         with:

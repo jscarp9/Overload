@@ -12,10 +12,13 @@ android {
         applicationId = "com.overload.app"
         minSdk = 26
         targetSdk = 35
-        // CI sets BUILD_NUMBER (last release + 1): versions go 0.1, 0.2, 0.3, ...
+        // Version follows the web app (overloadVersion in gradle.properties) plus a build number from CI:
+        // 0.13.1, 0.13.2, ... versionCode always goes up, also when the web version changes.
+        val base = (project.findProperty("overloadVersion") as String? ?: "0.0").trim()
+        val (major, minor) = base.split(".").map { it.toInt() } + listOf(0, 0)
         val build = (System.getenv("BUILD_NUMBER") ?: "0").toInt()
-        versionCode = build + 1
-        versionName = "0.$build"
+        versionCode = major * 1_000_000 + minor * 1_000 + build
+        versionName = if (build > 0) "$base.$build" else base
     }
     // Fixed debug key (committed) so every CI build has the same signature and installs over the last one.
     signingConfigs {

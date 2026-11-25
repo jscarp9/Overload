@@ -6,11 +6,11 @@ Overload is a simple workout log built around progressive overload. Pick a plan,
 
 ## Install
 
-1. Open the [Releases](../../releases) page and download the newest `overload-0.x.apk`.
+1. Open the [Releases](../../releases) page and download the newest `overload-0.13.x.apk`.
 2. Open it on your Android phone. If asked, allow installs from your browser or file manager.
 3. Later updates install over the top and keep your data.
 
-Every push to the `kotlin` branch builds a new release automatically (0.1, 0.2, 0.3, …).
+Every push to the `kotlin` branch builds a new release automatically. The version follows the web app: 0.13.1, 0.13.2, … When the web app moves to a new version, change `overloadVersion` in `gradle.properties` to match.
 
 ## Features
 
