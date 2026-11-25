@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.overload.app"
-    compileSdk = 35
+    compileSdk = 36
     defaultConfig {
         applicationId = "com.overload.app"
         minSdk = 26
