@@ -152,8 +152,10 @@ fun StatsScreen(vm: OverloadViewModel, d: AppData) {
         Tile("${w.done}/${w.planned}", "Sessions", Modifier.weight(1f)); Tile("${w.sets}", "Hard sets", Modifier.weight(1f))
         Tile(kfmt(w.vol), "$unit moved", Modifier.weight(1f)); Tile("${w.prs}", "PRs", Modifier.weight(1f), if (w.prs > 0) Red else ov.ink)
     }
-    if (w.avg > 0) Sub("Average workout this week: ${mins(w.avg)}", Modifier.padding(top = 8.dp))
-    Spacer(Modifier.height(18.dp))
+    Spacer(Modifier.height(12.dp))
+    QuestsCard(vm.engCtx.collectAsState().value)
+    if (w.avg > 0) Sub("Average workout this week: ${mins(w.avg)}", Modifier.padding(top = 2.dp))
+    Spacer(Modifier.height(10.dp))
 
     // sets by muscle
     val a = wd[0].toString(); val b = wd[6].toString()

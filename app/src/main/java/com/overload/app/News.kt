@@ -17,11 +17,18 @@ val VERSION: String = BuildConfig.VERSION_NAME
  * seenNews doesn't match. It's separate from VERSION because every push makes a new release, and
  * the sheet shouldn't pop up for releases with nothing new to say.
  */
-const val NEWS_ID = 1
+const val NEWS_ID = 2
 val NEWS = listOf(
-    "Rest alerts on your lock screen" to "Settings → Workout → Rest alerts on lock screen. Leave the app during rest and you get a notification when it's time for your next set.",
-    "Slimmer rest timer" to "The rest bar at the bottom is smaller and the next exercise fits on one line.",
-    "What's new" to "This screen. Find it again any time at the bottom of Settings."
+    "Crew" to "A new tab where you and your friends post workouts, react, comment and see who's lifting right now. Tap someone who's live to send them hype 🔥 Works with friends on the web app too.",
+    "The Arena" to "A crew rank board with a podium, Rank Power, titles you can steal, rivals, lift boards and crew challenges.",
+    "Back up and sync" to "Optional account with a recovery code. Your workouts sync across devices, including the web app, and your crew spot follows you. Settings → Data.",
+    "Ranks and badges" to "Climb from Iron to Olympian with divisions, promotion trials and prestige stars. Tap the emblem at the top to see your profile and every badge.",
+    "Daily challenges and weekly quests" to "3 new challenges every day on Today and 3 quests every week in Stats. Plus a weekly report card on Mondays.",
+    "Seasons" to "A 30-level season pass with plate colors, frames, auras and nameplates.",
+    "Lift ranks and muscle mastery" to "Every lift gets a strength rank for your bodyweight, and your body map levels up from Bronze to Legend.",
+    "Goals and quest chains" to "Set a lift goal with a date and see your projected finish. Quest chains walk you to your next big plate milestone.",
+    "Post-workout breakdown" to "Finish a workout to see a muscle map of what you hit and some fun stats.",
+    "Four tabs" to "Today, Crew, Stats and Plan. Progress lives under Stats → Lifts and Notes under Plan → Notes. New features unlock as you go."
 )
 
 @Composable

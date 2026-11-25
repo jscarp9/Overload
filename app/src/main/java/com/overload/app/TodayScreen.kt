@@ -26,11 +26,17 @@ fun TodayScreen(vm: OverloadViewModel, d: AppData, u: UiState, now: Long) {
     val s = vm.session(d, u)
     val groups = vm.todayGroups(d, u)
     val col = colorOf(day)
+    val c by vm.engCtx.collectAsState()
     Column(Modifier.fillMaxWidth()) {
+        SmartCard(vm, c, u)
+        if (LocalDate.now().monthValue == 12 && c.st.yirSeen != LocalDate.now().year && c.rs.isNotEmpty())
+            CardButton("🎬", "Your ${LocalDate.now().year} Year in review is here", "Tap to watch it") { vm.openYear(true) }
         Rack(vm, d, u)
         Hero(vm, d, u, day, s, groups, now)
         if (s.end != null) Summary(vm, d, s, now)
         if (s.end != null && s.start != null && d.settings.heartRate) HeartRateCard(vm, vm.curKey(u), s)
+        if (s.end != null) Analysis(vm, c, s, u)
+        ChallengesCard(vm, c, u)
         if (day.type == "off") {
             OvCard {
                 Column(Modifier.fillMaxWidth().padding(vertical = 10.dp), horizontalAlignment = Alignment.CenterHorizontally) {

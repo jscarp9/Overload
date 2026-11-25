@@ -41,10 +41,22 @@ Every push to the `kotlin` branch builds a new release automatically (0.1, 0.2, 
 - A weekly view: sessions done, hard sets, volume, PRs, and sets per muscle against your plan.
 - Volume for the last 8 weeks and your week streak.
 
+**Ranks, badges and seasons**
+- Ranks from Iron to Olympian with divisions, promotion trials and prestige stars. Tap the emblem at the top for your profile.
+- 70+ badges, milestones, weekly badges, daily challenges, weekly quests and a Monday report card.
+- A 30-level season pass with plate colours, frames, auras and nameplates.
+- Lift ranks for your bodyweight, muscle mastery, goals with a projected finish date, and quest chains.
+- A muscle map and fun stats after every workout, and a year in review.
+
+**Crew**
+- Join or start a crew (shared with friends on the web app). Post workouts, react, comment and see who's lifting live.
+- The Arena: podium, Rank Power, titles, rivals, lift boards, crew challenges, crew levels and monthly awards.
+
 **Notes, settings and backup**
 - Coloured notes you can pin.
 - Light, dark or automatic theme. lb or kg.
 - Save a backup file and restore it, including backups from the web version.
+- Optional cloud backup and sync (recovery code), shared with the web app.
 - A **What's new** screen after each update.
 
 All data stays on your phone.
@@ -56,6 +68,8 @@ Open this folder in Android Studio (Ladybug or newer), let Gradle sync, and run 
 - Min Android version: 8.0 (SDK 26). Heart rate needs Android 9 or newer.
 - Compiles against SDK 36, targets SDK 35.
 - Android Gradle plugin 8.10.1, Gradle 8.11.1, Kotlin 2.0.21, JDK 17.
+
+Tests: `gradle testDebugUnitTest` checks the engine gives the same daily challenges and quests as the web app.
 
 From the command line: `gradle assembleDebug`. The APK lands in `app/build/outputs/apk/debug/`.
 
@@ -78,6 +92,13 @@ All source is in `app/src/main/java/com/overload/app/`.
 | `RestAlerts.kt` | Lock-screen rest alerts (exact alarm and notification while the app is in the background) |
 | `Health.kt` | Heart rate through Health Connect: reading, the post-workout card and graph, the permission explanation screen |
 | `News.kt` | What's new screen |
+| `Engine.kt` | Ranks, badges, challenges, quests, seasons, lift ranks, mastery, goals (ported from the web app, same results) |
+| `ProfileScreen.kt` | Profile, badge sheets, frames and auras, season pass, rank-up moment, year in review |
+| `TodayExtras.kt` | Smart card, post-workout breakdown, challenges, goals, quest chains, weekly quests |
+| `Art.kt` | Muscle map, rank emblem, frames and auras, confetti |
+| `Crew.kt`, `CrewModels.kt`, `CrewScreen.kt` | Crew server calls, live socket, Arena logic and the Crew tab |
+| `Sync.kt`, `AccountUi.kt` | Cloud backup and sync with the web app's server |
+| `Sheets.kt`, `UiBits.kt` | Bottom sheets and shared UI pieces |
 | `Theme.kt`, `Components.kt` | Colours, plate graphics, shared UI pieces |
 
 Data is saved as JSON in the app's private storage.
@@ -86,7 +107,7 @@ Data is saved as JSON in the app's private storage.
 
 ### Differences from the web version
 
-Not ported yet: badges and ranks, daily challenges, weekly quests, the post-workout muscle map, share cards, copy-a-day, streak freezes, daily snapshots, the welcome splash and the background art. Fonts are the system font. Add Archivo and Inter in `res/font` to match the web look.
+Not ported yet: share cards (image export), passkey sign-in (use the recovery code), crew pings (lock-screen alerts for crew posts), copy-a-day, notes history, on-phone daily snapshots, the welcome splash and the background art. Fonts are the system font. Add Archivo and Inter in `res/font` to match the web look.
 
 ## License
 

@@ -59,15 +59,16 @@ fun PlanScreen(vm: OverloadViewModel, d: AppData, u: UiState) {
             }
         }
         Sub("Colour", Modifier.padding(top = 10.dp))
-        Row(Modifier.padding(top = 6.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            PC.keys.forEach { k ->
+        val cx by vm.engCtx.collectAsState()
+        PC.keys.chunked(7).forEach { row -> Row(Modifier.padding(top = 6.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            row.forEach { k -> val lock = cx.plateLocked(k)
                 Box(Modifier.size(38.dp).clip(androidx.compose.foundation.shape.CircleShape).background(PC.getValue(k).base)
                     .then(if (colorOf(day) == k) Modifier.background(Color.White.copy(.35f)) else Modifier)
-                    .clickable { vm.editDay(di) { x -> x.copy(color = k) } }, contentAlignment = Alignment.Center) {
-                    if (colorOf(day) == k) OvText("✓", 16, FontWeight.Black, Color.White)
+                    .clickable { vm.setPlateColor(di, k) }, contentAlignment = Alignment.Center) {
+                    if (colorOf(day) == k) OvText("✓", 16, FontWeight.Black, Color.White) else if (lock.isNotEmpty()) OvText("🔒", 13)
                 }
             }
-        }
+        } }
     }
     if (day.type != "off") {
         day.groups.forEachIndexed { gi, gr ->
@@ -194,6 +195,8 @@ fun SettingsScreen(vm: OverloadViewModel, d: AppData) {
         if (st.heartRate) Sub("In Samsung Health: Settings → Health Connect, and allow heart rate. Starting a Weights workout on your watch gives a much more detailed graph.", Modifier.padding(bottom = 6.dp))
     }
     SecLabel("DATA")
+    val uiS by vm.ui.collectAsState()
+    AccountCard(vm, d, uiS.confirm)
     OvCard {
         Title("Backup", 20)
         Sub("Your log, plan and notes live on this phone. Save a backup file every week or two." +
@@ -241,6 +244,7 @@ fun OnboardScreen(vm: OverloadViewModel) {
             }
         }
         Spacer(Modifier.height(14.dp))
+        CardButton("☁️", "Already have an account?", "Sign in to bring back all your workouts") { vm.openSheet(Sheet.SignIn) }
         TEMPLATES.forEach { t ->
             Row(Modifier.fillMaxWidth().padding(bottom = 10.dp).clip(RoundedCornerShape(22.dp)).background(ov.card).clickable { vm.startPlan(t.key, name) }.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
                 Plate(t.color, "done", Modifier.size(52.dp)); Spacer(Modifier.width(14.dp))
