@@ -124,16 +124,16 @@ private fun RestPill(vm: OverloadViewModel, u: UiState, now: Long) {
     val sub = if (done) r.next.ifEmpty { "Next set" } else if (r.next.isNotEmpty()) "Next: ${r.next}" else "Breathe"
     val secs = ((left + 999) / 1000).coerceAtLeast(0)
     val frac = if (done) 0f else (left / (r.dur * 1000f)).coerceIn(0f, 1f)
-    Row(Modifier.fillMaxWidth().padding(bottom = 8.dp).background(if (done) Color(0xFF16B65B) else Color(0xFF14161C), RoundedCornerShape(18.dp)).padding(horizontal = 8.dp, vertical = 6.dp),
+    Row(Modifier.fillMaxWidth().padding(bottom = 8.dp).background(if (done) Color(0xFF16B65B) else Color(0xFF14161C), RoundedCornerShape(20.dp)).padding(horizontal = 8.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically) {
-        Canvas(Modifier.size(30.dp)) {
-            val sw = 4.dp.toPx(); val inset = sw / 2
+        Canvas(Modifier.size(36.dp)) {
+            val sw = 4.5.dp.toPx(); val inset = sw / 2
             drawCircle(Color.White.copy(.16f), size.minDimension / 2 - inset, style = Stroke(sw))
             drawArc(Color.White, -90f, 360f * (1 - frac), false, Offset(inset, inset), Size(size.width - sw, size.height - sw), style = Stroke(sw, cap = StrokeCap.Round))
         }
-        Spacer(Modifier.width(8.dp))
-        Title(if (done) "Go" else "${secs / 60}:${(secs % 60).toString().padStart(2, '0')}", 20, Color.White, Modifier.widthIn(min = 50.dp))
-        Text("$label · $sub", Modifier.weight(1f).padding(start = 4.dp), color = Color.White.copy(.8f), fontSize = 13.sp, fontWeight = FontWeight.SemiBold,
+        Spacer(Modifier.width(10.dp))
+        Title(if (done) "Go" else "${secs / 60}:${(secs % 60).toString().padStart(2, '0')}", 24, Color.White, Modifier.widthIn(min = 58.dp))
+        Text("$label · $sub", Modifier.weight(1f).padding(start = 4.dp), color = Color.White.copy(.8f), fontSize = 14.sp, fontWeight = FontWeight.SemiBold,
             maxLines = 1, softWrap = false, overflow = TextOverflow.Ellipsis)
         RestBtn("−15") { vm.restMinus() }; RestBtn("+15") { vm.restPlus() }; RestBtn("↺") { vm.restReset() }; RestBtn("✕") { vm.restStop() }
     }
@@ -141,6 +141,6 @@ private fun RestPill(vm: OverloadViewModel, u: UiState, now: Long) {
 
 @Composable
 private fun RestBtn(t: String, onClick: () -> Unit) =
-    Box(Modifier.padding(start = 3.dp).height(32.dp).widthIn(min = 32.dp).background(Color.White.copy(.12f), RoundedCornerShape(10.dp)).clickable(onClick = onClick).padding(horizontal = 6.dp), contentAlignment = Alignment.Center) {
-        OvText(t, 12, FontWeight.ExtraBold, Color.White)
+    Box(Modifier.padding(start = 3.dp).height(36.dp).widthIn(min = 34.dp).background(Color.White.copy(.12f), RoundedCornerShape(11.dp)).clickable(onClick = onClick).padding(horizontal = 6.dp), contentAlignment = Alignment.Center) {
+        OvText(t, 13, FontWeight.ExtraBold, Color.White)
     }
