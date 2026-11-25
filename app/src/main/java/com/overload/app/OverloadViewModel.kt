@@ -271,6 +271,24 @@ class OverloadViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
+    // ---------- lock-screen rest alerts ----------
+    private val appCtx get() = getApplication<Application>()
+    private var alertPending = false
+    fun enableRestAlerts(granted: Boolean) {
+        if (!granted) { say("Notifications are blocked. Allow them in your phone settings"); return }
+        setSettings { it.copy(restAlerts = true) }
+        RestAlerts.show(appCtx, "Rest alerts are on", "You'll get a ping here when rest is over 💪")
+        say("Rest alerts on. Test ping sent")
+    }
+    fun disableRestAlerts() { setSettings { it.copy(restAlerts = false) }; RestAlerts.cancel(appCtx); say("Rest alerts off") }
+    /** App left the screen: if rest is running, set an alarm for when it ends. */
+    fun onBackground() {
+        val r = ui.value.rest ?: return
+        if (!data.value.settings.restAlerts || r.endAt - System.currentTimeMillis() <= 3000) return
+        RestAlerts.schedule(appCtx, r.endAt, r.next); alertPending = true
+    }
+    fun onForeground() { if (alertPending) { alertPending = false; RestAlerts.cancel(appCtx) } }
+
     // ---------- notes / settings ----------
     fun editNote(n: Note?) = ui.update { it.copy(editNote = n) }
     fun newNote() = editNote(Note(id = ""))
@@ -282,7 +300,7 @@ class OverloadViewModel(app: Application) : AndroidViewModel(app) {
     }
     fun deleteNote(id: String) { update { d -> d.copy(notes = d.notes.filter { it.id != id }) }; editNote(null) }
     fun setSettings(f: (Settings) -> Settings) = update { it.copy(settings = f(it.settings)) }
-    fun wipe() { update { AppData(settings = Settings(theme = it.settings.theme)) }; ui.update { UiState() } }
+    fun wipe() { RestAlerts.cancel(appCtx); update { AppData(settings = Settings(theme = it.settings.theme)) }; ui.update { UiState() } }
 
     // ---------- backup ----------
     fun exportJson(): String {

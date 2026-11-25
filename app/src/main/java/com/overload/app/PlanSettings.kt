@@ -143,6 +143,7 @@ fun SettingsScreen(vm: OverloadViewModel, d: AppData) {
     val save = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri: Uri? ->
         if (uri != null) ctx.contentResolver.openOutputStream(uri)?.use { it.write(vm.exportJson().toByteArray()) }
     }
+    val notifPerm = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { vm.enableRestAlerts(it) }
     val pick = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         if (uri != null) ctx.contentResolver.openInputStream(uri)?.use { vm.importJson(it.readBytes().decodeToString()) }
     }
@@ -169,6 +170,13 @@ fun SettingsScreen(vm: OverloadViewModel, d: AppData) {
         TogRow("Vibrate when rest ends", null, st.vibe) { v -> vm.setSettings { it.copy(vibe = v) } }
         TogRow("Track RIR", "Adds a reps in reserve box to each set", st.rir) { v -> vm.setSettings { it.copy(rir = v) } }
         TogRow("Keep screen on during workouts", "So the rest timer stays on screen", st.awake) { v -> vm.setSettings { it.copy(awake = v) } }
+        TogRow("Rest alerts on lock screen", "Get a ping when rest is over, even with your phone locked", st.restAlerts) { v ->
+            when {
+                !v -> vm.disableRestAlerts()
+                RestAlerts.canNotify(ctx) -> vm.enableRestAlerts(true)
+                else -> notifPerm.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
     }
     SecLabel("DATA")
     OvCard {

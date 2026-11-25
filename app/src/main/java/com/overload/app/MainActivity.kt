@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -23,14 +24,16 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 
 class MainActivity : ComponentActivity() {
+    private val vm: OverloadViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContent { App(viewModel()) }
+        setContent { App(vm) }
     }
+    override fun onStart() { super.onStart(); vm.onForeground() }
+    override fun onStop() { super.onStop(); if (!isChangingConfigurations) vm.onBackground() }
 }
 
 @Composable

@@ -12,6 +12,7 @@ Native Android port of the Overload web app (index.html). Open this folder in An
 - `OtherScreens.kt`    Progress (lift list + chart), Stats, Notes
 - `PlanSettings.kt`    Plan editor, Settings, onboarding
 - `MainActivity.kt`    scaffold, bottom nav, floating rest timer
+- `RestAlerts.kt`      lock-screen rest alerts (exact alarm + notification while the app is in the background)
 
 Data is stored as JSON in the app's private files dir. Settings > Restore can also import a backup file
 exported from the web version.
