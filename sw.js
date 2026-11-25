@@ -1,6 +1,6 @@
 /* Overload offline helper. © 2026 Jake Scarpa. All rights reserved. */
 const BETA = /overload-beta/i.test(self.registration.scope);
-const CACHE = (BETA ? 'overload-beta' : 'overload') + '-v8';
+const CACHE = (BETA ? 'overload-beta' : 'overload') + '-v9';
 const DBN = BETA ? 'overload-beta' : 'overload';
 const SHELL = ['./', './index.html', './icon.png'];
 
