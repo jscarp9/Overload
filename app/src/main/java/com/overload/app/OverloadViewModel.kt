@@ -76,6 +76,7 @@ class OverloadViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
     private fun say(msg: String) { toasts.tryEmit(msg) }
+    fun toast(msg: String) = say(msg)
 
     // ---------- derived helpers ----------
     val unit get() = data.value.settings.unit
@@ -294,6 +295,38 @@ class OverloadViewModel(app: Application) : AndroidViewModel(app) {
         alertPending = false; RestAlerts.cancel(appCtx)
         // rest ended while away: the notification already pinged, so don't beep again on return
         ui.update { u -> u.copy(rest = u.rest?.let { if (System.currentTimeMillis() >= it.endAt) it.copy(buzzed = true) else it }) }
+    }
+
+    // ---------- heart rate (Health Connect) ----------
+    private val hrLoading = mutableSetOf<String>()
+    fun enableHeartRate(granted: Boolean) {
+        if (!granted) { say("Heart rate access wasn't allowed"); return }
+        setSettings { it.copy(heartRate = true) }
+        say("Heart rate on. In Samsung Health, turn on syncing with Health Connect")
+    }
+    /**
+     * Reads heart rate for a finished workout. Samsung Health syncs late, so it re-reads for 2 hours
+     * after the workout ends (at most every 2 minutes). force = the refresh button.
+     */
+    fun loadHeartRate(key: String, force: Boolean = false) {
+        val d = data.value
+        if (!d.settings.heartRate) return
+        val s = d.sessions[key] ?: return
+        val start = s.start ?: return; val end = s.end ?: return
+        val h = s.hr; val t = System.currentTimeMillis()
+        val stale = h == null || h.forEnd != end || (t < end + 2 * 3_600_000L && t - h.fetchedAt > 120_000L)
+        if (!force && !stale) return
+        if (!hrLoading.add(key)) return
+        viewModelScope.launch {
+            val r = Health.read(appCtx, start, end)
+            hrLoading.remove(key)
+            if (r == null) { if (force || h == null) say("Couldn't read heart rate. Check Overload's access in Health Connect"); return@launch }
+            update { dd ->
+                val ss = dd.sessions[key]
+                if (ss == null || ss.end != end) dd else dd.copy(sessions = dd.sessions + (key to ss.copy(hr = r)))
+            }
+            if (force) say(if (r.avg > 0) "Heart rate updated" else "No heart rate yet. Samsung Health may still be syncing")
+        }
     }
 
     // ---------- notes / settings ----------

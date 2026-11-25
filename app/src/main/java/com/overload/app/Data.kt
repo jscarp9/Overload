@@ -26,7 +26,19 @@ data class Session(
     val notes: String = "",
     val exNotes: Map<String, String> = emptyMap(),
     val swap: Map<String, Exercise> = emptyMap(),
-    val start: Long? = null, val end: Long? = null, val pauseAt: Long? = null, val paused: Long = 0
+    val start: Long? = null, val end: Long? = null, val pauseAt: Long? = null, val paused: Long = 0,
+    val hr: HeartRate? = null
+)
+
+/** One point on the heart rate graph: t = seconds from workout start, b = bpm. */
+@Serializable
+data class HrPt(val t: Int, val b: Int)
+
+/** Heart rate for one finished workout. avg 0 = no readings found (yet). forEnd = the end time it was read for. */
+@Serializable
+data class HeartRate(
+    val avg: Int = 0, val max: Int = 0, val min: Int = 0, val pts: List<HrPt> = emptyList(),
+    val fetchedAt: Long = 0, val forEnd: Long = 0
 )
 
 @Serializable
@@ -40,7 +52,8 @@ data class Settings(
     val unit: String = "lb", val sound: Boolean = true, val vibe: Boolean = true,
     val autoRest: Boolean = true, val awake: Boolean = false, val rir: Boolean = false,
     val theme: String = "auto", val name: String = "", val lastBackup: Long? = null,
-    val restAlerts: Boolean = false, val seenNews: Int = 0
+    val restAlerts: Boolean = false, val seenNews: Int = 0,
+    val heartRate: Boolean = false
 )
 
 @Serializable

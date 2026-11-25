@@ -30,6 +30,7 @@ fun TodayScreen(vm: OverloadViewModel, d: AppData, u: UiState, now: Long) {
         Rack(vm, d, u)
         Hero(vm, d, u, day, s, groups, now)
         if (s.end != null) Summary(vm, d, s, now)
+        if (s.end != null && s.start != null && d.settings.heartRate) HeartRateCard(vm, vm.curKey(u), s)
         if (day.type == "off") {
             OvCard {
                 Column(Modifier.fillMaxWidth().padding(vertical = 10.dp), horizontalAlignment = Alignment.CenterHorizontally) {

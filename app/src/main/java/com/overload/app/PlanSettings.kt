@@ -23,6 +23,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import java.time.LocalDate
+import kotlinx.coroutines.launch
 
 // ============================ PLAN ============================
 @Composable
@@ -143,6 +144,8 @@ fun SettingsScreen(vm: OverloadViewModel, d: AppData) {
     val save = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri: Uri? ->
         if (uri != null) ctx.contentResolver.openOutputStream(uri)?.use { it.write(vm.exportJson().toByteArray()) }
     }
+    val scope = rememberCoroutineScope()
+    val hrPerm = rememberLauncherForActivityResult(Health.permissionContract()) { granted -> vm.enableHeartRate(granted.containsAll(Health.PERMS)) }
     val notifPerm = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { vm.enableRestAlerts(it) }
     val pick = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         if (uri != null) ctx.contentResolver.openInputStream(uri)?.use { vm.importJson(it.readBytes().decodeToString()) }
@@ -177,6 +180,18 @@ fun SettingsScreen(vm: OverloadViewModel, d: AppData) {
                 else -> notifPerm.launch(android.Manifest.permission.POST_NOTIFICATIONS)
             }
         }
+    }
+    SecLabel("HEALTH")
+    OvCard {
+        TogRow("Heart rate from Samsung Health", "Average, max and a heart rate graph after each workout, through Health Connect", st.heartRate) { v ->
+            if (!v) vm.setSettings { it.copy(heartRate = false) }
+            else when (Health.status(ctx)) {
+                "AVAILABLE" -> scope.launch { if (Health.hasPerms(ctx)) vm.enableHeartRate(true) else hrPerm.launch(Health.PERMS) }
+                "NEEDS_INSTALL" -> { vm.toast("Install or update Health Connect first"); Health.openStore(ctx) }
+                else -> vm.toast("Heart rate needs Android 9 or newer")
+            }
+        }
+        if (st.heartRate) Sub("In Samsung Health: Settings → Health Connect, and allow heart rate. Starting a Weights workout on your watch gives a much more detailed graph.", Modifier.padding(bottom = 6.dp))
     }
     SecLabel("DATA")
     OvCard {
