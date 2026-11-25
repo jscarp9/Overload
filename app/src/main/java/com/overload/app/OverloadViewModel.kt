@@ -36,7 +36,8 @@ data class UiState(
     val rest: RestState? = null,
     val picker: Picker? = null,
     val warm: Set<String> = emptySet(),
-    val editNote: Note? = null
+    val editNote: Note? = null,
+    val news: Boolean = false          // What's new sheet open
 )
 
 class OverloadViewModel(app: Application) : AndroidViewModel(app) {
@@ -44,7 +45,7 @@ class OverloadViewModel(app: Application) : AndroidViewModel(app) {
     private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true; coerceInputValues = true }
 
     val data = MutableStateFlow(load())
-    val ui = MutableStateFlow(UiState())
+    val ui = MutableStateFlow(UiState(news = data.value.plan != null && data.value.settings.seenNews != NEWS_ID))
     val now = MutableStateFlow(System.currentTimeMillis())
     val toasts = MutableSharedFlow<String>(extraBufferCapacity = 4)
 
@@ -127,7 +128,7 @@ class OverloadViewModel(app: Application) : AndroidViewModel(app) {
     // ---------- onboarding / plan ----------
     fun startPlan(key: String, name: String) {
         val t = TEMPLATES.first { it.key == key }
-        update { it.copy(plan = t.days(), settings = it.settings.copy(name = name.trim())) }
+        update { it.copy(plan = t.days(), settings = it.settings.copy(name = name.trim(), seenNews = NEWS_ID)) }
         say("You're set. Let's lift")
     }
     fun replacePlan(key: String) {
@@ -305,8 +306,10 @@ class OverloadViewModel(app: Application) : AndroidViewModel(app) {
         editNote(null); say("Note saved")
     }
     fun deleteNote(id: String) { update { d -> d.copy(notes = d.notes.filter { it.id != id }) }; editNote(null) }
+    fun showNews() = ui.update { it.copy(news = true) }
+    fun closeNews() { ui.update { it.copy(news = false) }; if (data.value.settings.seenNews != NEWS_ID) setSettings { it.copy(seenNews = NEWS_ID) } }
     fun setSettings(f: (Settings) -> Settings) = update { it.copy(settings = f(it.settings)) }
-    fun wipe() { RestAlerts.cancel(appCtx); update { AppData(settings = Settings(theme = it.settings.theme)) }; ui.update { UiState() } }
+    fun wipe() { RestAlerts.cancel(appCtx); update { AppData(settings = Settings(theme = it.settings.theme, seenNews = NEWS_ID)) }; ui.update { UiState() } }
 
     // ---------- backup ----------
     fun exportJson(): String {

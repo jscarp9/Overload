@@ -54,6 +54,7 @@ fun App(vm: OverloadViewModel) {
     SideEffect { view.keepScreenOn = d.settings.awake && s.start != null && s.end == null && s.pauseAt == null }
 
     OverloadTheme(d.settings.theme) {
+        if (u.news) WhatsNewDialog { vm.closeNews() }
         Scaffold(
             containerColor = Color.Transparent,
             snackbarHost = { SnackbarHost(snack, Modifier.statusBarsPadding()) },
@@ -78,7 +79,7 @@ fun App(vm: OverloadViewModel) {
                             else -> PlanScreen(vm, d, u)
                         }
                     }
-                    if (d.plan != null) Sub("Overload · Kotlin port", Modifier.fillMaxWidth().padding(top = 18.dp), ov.mute)
+                    if (d.plan != null && !u.settings) Sub("Overload $VERSION", Modifier.fillMaxWidth().padding(top = 18.dp), ov.mute)
                 }
             }
         }

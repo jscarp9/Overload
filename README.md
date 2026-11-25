@@ -12,10 +12,11 @@ Native Android port of the Overload web app (index.html). Open this folder in An
 - `OtherScreens.kt`    Progress (lift list + chart), Stats, Notes
 - `PlanSettings.kt`    Plan editor, Settings, onboarding
 - `MainActivity.kt`    scaffold, bottom nav, floating rest timer
+- `News.kt`          What's new sheet (bump NEWS_ID when you edit NEWS so it pops up once after the update)
 - `RestAlerts.kt`      lock-screen rest alerts (exact alarm + notification while the app is in the background)
 
 Data is stored as JSON in the app's private files dir. Settings > Restore can also import a backup file
 exported from the web version.
 
-Not ported: welcome splash, share-card image, decorative background art, what's-new sheet, service worker
+Not ported: welcome splash, share-card image, decorative background art, service worker
 (not needed in a native app). Fonts are the system font (add Archivo/Inter in res/font to match the web look).

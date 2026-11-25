@@ -192,6 +192,12 @@ fun SettingsScreen(vm: OverloadViewModel, d: AppData) {
         Spacer(Modifier.height(14.dp))
         OvButton(if (confirmWipe) "Tap again to erase everything" else "Erase all data", { if (confirmWipe) { vm.wipe(); confirmWipe = false } else confirmWipe = true }, fg = Red)
     }
+    Column(Modifier.fillMaxWidth().padding(top = 18.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Sub("Overload $VERSION · "); OvButton("What's new", { vm.showNews() }, small = true)
+        }
+        Sub("© 2026 Jake Scarpa. All rights reserved.", Modifier.padding(top = 6.dp))
+    }
 }
 
 @Composable private fun SecLabel(t: String) = OvText(t, 13, FontWeight.ExtraBold, ov.mute, Modifier.padding(start = 4.dp, top = 20.dp, bottom = 8.dp))

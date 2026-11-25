@@ -40,7 +40,7 @@ data class Settings(
     val unit: String = "lb", val sound: Boolean = true, val vibe: Boolean = true,
     val autoRest: Boolean = true, val awake: Boolean = false, val rir: Boolean = false,
     val theme: String = "auto", val name: String = "", val lastBackup: Long? = null,
-    val restAlerts: Boolean = false
+    val restAlerts: Boolean = false, val seenNews: Int = 0
 )
 
 @Serializable
