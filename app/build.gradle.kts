@@ -12,8 +12,17 @@ android {
         applicationId = "com.overload.app"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
-        versionName = "2.0"
+        // CI sets BUILD_NUMBER (last release + 1): versions go 0.1, 0.2, 0.3, ...
+        val build = (System.getenv("BUILD_NUMBER") ?: "0").toInt()
+        versionCode = build + 1
+        versionName = "0.$build"
+    }
+    // Fixed debug key (committed) so every CI build has the same signature and installs over the last one.
+    signingConfigs {
+        getByName("debug") {
+            storeFile = rootProject.file("debug.keystore")
+            storePassword = "android"; keyAlias = "androiddebugkey"; keyPassword = "android"
+        }
     }
     buildTypes { release { isMinifyEnabled = false } }
     compileOptions { sourceCompatibility = JavaVersion.VERSION_17; targetCompatibility = JavaVersion.VERSION_17 }

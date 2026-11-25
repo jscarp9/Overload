@@ -6,11 +6,25 @@ on:
   pull_request:
   workflow_dispatch:
 
+permissions:
+  contents: write   # needed to create releases
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # need tags to find the last release number
+
+      # Next version = last release tag (v0.N) + 1, so releases go 0.1, 0.2, 0.3, ...
+      - name: Work out version
+        id: ver
+        run: |
+          last=$(git tag -l 'v0.*' | sed 's/^v0\.//' | grep -E '^[0-9]+$' | sort -n | tail -1)
+          n=$(( ${last:-0} + 1 ))
+          echo "BUILD_NUMBER=$n" >> "$GITHUB_ENV"
+          echo "name=0.$n" >> "$GITHUB_OUTPUT"
 
       - uses: actions/setup-java@v4
         with:
@@ -31,3 +45,24 @@ jobs:
         with:
           name: overload-debug-apk
           path: app/build/outputs/apk/debug/*.apk
+
+      # On pushes to kotlin (not PRs), publish the APK as a GitHub Release.
+      - name: Rename APK
+        if: github.event_name == 'push'
+        run: cp app/build/outputs/apk/debug/app-debug.apk overload-${{ steps.ver.outputs.name }}.apk
+
+      - name: Publish release
+        if: github.event_name == 'push'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.ver.outputs.name }}
+          name: Overload ${{ steps.ver.outputs.name }}
+          target_commitish: ${{ github.sha }}
+          make_latest: true
+          body: |
+            Automatic build of `${{ github.sha }}` from the kotlin branch.
+
+            ${{ github.event.head_commit.message }}
+
+            Download the APK below and open it on your phone to install or update.
+          files: overload-${{ steps.ver.outputs.name }}.apk
