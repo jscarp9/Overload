@@ -784,6 +784,34 @@ html[data-mode=dark] .c17{border-color:rgba(255,255,255,.07)}
 .nf-heaster{background:linear-gradient(90deg,#ff9fd0,#9fe3ff,#fff08a,#b8ffb0,#d9b3ff,#ff9fd0);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent!important;animation:nfs 4s linear infinite}
 .nf-hjuly4{background:linear-gradient(90deg,#c8202b,#ffffff,#2b4fd1,#c8202b);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent!important;animation:nfs 3s linear infinite}
 .nf-hhalloween{background:linear-gradient(90deg,#ff7a1a,#9b6bd6,#ffb347,#ff7a1a);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent!important;animation:nfs 2.4s linear infinite}
+/* 0.20 */
+.ph20{position:relative}
+.ph20btns,.cb20btns{position:absolute;top:10px;right:10px;display:flex;gap:8px;z-index:3}
+.ic20{width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,.22);background:rgba(8,9,12,.45);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);color:#fff;display:grid;place-items:center;cursor:pointer;position:relative;font-size:16px;padding:0}
+.ic20 i{position:absolute;top:-4px;right:-4px;min-width:17px;height:17px;border-radius:9px;background:#ef2b36;color:#fff;font:800 10px/17px Inter,sans-serif;font-style:normal;padding:0 4px}
+.ph20name{display:flex;align-items:center;justify-content:center;gap:6px;margin:10px 0 2px}
+.ph20name .ph16n{margin:0}
+.ph20cr{font-size:22px;line-height:1}.ph20bal{visibility:hidden}
+.ph20meta{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:6px;color:var(--mute);font-size:13.5px;font-weight:600;padding:0 14px}
+.ph20meta i{font-style:normal;opacity:.5}
+.m20f{color:#e3c25a}.m20cf{color:#cfd4dc}
+.ph20pins{display:flex;justify-content:center;gap:8px;margin:12px 0 2px}
+.pin20{width:38px;height:38px;border-radius:50%;border:1px solid rgba(127,127,127,.25);background:rgba(127,127,127,.1);font-size:18px;display:grid;place-items:center;cursor:pointer;padding:0;color:var(--ink)}
+.pin20.add{border-style:dashed;color:var(--mute);font-size:16px}
+.cb20{position:relative}
+.cb20 .cbbtn{display:none}
+.cb20shade{position:absolute;inset:0;background:linear-gradient(180deg,transparent 35%,rgba(0,0,0,.55));pointer-events:none}
+.cb20 .cb2in{position:relative;z-index:2}
+.cb20stats{position:relative;z-index:2;display:flex;align-items:center;flex-wrap:wrap;gap:6px;padding:0 16px 12px;color:rgba(255,255,255,.82);font-size:12.5px;font-weight:600}
+.cb20stats b{color:#fff}.cb20stats i{font-style:normal;opacity:.5}
+.cb20rk{display:inline-flex;align-items:center;gap:4px;border:0;background:none;color:inherit;font:inherit;padding:0;cursor:pointer}.cb20rk svg,.cb20rk img{width:18px;height:18px}
+.cb20lv{display:inline-flex;align-items:center;gap:6px}.cb20lv .cbbar2{width:46px;height:5px;border-radius:3px;background:rgba(255,255,255,.18);display:inline-block;overflow:hidden}.cb20lv .cbbar2 u{display:block;height:100%;background:#ef2b36}
+.arena20{flex-wrap:nowrap;overflow-x:auto}
+.seg20{transform:scale(.92);transform-origin:top center;margin-bottom:4px}
+.ph20 .ph20btns{top:128px;right:14px}
+.ph20 .ph20btns .ic20{background:rgba(127,127,127,.12);border-color:rgba(127,127,127,.25);color:var(--ink)}
+.cb20 .cb2in{padding-top:22px;padding-right:96px}
+.cb20 .cb2crest{margin-top:4px}
 </style>
 </head>
 <body>
@@ -908,8 +936,8 @@ function plateSVG(color,state,opts={}){const id='p'+(pid++),c=PC[color]||PC.red,
 /* ---------- today ---------- */
 function counts(){const s=cur();let tot=0,dn=0;todayGroups().forEach(gr=>gr.forEach(e=>{tot+=Math.max(+e.sets||2,(s.ex[e.id]||[]).length);dn+=(s.ex[e.id]||[]).filter(x=>x&&x.d).length}));return[dn,tot]}
 
-const VERSION=BETA?'0.19 beta':'0.19';
-const NEWS=[['Holiday Drops','Lift on a holiday and unlock a whole matching set: an animated plate with the year on it, a profile banner, a name effect, a crew reaction, a set-complete burst and a dated medal for your trophy room. You can only earn each year’s set on that day.'],['Crew holiday bonus','If 3 people in your crew lift on a holiday, the whole crew unlocks a holiday crew banner, and your crest dresses up for the season.'],['8 holidays','Thanksgiving, Christmas, New Year’s, Valentine’s, St. Patrick’s, Easter (new plate), the Fourth of July and Halloween.']];
+const VERSION=BETA?'0.20 beta':'0.20';
+const NEWS=[['Cleaner profile','Your name sits centered, your info is one line, pinned badges are small icons, and Edit and Share live in the banner corner.'],['Cleaner crew screen','Crew stats sit inside the banner, the Arena has 4 tabs, and the podium people aren’t repeated in the list below.'],['Holiday Drops','Lift on a holiday to unlock a whole matching set. The crew gets a bonus if 3 of you lift.']];
 const isDark=()=>document.documentElement.dataset.mode==='dark';
 function applyTheme(){const t=st.set.theme||'auto',mq=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)');const m=t==='auto'?(mq&&mq.matches?'dark':'light'):t;document.documentElement.dataset.mode=m;const mt=document.querySelector('meta[name=theme-color]');if(mt)mt.setAttribute('content',m==='dark'?'#07080c':'#f7f5f1')}
 function todayGroups(){const p=pd(),sw=(cur().swap)||{};return p.groups.map(gr=>gr.map(e=>sw[e.id]||e))}
@@ -1119,7 +1147,7 @@ function saveRename(){const r=$('rename');if(!r)return;const v=r.value.trim();if
 main.addEventListener('focusout',e=>{if(e.target.id==='rename')setTimeout(saveRename,0)});
 main.addEventListener('keydown',e=>{if(e.target.id==='rename'&&e.key==='Enter'){e.preventDefault();e.target.blur();return}if(e.target.id==='psearch'&&e.key==='Enter'){e.preventDefault();const q=e.target.value.trim();if(!q)return;const hit=LIB.find(x=>x[0].toLowerCase()===q.toLowerCase());if(hit)addFromPicker(...hit);else addFromPicker(q,'Other',8,12)}});
 main.addEventListener('click',async e=>{const b=e.target.closest('button');if(!b)return;const d=st.plan&&st.plan.days[st.pday];
- if(await click18(b))return;if(await click17(b))return;if(await click16(b))return;if(await click15(b))return;if(await click14(b))return;if(await crewClick(b))return;
+ if(await click20(b))return;if(await click18(b))return;if(await click17(b))return;if(await click16(b))return;if(await click15(b))return;if(await click14(b))return;if(await crewClick(b))return;
  if(await acctClick(b))return;if(await click13(b))return;
  if(b.id==='openprof'){st.profile=true;render();window.scrollTo({top:0});return}
  if(b.id==='pclose2'){st.profile=false;render();return}
@@ -3248,6 +3276,91 @@ async function sheetClick19(b){const sh=st.sheet;if(!sh||sh.type!=='hol19')retur
  return false}
 {const _d=dots17;dots17=function(){_d();try{const s=cur&&cur();if(s&&s.start&&!s.end)return;clearTimeout(window.__hr19);window.__hr19=setTimeout(holReveal19,900);if(st.cs&&!window.__hc19){window.__hc19=1;setTimeout(()=>{window.__hc19=0;holCheck19()},1500)}}catch(e){}}}
 function boot19(){try{AUTO18.push('hol19');setTimeout(holReveal19,2500);setTimeout(holCheck19,6000);setInterval(holCheck19,60000);document.addEventListener('visibilitychange',()=>{if(!document.hidden){setTimeout(holReveal19,800);setTimeout(holCheck19,2000)}})}catch(e){console.warn('boot19',e)}}
+/* =====================================================================
+   0.20: space founder banners, cleaner profile header, cleaner crew screen
+   ===================================================================== */
+/* ---------- space founder banners ---------- */
+function spaceKit(u){let sd=hashS(u)||7;const rnd=()=>{sd=(sd*16807)%2147483647;return (sd-1)/2147483646},R=(a,b)=>a+rnd()*(b-a);
+ const layer=(n,rmin,rmax,drift,cols)=>{let o='';for(let i=0;i<n;i++){const x=R(-20,400).toFixed(1),y=R(0,130).toFixed(1),r=R(rmin,rmax).toFixed(2),d=R(1.6,5.5).toFixed(1),b=R(0,5).toFixed(1);o+=`<circle cx="${x}" cy="${y}" r="${r}" fill="${cols[i%cols.length]}"><animate attributeName="opacity" values="${R(.25,.55).toFixed(2)};1;${R(.25,.55).toFixed(2)}" dur="${d}s" begin="-${b}s" repeatCount="indefinite"/></circle>`}return `<g><animateTransform attributeName="transform" type="translate" values="0 0;${-drift} 0;0 0" dur="${(60+drift*4)}s" repeatCount="indefinite"/>${o}</g>`};
+ const stars=()=>layer(90,.2,.6,4,['#ffffff','#d6dcff','#ffe9b8'])+layer(45,.5,1,9,['#ffffff','#ffe7a8'])+layer(14,.9,1.5,16,['#fff8e6','#ffd77a']);
+ const flare=(x,y,s,c,d)=>`<g transform="translate(${x} ${y})"><circle r="${3*s}" fill="${c}" opacity=".25"/><circle r="${1.1*s}" fill="#fffdf2"/><path d="M0 -${7*s} L${.45*s} 0 L0 ${7*s} L-${.45*s} 0Z M-${7*s} 0 L0 ${.45*s} L${7*s} 0 L0 -${.45*s}Z" fill="#fffdf2" opacity=".85"><animate attributeName="opacity" values=".4;1;.4" dur="${d}s" repeatCount="indefinite"/></path></g>`;
+ const neb=(n,cols,cx,cy,spread,op)=>{let o='';for(let i=0;i<n;i++)o+=`<ellipse cx="${(cx+R(-spread,spread)).toFixed(0)}" cy="${(cy+R(-40,40)).toFixed(0)}" rx="${R(40,120).toFixed(0)}" ry="${R(14,40).toFixed(0)}" fill="${cols[i%cols.length]}" opacity="${R(op*.6,op).toFixed(2)}" transform="rotate(${R(-30,30).toFixed(0)} 190 65)"/>`;return o};
+ const plate=(r,id)=>{let bolts='';for(let i=0;i<8;i++){const a=i*Math.PI/4+Math.PI/8;bolts+=`<circle cx="${(r*.62*Math.cos(a)).toFixed(2)}" cy="${(r*.62*Math.sin(a)).toFixed(2)}" r="${(r*.045).toFixed(2)}" fill="#6e5014"/><circle cx="${(r*.62*Math.cos(a)-r*.012).toFixed(2)}" cy="${(r*.62*Math.sin(a)-r*.012).toFixed(2)}" r="${(r*.018).toFixed(2)}" fill="#fff6cf"/>`}
+  return `<circle r="${r}" fill="url(#${id}pl)"/><circle r="${r}" fill="none" stroke="url(#${id}g)" stroke-width="${(r*.06).toFixed(2)}"/><circle r="${(r*.86).toFixed(2)}" fill="none" stroke="url(#${id}g)" stroke-width="${(r*.015).toFixed(2)}" opacity=".7"/><circle r="${(r*.76).toFixed(2)}" fill="none" stroke="#e8c55c" stroke-width="${(r*.012).toFixed(2)}" stroke-dasharray="${(r*.02).toFixed(2)} ${(r*.06).toFixed(2)}" opacity=".6"/>${bolts}<circle r="${(r*.42).toFixed(2)}" fill="url(#${id}hub)"/><circle r="${(r*.42).toFixed(2)}" fill="none" stroke="#5a410f" stroke-width="${(r*.015).toFixed(2)}"/><circle r="${(r*.2).toFixed(2)}" fill="#030303" stroke="url(#${id}g)" stroke-width="${(r*.035).toFixed(2)}"/><text y="${(-r*.5).toFixed(2)}" text-anchor="middle" style="font:900 ${(r*.17).toFixed(2)}px Archivo,'Inter Display',Inter,sans-serif;letter-spacing:${(r*.03).toFixed(2)}px" fill="url(#${id}g)">001</text><path d="M${(-r*.7).toFixed(1)} ${(-r*.35).toFixed(1)} A${(r*.78).toFixed(1)} ${(r*.78).toFixed(1)} 0 0 1 ${(-r*.1).toFixed(1)} ${(-r*.77).toFixed(1)}" stroke="#fff" stroke-width="${(r*.05).toFixed(2)}" stroke-linecap="round" fill="none" opacity=".18"/>`};
+ const defs=id=>`<linearGradient id="${id}g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff4c4"/><stop offset=".35" stop-color="#e8c55c"/><stop offset=".7" stop-color="#8a6a1f"/><stop offset="1" stop-color="#ffe08a"/></linearGradient><radialGradient id="${id}pl" cx="40%" cy="35%" r="75%"><stop offset="0" stop-color="#26241f"/><stop offset=".7" stop-color="#0b0a08"/><stop offset="1" stop-color="#020202"/></radialGradient><radialGradient id="${id}hub" cx="38%" cy="32%" r="72%"><stop offset="0" stop-color="#fff3c0"/><stop offset=".5" stop-color="#d9b04a"/><stop offset="1" stop-color="#6e5014"/></radialGradient><filter id="${id}b1"><feGaussianBlur stdDeviation="2.2"/></filter><filter id="${id}b2"><feGaussianBlur stdDeviation="9"/></filter><filter id="${id}b3"><feGaussianBlur stdDeviation="16"/></filter>`;
+ return {R,stars,flare,neb,plate,defs}}
+function spaceScene(k,uid){const u=('sp'+k+(uid||pid++)).replace(/[^\w-]/g,''),K=spaceKit(u),{R}=K;let o=`<defs>${K.defs(u)}`;
+ if(k==='feclipse'){const cx=272,cy=64;let rays='';for(let i=0;i<48;i++){const len=R(60,150);rays+=`<path d="M0 -40 L${R(.8,2.6).toFixed(1)} -${len.toFixed(0)} L-${R(.8,2.6).toFixed(1)} -${len.toFixed(0)} Z" fill="#ffd77a" opacity="${R(.04,.2).toFixed(2)}" transform="rotate(${(i*7.5+R(-2,2)).toFixed(1)})"/>`}
+  let rays2='';for(let i=0;i<24;i++){const len=R(50,95);rays2+=`<path d="M0 -40 Q${R(-6,6).toFixed(0)} -${(len*.6).toFixed(0)} 0 -${len.toFixed(0)}" stroke="#fff0c0" stroke-width="${R(.4,1.2).toFixed(1)}" fill="none" opacity="${R(.08,.25).toFixed(2)}" transform="rotate(${(i*15).toFixed(0)})"/>`}
+  let prom='';for(let i=0;i<7;i++){const a=R(0,360),h=R(8,18);prom+=`<path d="M-4 -40 C-6 -${(40+h).toFixed(0)} 6 -${(40+h).toFixed(0)} 4 -40" stroke="#ff9a2a" stroke-width="${R(1.2,2.6).toFixed(1)}" fill="none" transform="rotate(${a.toFixed(0)})"><animate attributeName="opacity" values="0;.9;0" dur="${R(3,7).toFixed(1)}s" begin="-${R(0,7).toFixed(1)}s" repeatCount="indefinite"/></path>`}
+  let dust='';for(let i=0;i<34;i++){const x=R(120,390),y=R(0,130),d=R(7,16).toFixed(1);dust+=`<circle cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="${R(.4,1.3).toFixed(1)}" fill="#ffe7a0"><animateTransform attributeName="transform" type="translate" values="0 0;${R(-40,-12).toFixed(0)} ${R(-12,12).toFixed(0)}" dur="${d}s" begin="-${R(0,10).toFixed(1)}s" repeatCount="indefinite"/><animate attributeName="opacity" values="0;.9;0" dur="${d}s" begin="-${R(0,10).toFixed(1)}s" repeatCount="indefinite"/></circle>`}
+  o+=`<radialGradient id="${u}bg" cx="72%" cy="50%" r="80%"><stop offset="0" stop-color="#3d2708"/><stop offset=".32" stop-color="#140c04"/><stop offset="1" stop-color="#010102"/></radialGradient><radialGradient id="${u}c" cx="50%" cy="50%" r="50%"><stop offset=".52" stop-color="#fff6d0"/><stop offset=".6" stop-color="#ffc94a" stop-opacity=".95"/><stop offset=".74" stop-color="#e08a12" stop-opacity=".35"/><stop offset="1" stop-color="#e08a12" stop-opacity="0"/></radialGradient></defs>
+  <rect width="380" height="130" fill="url(#${u}bg)"/>${K.neb(5,['#5a3608','#2a1a40','#7a4e10'],260,65,140,.35).replace(/<ellipse/g,`<ellipse filter="url(#${u}b3)"`)}${K.stars()}${K.flare(48,26,1,'#ffd77a',3.4)}${K.flare(150,104,.7,'#cfd8ff',4.6)}
+  <g transform="translate(${cx} ${cy})"><g><animateTransform attributeName="transform" type="rotate" values="0;360" dur="140s" repeatCount="indefinite"/>${rays}</g><g><animateTransform attributeName="transform" type="rotate" values="360;0" dur="90s" repeatCount="indefinite"/>${rays2}</g>
+   <circle r="78" fill="url(#${u}c)" filter="url(#${u}b3)"><animate attributeName="r" values="72;82;72" dur="6s" repeatCount="indefinite"/></circle><circle r="50" fill="url(#${u}c)" filter="url(#${u}b1)"/><g filter="url(#${u}b1)">${prom}</g>
+   <circle r="41.4" fill="none" stroke="#fffbe6" stroke-width="2.4"/><g><animateTransform attributeName="transform" type="translate" values="-2.5 1;0 0;-2.5 1" dur="12s" repeatCount="indefinite"/>${K.plate(41,u)}</g>
+   <circle cx="-29" cy="-29" r="3.4" fill="#fffdf0" filter="url(#${u}b1)" opacity="0"><animate attributeName="opacity" values="0;0;1;0" keyTimes="0;.86;.9;1" dur="8s" repeatCount="indefinite"/></circle><path d="M-29 -41 V-17 M-41 -29 H-17" stroke="#fffdf0" stroke-width="1.2" opacity="0"><animate attributeName="opacity" values="0;0;1;0" keyTimes="0;.86;.9;1" dur="8s" repeatCount="indefinite"/></path></g>${dust}
+  <text x="16" y="20" style="font:800 7px Archivo,Inter,sans-serif;letter-spacing:4.5px" fill="url(#${u}g)" opacity=".8">TOTALITY · FOUNDER 001</text>`}
+ else if(k==='fconst'){const crown=[[70,72],[62,48],[80,60],[94,36],[108,60],[126,48],[118,72]],pc=[288,62],ring=Array.from({length:12},(_,i)=>[pc[0]+36*Math.cos(i*Math.PI/6-Math.PI/2),pc[1]+36*Math.sin(i*Math.PI/6-Math.PI/2)]),inner=Array.from({length:6},(_,i)=>[pc[0]+16*Math.cos(i*Math.PI/3),pc[1]+16*Math.sin(i*Math.PI/3)]);
+  const T=16,line=(a,b,t0)=>{const len=Math.hypot(b[0]-a[0],b[1]-a[1]).toFixed(1),k1=(t0/T).toFixed(3),k2=((t0+.5)/T).toFixed(3);return `<path d="M${a[0].toFixed(1)} ${a[1].toFixed(1)} L${b[0].toFixed(1)} ${b[1].toFixed(1)}" stroke="#ffd77a" stroke-width=".9" stroke-dasharray="${len}" stroke-dashoffset="${len}" stroke-linecap="round"><animate attributeName="stroke-dashoffset" values="${len};${len};0;0;${len}" keyTimes="0;${k1};${k2};.93;1" dur="${T}s" repeatCount="indefinite"/><animate attributeName="opacity" values=".55;1;.55" dur="2.4s" repeatCount="indefinite"/></path>`};
+  let L='';[0,1,2,3,4,5,6,0].forEach((v,i,a)=>{if(i<a.length-1)L+=line(crown[v],crown[a[i+1]],.6+i*.35)});ring.forEach((p,i)=>L+=line(p,ring[(i+1)%12],3.6+i*.28));inner.forEach((p,i)=>L+=line(p,inner[(i+1)%6],7.2+i*.25));for(let i=0;i<6;i++)L+=line(inner[i],ring[i*2],9+i*.22);
+  const node=(p,s,t0)=>`<g transform="translate(${p[0].toFixed(1)} ${p[1].toFixed(1)})" opacity=".35"><animate attributeName="opacity" values=".35;.35;1;1;.35" keyTimes="0;${(t0/T).toFixed(3)};${((t0+.3)/T).toFixed(3)};.93;1" dur="${T}s" repeatCount="indefinite"/><circle r="${5*s}" fill="#ffd77a" opacity=".2"/><circle r="${1.6*s}" fill="#fff8e0"/><path d="M0 -${5.5*s} L.45 0 L0 ${5.5*s} L-.45 0Z M-${5.5*s} 0 L0 .45 L${5.5*s} 0 L0 -.45Z" fill="#fff8e0" opacity=".8"/></g>`;
+  const nodes=crown.map((p,i)=>node(p,i===3?1.3:1,.6+i*.35)).join('')+ring.map((p,i)=>node(p,.85,3.6+i*.28)).join('')+inner.map((p,i)=>node(p,.7,7.2+i*.25)).join('')+node(pc,1.5,10.4);
+  const shoot=(t0,x0,y0,x1,y1,len)=>`<g opacity="0"><animate attributeName="opacity" values="0;0;1;0;0" keyTimes="0;${(t0/T).toFixed(3)};${((t0+.2)/T).toFixed(3)};${((t0+1.1)/T).toFixed(3)};1" dur="${T}s" repeatCount="indefinite"/><g><animateTransform attributeName="transform" type="translate" values="${x0} ${y0};${x0} ${y0};${x1} ${y1};${x1} ${y1}" keyTimes="0;${(t0/T).toFixed(3)};${((t0+1.1)/T).toFixed(3)};1" dur="${T}s" repeatCount="indefinite"/><path d="M0 0 L-${len} -${(len*.28).toFixed(0)}" stroke="url(#${u}ss)" stroke-width="1.5" stroke-linecap="round"/><circle r="1.4" fill="#fffdf0"/></g></g>`;
+  o+=`<linearGradient id="${u}ss" x1="1" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#fff6d6"/><stop offset="1" stop-color="#fff6d6" stop-opacity="0"/></linearGradient></defs><rect width="380" height="130" fill="#02030a"/>
+  <g filter="url(#${u}b3)"><g><animateTransform attributeName="transform" type="rotate" values="0 200 65;8 200 65;0 200 65" dur="40s" repeatCount="indefinite"/>${K.neb(8,['#8a5a12','#4a2f7a','#b8862b','#22164a','#6a3a10'],200,65,190,.42)}</g></g>
+  <path d="M-10 100 Q120 60 240 70 T400 30" stroke="#ffe7b0" stroke-width="22" fill="none" opacity=".05" filter="url(#${u}b2)"/>${K.stars()}${K.flare(210,22,1,'#cfd8ff',3.8)}${K.flare(168,110,.8,'#ffd77a',4.4)}
+  <g filter="url(#${u}b1)" opacity=".6">${L}</g>${L}${nodes}
+  <text x="${pc[0]}" y="${pc[1]+3}" text-anchor="middle" style="font:900 8.5px Archivo,'Inter Display',Inter,sans-serif;letter-spacing:1.5px" fill="url(#${u}g)" opacity="0">001<animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;.68;.72;.93;1" dur="${T}s" repeatCount="indefinite"/></text>
+  ${shoot(2.4,-40,8,420,120,70)}${shoot(12.2,60,-10,330,110,55)}
+  <text x="16" y="20" style="font:800 7px Archivo,Inter,sans-serif;letter-spacing:4.5px" fill="url(#${u}g)" opacity=".8">CONSTELLATION · FOUNDER 001</text>`}
+ else{const cx=270,cy=64;let arms='',glow='';for(let arm=0;arm<4;arm++){for(let i=0;i<120;i++){const t=i/120,a=arm*Math.PI/2+t*5.4,r=10+t*150,x=r*Math.cos(a)+R(-7,7)*t*2,y=r*Math.sin(a)*.46+R(-4,4)*t;arms+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(R(.35,1.7)*(1.15-t*.6)).toFixed(2)}" fill="${t<.3?'#fffaf0':t<.6?'#f3d77a':t<.85?'#c99a35':'#8aa0d6'}" opacity="${(.98-t*.5).toFixed(2)}"/>`}
+   for(let i=0;i<10;i++){const t=i/10,a=arm*Math.PI/2+t*5.4,r=14+t*140;glow+=`<circle cx="${(r*Math.cos(a)).toFixed(1)}" cy="${(r*Math.sin(a)*.46).toFixed(1)}" r="${(24-t*12).toFixed(1)}" fill="${i%3?'#c99a35':'#5a3a8a'}" opacity=".14"/>`}}
+  const planet=(rx,ry,dur,r,c1,c2,ring,begin)=>`<g><animateMotion dur="${dur}s" begin="-${begin}s" repeatCount="indefinite" path="M${rx} 0 A${rx} ${ry} 0 1 1 -${rx} 0 A${rx} ${ry} 0 1 1 ${rx} 0"/>${ring?`<ellipse rx="${r*2.2}" ry="${r*.55}" fill="none" stroke="#e8c55c" stroke-width="1" opacity=".8" transform="rotate(-14)"/>`:''}<circle r="${r}" fill="${c1}"/><circle r="${r}" fill="url(#${u}ps)"/><path d="M-${r} 0 A${r} ${r*.3} 0 0 0 ${r} 0" stroke="${c2}" stroke-width="${r*.25}" fill="none" opacity=".5"/>${ring?`<path d="M-${r*2.2} 0 A${r*2.2} ${r*.55} 0 0 0 ${r*2.2} 0" stroke="#ffe9a8" stroke-width="1" fill="none" transform="rotate(-14)"/>`:''}</g>`;
+  o+=`<radialGradient id="${u}core" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#fffbe8"/><stop offset=".3" stop-color="#ffd77a" stop-opacity=".9"/><stop offset="1" stop-color="#ffd77a" stop-opacity="0"/></radialGradient><radialGradient id="${u}ps" cx="32%" cy="30%" r="75%"><stop offset="0" stop-color="#fff" stop-opacity=".4"/><stop offset=".6" stop-color="#000" stop-opacity=".1"/><stop offset="1" stop-color="#000" stop-opacity=".65"/></radialGradient></defs>
+  <rect width="380" height="130" fill="#020207"/>${K.neb(4,['#2a1a4a','#3d2a08'],120,60,140,.4).replace(/<ellipse/g,`<ellipse filter="url(#${u}b3)"`)}${K.stars()}${K.flare(40,22,1,'#cfd8ff',4)}${K.flare(120,108,.8,'#ffd77a',3.2)}
+  <g transform="translate(${cx} ${cy}) rotate(-16)"><g filter="url(#${u}b2)">${glow}</g><g><animateTransform attributeName="transform" type="rotate" values="0;360" dur="160s" repeatCount="indefinite"/><g filter="url(#${u}b1)" opacity=".55">${arms}</g>${arms}</g>
+   <ellipse rx="62" ry="26" fill="url(#${u}core)" filter="url(#${u}b2)"/><ellipse rx="26" ry="12" fill="url(#${u}core)"/>
+   <g transform="rotate(16)">${K.plate(17,u)}<circle r="17" fill="none" stroke="#fff6d6" stroke-width="1"><animate attributeName="r" values="17;34" dur="4.5s" repeatCount="indefinite"/><animate attributeName="opacity" values=".6;0" dur="4.5s" repeatCount="indefinite"/></circle></g>
+   ${planet(84,36,26,5,'#c9873a','#7a4a1a',1,4)}${planet(124,52,44,3.2,'#8c95b8','#4a5270',0,22)}${planet(58,24,16,2.3,'#e8c55c','#8a6a1f',0,8)}</g>
+  <g opacity="0"><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;.55;.58;.72;.76" dur="13s" repeatCount="indefinite"/><g><animateTransform attributeName="transform" type="translate" values="-40 120;420 -10" dur="13s" repeatCount="indefinite"/><circle r="2.6" fill="#fff8e0"/><path d="M0 0 L-44 13" stroke="#ffe7a0" stroke-width="1.8" stroke-linecap="round" opacity=".7"/><path d="M0 0 L-30 4" stroke="#cfe0ff" stroke-width="1" stroke-linecap="round" opacity=".5"/></g></g>
+  <text x="16" y="20" style="font:800 7px Archivo,Inter,sans-serif;letter-spacing:4.5px" fill="url(#${u}g)" opacity=".8">GALAXY 001 · THE ORIGIN</text>`}
+ return `<svg class="scene" viewBox="0 0 380 130" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${o}</svg>`}
+const OLDF20={vault:'feclipse',fblue:'fconst',throne:'fgalaxy'};
+['vault','fblue','throne'].forEach(k=>{delete LOCK.pbanner.items[k];delete XSC[k]});
+Object.assign(XSC,{feclipse:['Gold Eclipse','Founder only'],fconst:['The Constellation','Founder only'],fgalaxy:['Golden Galaxy','Founder only']});
+Object.assign(LOCK.pbanner.items,{feclipse:['Gold Eclipse','','Founder only',()=>!!st.set.founder],fconst:['The Constellation','','Founder only',()=>!!st.set.founder],fgalaxy:['Golden Galaxy','','Founder only',()=>!!st.set.founder]});
+FONLY18.length=0;FONLY18.push('feclipse','fconst','fgalaxy','cofounder','founder');
+{const _x=xScene;xScene=function(k,uid){if(OLDF20[k])k=OLDF20[k];if(k==='feclipse'||k==='fconst'||k==='fgalaxy')return spaceScene(k,uid);let s=_x(k,uid);if(k==='founder'||k==='cofounder')s=s.replace(/<text x="190" y="123"[\s\S]*?<\/text>/,'');return s}}
+myBanner=function(){let k=look('pbanner');if(OLDF20[k])k=OLDF20[k];if(k!=='none')return k;return st.set.founder?'feclipse':st.set.cofounder?'cofounder':''};
+
+/* ---------- profile header: centered name, one info line, small pins, icon buttons ---------- */
+{const _r=renderProfile16;renderProfile16=function(){const full=_r(),cut=full.indexOf('<div class="tiles four life16">');if(cut<0)return full;
+ const E=engine(),ban=myBanner(),nm=st.set.name||'Lifter',P=st.set.prof||{},show=(st.set.showcase||[]).map(k=>E.B.find(x=>x.k===k)||E.R.find(x=>x.k===k)).filter(Boolean),F=!!st.set.founder,CF=!F&&!!st.set.cofounder;
+ const nfx=[nfxClass({profile:{nameFx:look('nameFx')}}),F&&look('nameFx')==='none'?'nf-founder':'',CF&&look('nameFx')==='none'?'nf-cofounder':''].filter(Boolean).join(' ');
+ const meta=[F?'<b class="m20f">Founder #001</b>':CF?'<b class="m20cf">Co-Founder #002</b>':'',esc(E.rname),'🔥 '+E.streak+' wk'].filter(Boolean).join('<i>·</i>');
+ const head=`<div class="card ph16 ph20">${ban?`<div class="ph16ban">${sceneSVG(ban,8,'me'+ban)}</div>`:'<div class="ph16ban ph16plain"></div>'}
+ <div class="ph20btns"><button class="ic20" id="profedit2" aria-label="Edit profile"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg></button><button class="ic20" id="shareprof" aria-label="Share"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg></button></div>
+ <div class="ph16row"><span class="ph16av">${avatar({id:myId(),name:nm,profile:{av:st.set.av||{}}},76)}</span><div class="ph16emb">${emblem(E.rank,E.rank>=6?'spin':'')}</div></div>
+ <div class="ph20name">${F?'<span class="ph20cr">👑</span>':''}<h2 class="ph16n ${nfx}">${esc(nm)}</h2>${F?'<span class="ph20cr ph20bal">👑</span>':''}</div>
+ <div class="ph20meta">${meta}</div>${P.motto?`<p class="ph16m">“${esc(P.motto)}”</p>`:''}
+ <div class="ph20pins">${show.map(b=>`<button class="pin20" data-bdg="${b.k}" aria-label="${esc(b.name)}" title="${esc(b.name)}">${b.icon}</button>`).join('')}${show.length<3?`<button class="pin20 add" id="pinpick" aria-label="Pin a badge">＋</button>`:''}</div></div>`;
+ return head+full.slice(cut)}}
+
+/* ---------- crew screen: tidy banner with stats inside, 4 arena tabs, no repeats ---------- */
+crewHead14=function(){const c=st.cs.crew,lv=c.level||1,a=crewXpFor(lv),z=crewXpFor(lv+1),n=bellUnread(),live=Object.keys(st.liveMap||{}).length,R=crewRankInfo(),S=crewSum(),founded=new Date(c.created||Date.now()),pc=Math.min(100,Math.round(((c.xp||0)-a)/(z-a)*100));
+ return `<div class="crewban2 cb20"${st.cs.style&&st.cs.style.c1?` style="--sc1:${esc(st.cs.style.c1)};--sc2:${esc(st.cs.style.c2||st.cs.style.c1)}"`:''}>${sceneSVG(c.banner,lv,'crew'+c.code)}<div class="cb20shade"></div>
+ <div class="cb20btns"><button class="ic20" id="bellbtn" aria-label="Activity${n?`, ${n} new`:''}">🔔${n?`<i>${n>9?'9+':n}</i>`:''}</button><button class="ic20" id="crinfo" aria-label="Crew settings">⚙︎</button></div>
+ <div class="cb2in"><button class="cb2crest" id="crestbtn" aria-label="Crew crest">${crestSVG(c.crest,R.r,58)}</button><div class="cb2t"><h2>${esc(c.name)}</h2><div class="cb2s">${c.founders?'<span class="fbadge">★ Founders</span>':''}<span>Est. ${MON[founded.getMonth()]} ${founded.getFullYear()}</span></div>${st.cs.style&&st.cs.style.motto?`<div class="cb2motto">“${esc(st.cs.style.motto)}”</div>`:''}</div></div>
+ <div class="cb20stats"><span><b>${kfmt(S.vol)}</b> ${U()}</span><i>·</i><span><b>${S.streak}</b> wk streak</span><i>·</i><button class="cb20rk" id="crewrankbtn">${emblem(R.r)}<b>${RANKS[R.r][0]}</b></button><i>·</i><span class="cb20lv"><b>Lv ${lv}</b><span class="cbbar2"><u style="width:${pc}%"></u></span></span></div>
+ ${live?`<div class="cb2live"><span class="ldot"></span>${live} training now</div>`:''}</div>`};
+arena15=function(){const k=st.sub.arena2||'rank';
+ let h=`<div class="pchips arena20">${[['rank','Rankings'],['tro','Trophies'],['rec','Records'],['fun','Awards']].map(([a,b])=>`<button class="pchip${a===k?' on':''}" data-arena20="${a}">${b}</button>`).join('')}</div>`;
+ if(k==='rank'){let a=arenaHTML().replace('<div class="seg2" role="tablist">','<div class="seg2 seg20" role="tablist">');let n=0;a=a.replace(/<button class="arow[^"]*"[\s\S]*?<\/button>/g,m=>(n++<3?'':m));a=a.replace('<div class="card alist"></div>','');h+=a}
+ else if(k==='tro')h+=trophyCase()+raidWinsHTML()+hofHTML()+`<button class="btn wide" id="crewcard" style="margin:4px 0 14px">📸 Share crew card</button>`;
+ else if(k==='rec')h+=crewRecords()+seasonWall();else h+=jokeAwards()+(typeof awardsHTML==='function'?awardsHTML():'');return h};
+async function click20(b){const d=b.dataset;if(d.arena20){st.sub.arena2=d.arena20;render();return true}if(d.arena17){const a=d.arena17;if(a.startsWith('r_')){st.sub.arena2='rank';st.sub.arena=a.slice(2)}else st.sub.arena2=a;render();return true}return false}
+function boot20(){try{const L=st.set.look;if(L&&OLDF20[L.pbanner]){L.pbanner=OLDF20[L.pbanner];saveSet()}}catch(e){}}
 /* ---------- background art ---------- */
 const ICONS={
  dumbbell:'<rect x="4" y="34" width="9" height="32" rx="3"/><rect x="13" y="24" width="12" height="52" rx="4"/><rect x="25" y="45" width="50" height="10" rx="3"/><path d="M33 45v10M38 45v10M62 45v10M67 45v10"/><rect x="75" y="24" width="12" height="52" rx="4"/><rect x="87" y="34" width="9" height="32" rx="3"/>',
@@ -3314,7 +3427,7 @@ async function sheetClick13(b){const d=b.dataset,sh=st.sheet;if(!sh)return false
  addEventListener('online',()=>{if(st.set.acct)syncNow(true);if(crewOn())wsConnect()});
  document.addEventListener('visibilitychange',()=>{if(document.hidden){if(ws){try{ws.close()}catch(e){}}return}if(st.set.acct)syncNow();if(crewOn()){wsConnect();setTimeout(sendLive,500)}})})();
 
-boot15();boot14();boot16();boot18();boot19();loadCounter();crewLoop();if(crewOn()){saveCrewId();setTimeout(()=>syncCrew(true),2500)}
+boot20();boot15();boot14();boot16();boot18();boot19();loadCounter();crewLoop();if(crewOn()){saveCrewId();setTimeout(()=>syncCrew(true),2500)}
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&crewOn())syncCrew()});
 if(st.plan&&!Array.isArray(st.set.seen))checkUnlocks();
 splash().then(()=>{if(st.plan&&st.set.seenVer!==VERSION){st.sheet={type:'news'};renderSheet()}else if(!weekReport()){checkUnlocks()}checkMissing().then(()=>mirrorNow())});
