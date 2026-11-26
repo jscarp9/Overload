@@ -55,6 +55,7 @@ private fun JsonObjectBuilder.weekStat(c: Ctx, wd: List<LocalDate>) {
  * Identity is a random id + key kept in settings (crewMe), just like the web app.
  */
 class CrewService(private val vm: OverloadViewModel) {
+    val vmRef: OverloadViewModel get() = vm
     private val scope get() = vm.viewModelScope
     private val cacheFile by lazy { File(vm.appContext.filesDir, "overload-crew.json") }
     private val http by lazy { OkHttpClient.Builder().pingInterval(25, TimeUnit.SECONDS).build() }
@@ -156,7 +157,7 @@ class CrewService(private val vm: OverloadViewModel) {
         }
     }
     fun leave() = scope.launch {
-        call("leave"); vm.setSettings { it.copy(crew = null) }; vm.crewState.value = null; saveCache(null); closeWs(); vm.live.value = emptyMap()
+        call("leave"); vm.setSettings { it.copy(crew = null) }; vm.crewState.value = null; saveCache(null); closeWs(); vm.live.value = emptyMap(); vm.chat.reset(); setGrp(null)
         vm.closeSheet(); vm.toast("You left the crew")
     }
     fun kick(id: String) = fire("kick", buildJsonObject { put("target", id) })
@@ -209,7 +210,7 @@ class CrewService(private val vm: OverloadViewModel) {
     fun sendLive() {
         if (!on) return
         val s = liveSession(); val t = today()
-        val msg = if (s != null) buildJsonObject { put("t", "live"); put("on", true); put("day", vm.data.value.plan?.getOrNull(dayIdx(t))?.name ?: "Workout"); put("start", s.start!!) }
+        val msg = if (s != null) buildJsonObject { put("t", "live"); put("on", true); put("day", vm.data.value.plan?.getOrNull(dayIdx(t))?.name ?: "Workout"); put("start", s.start!!); grpLive().forEach { (k, v) -> put(k, v) } }
         else buildJsonObject { put("t", "live"); put("on", false) }
         if (ws?.send(msg.toString()) != true && s != null) scope.launch { val r = call("live", msg); (r["live"] as? JsonObject)?.let { vm.live.value = parseLive(it) } }
         beat?.cancel()
@@ -222,7 +223,9 @@ class CrewService(private val vm: OverloadViewModel) {
     }
     private fun parseLive(o: JsonObject): Map<String, LiveInfo> = o.mapNotNull { (id, v) ->
         val j = v as? JsonObject ?: return@mapNotNull null
-        id to LiveInfo(j["day"]?.jsonPrimitive?.contentOrNull ?: "Lifting", j["start"]?.jsonPrimitive?.longOrNull ?: System.currentTimeMillis())
+        id to LiveInfo(j["day"]?.jsonPrimitive?.contentOrNull ?: "Lifting", j["start"]?.jsonPrimitive?.longOrNull ?: System.currentTimeMillis(),
+            j["g"]?.jsonPrimitive?.contentOrNull ?: "", j["sets"]?.jsonPrimitive?.intOrNull ?: 0, j["vol"]?.jsonPrimitive?.doubleOrNull ?: 0.0,
+            j["ex"]?.jsonPrimitive?.contentOrNull ?: "", j["rest"]?.jsonPrimitive?.longOrNull ?: 0L, j["prs"]?.jsonPrimitive?.intOrNull ?: 0)
     }.toMap()
 
     fun connect() {
@@ -239,6 +242,8 @@ class CrewService(private val vm: OverloadViewModel) {
                     when (m["t"]?.jsonPrimitive?.contentOrNull) {
                         "refresh", "kicked" -> sync(true)
                         "live" -> vm.live.value = (m["live"] as? JsonObject)?.let(::parseLive) ?: emptyMap()
+                        "chat" -> parseChatMsg(m["msg"])?.let { vm.chat.onMsg(it) }
+                        "chatupd" -> parseChatMsg(m["msg"])?.let { vm.chat.onUpd(it) }
                         "hype" -> { val from = m["from"]?.jsonPrimitive?.contentOrNull ?: "Your crew"; vm.haptic("heavy"); vm.ui.update { it.copy(hype = (it.hype.first + 1) to from) }; vm.addBell("🔥", "$from hyped you up") }
                     }
                 }
@@ -272,6 +277,18 @@ class CrewService(private val vm: OverloadViewModel) {
             putJsonArray("days") { c.rs.map { it.date }.distinct().takeLast(21).forEach { add(it) } }
             putJsonObject("lifts") { top.forEach { (n, v) -> putJsonObject(n) { put("e", jsRound(v.first)); put("w", v.second); put("r", v.third) } } }
             put("bw", st.bw); put("lvl", e.lvl); put("frame", st.frame); put("aura", st.aura); put("tag", st.tag); put("trial", if (e.trial != null) 1 else 0)
+            // 0.14: looks and trophies
+            put("nameFx", c.look("nameFx")); put("card", c.look("card")); put("pbanner", c.look("pbanner"))
+            putJsonArray("troph") { c.trophies().filter { it.earned }.forEach { add(it.k) } }
+            // 0.15: crew profile
+            val P = st.prof
+            put("motto", P.motto); put("gym", P.gym); put("phase", P.phase); put("ltype", P.ltype); put("song", P.song)
+            st.av?.let { put("av", vm.jsonCodec.encodeToJsonElement(it)) } ?: put("av", JsonNull)
+            put("pacc", P.acc); put("rim", st.rim); putJsonArray("tpins") { P.tpins.take(3).forEach { add(it) } }
+            put("flex", vm.jsonCodec.encodeToJsonElement(c.myFlex())); put("prtl", vm.jsonCodec.encodeToJsonElement(c.prTimeline().takeLast(20)))
+            c.bestLift()?.let { put("best", vm.jsonCodec.encodeToJsonElement(it)) } ?: put("best", JsonNull)
+            putJsonArray("plates") { FIN.keys.filter { FIN[it]!!.cat != "finish" && c.finOwned(it) }.take(40).forEach { add(it) } }
+            put("fav", P.fav); if (st.founder) put("founder", true)
         }
     }
 
@@ -401,7 +418,11 @@ class CrewService(private val vm: OverloadViewModel) {
             val row = when (e.type) {
                 "react" -> "🔥" to "$who reacted ${REACTS[e.emoji] ?: "🔥"} to your post"; "comment" -> "💬" to "$who commented: \"${e.text}\""
                 "rank" -> "🏅" to "$who ranked up to ${e.text}"; "join" -> "👋" to "$who joined the crew"
-                "challenge" -> "🏁" to "$who set a challenge: ${e.text}"; "hype" -> "🔥" to "$who hyped you up"; else -> null
+                "challenge" -> "🏁" to "$who set a challenge: ${e.text}"; "hype" -> "🔥" to "$who hyped you up"
+                "mention" -> "💬" to "$who mentioned you: \"${e.text}\""; "reply" -> "↪" to "$who replied: \"${e.text}\""
+                "trophy" -> "🏆" to "Crew trophy unlocked: ${e.text}"; "crewrank" -> "🛡" to "Your crew ranked up to ${e.text}"
+                "rename" -> "✏️" to "$who renamed the crew to ${e.text}"; "shame" -> "🩷" to "${e.text} got the shame plate this week"
+                "restore" -> "↩" to "$who restored crew posts from a backup"; else -> null
             }
             if (row != null) out += BellRow(e.ts, row.first, row.second) }
         return out.sortedByDescending { it.ts }.take(60)
@@ -422,7 +443,7 @@ class CrewService(private val vm: OverloadViewModel) {
     }
 }
 
-val REACTS = linkedMapOf("fire" to "🔥", "muscle" to "💪", "trophy" to "🏆")
+val REACTS: Map<String, String> get() = RE14
 val BANNERS = linkedMapOf("steel" to Triple(0xFF3A3D46, 0xFF8C939E, 1), "ember" to Triple(0xFFFF2D2D, 0xFFFFC14D, 2), "ocean" to Triple(0xFF0B4BD6, 0xFF00C2FF, 3),
     "toxic" to Triple(0xFF16A34A, 0xFFA8FF1A, 5), "royal" to Triple(0xFF5B2BD6, 0xFFFF4FD8, 7), "gold" to Triple(0xFFB8860B, 0xFFFFE07A, 10))
 fun crewXpFor(l: Int) = 60 * (l - 1) * (l - 1)

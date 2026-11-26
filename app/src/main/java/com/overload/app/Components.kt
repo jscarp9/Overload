@@ -131,15 +131,17 @@ fun Toggle(on: Boolean, onChange: (Boolean) -> Unit) {
 
 /**
  * Bumper plate. state: "done" = solid colour, "idle" = black with a coloured rim, "rest" = bare steel.
- * ring (0..1) draws a progress arc around the edge (the big hero plate).
+ * ring (0..1) draws a progress arc around the edge (the big hero plate). label = rim engraving on big plates.
+ * Special plates (Locker.kt FIN) draw their artwork over the face when solid.
  */
 @Composable
-fun Plate(color: String, state: String, modifier: Modifier = Modifier, ring: Float? = null) {
+fun Plate(color: String, state: String, modifier: Modifier = Modifier, ring: Float? = null, label: String? = null, og: Int = 0) {
     val p = pc(color)
     val base = when (state) { "rest" -> Color(0xFFC9CDD4); "idle" -> Color(0xFF25272D); else -> p.base }
     val light = when (state) { "rest" -> Color.White; "idle" -> Color(0xFF4A4D55); else -> p.light }
     val dark = when (state) { "rest" -> Color(0xFF7D828C); "idle" -> Color(0xFF0D0E11); else -> p.dark }
     Canvas(modifier.aspectRatio(1f)) {
+        if (color == "founder" && state != "idle" && state != "rest") { viewBox(100f, 100f) { founderPlate(label ?: "", ring) }; return@Canvas }
         val r = size.minDimension / 2; val c = center
         if (state == "rest") {
             val rr = r * .7f
@@ -147,10 +149,12 @@ fun Plate(color: String, state: String, modifier: Modifier = Modifier, ring: Flo
             drawCircle(Color.White.copy(.7f), rr * .97f, c, style = Stroke(r * .012f))
         } else {
             drawCircle(Brush.radialGradient(listOf(light, base, dark), Offset(size.width * .38f, size.height * .32f), r * 1.5f), r, c)
+            if (state == "done" && FIN[color] != null) viewBox(100f, 100f) { plateOverlay(color, color, og) }
             drawCircle(Color.White.copy(.3f), r * .98f, c, style = Stroke(r * .012f))
             drawCircle(Color.Black.copy(.22f), r * .93f, c, style = Stroke(r * .025f))
             if (state == "idle") drawCircle(p.base, r * .86f, c, style = Stroke(r * .05f))
             drawCircle(Color.Black.copy(.16f), r * .75f, c, style = Stroke(r * .018f))
+            if (label != null) viewBox(100f, 100f) { rimText(label, 50f, 50f, 40f, 5.6f, Color.White.copy(.85f), 1.4f) }
         }
         val hub = r * if (state == "rest") .26f else .47f
         drawCircle(Brush.linearGradient(listOf(Color.White, Color(0xFF9AA0AA), Color(0xFFF4F6F9), Color(0xFF6F7580)), c - Offset(hub, hub), c + Offset(hub, hub)), hub, c)

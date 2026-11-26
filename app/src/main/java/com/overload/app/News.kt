@@ -17,18 +17,21 @@ val VERSION: String = BuildConfig.VERSION_NAME
  * seenNews doesn't match. It's separate from VERSION because every push makes a new release, and
  * the sheet shouldn't pop up for releases with nothing new to say.
  */
-const val NEWS_ID = 2
+const val NEWS_ID = 3
 val NEWS = listOf(
-    "Crew" to "A new tab where you and your friends post workouts, react, comment and see who's lifting right now. Tap someone who's live to send them hype 🔥 Works with friends on the web app too.",
-    "The Arena" to "A crew rank board with a podium, Rank Power, titles you can steal, rivals, lift boards and crew challenges.",
-    "Back up and sync" to "Optional account with a recovery code. Your workouts sync across devices, including the web app, and your crew spot follows you. Settings → Data.",
-    "Ranks and badges" to "Climb from Iron to Olympian with divisions, promotion trials and prestige stars. Tap the emblem at the top to see your profile and every badge.",
-    "Daily challenges and weekly quests" to "3 new challenges every day on Today and 3 quests every week in Stats. Plus a weekly report card on Mondays.",
-    "Seasons" to "A 30-level season pass with plate colors, frames, auras and nameplates.",
-    "Lift ranks and muscle mastery" to "Every lift gets a strength rank for your bodyweight, and your body map levels up from Bronze to Legend.",
-    "Goals and quest chains" to "Set a lift goal with a date and see your projected finish. Quest chains walk you to your next big plate milestone.",
-    "Post-workout breakdown" to "Finish a workout to see a muscle map of what you hit and some fun stats.",
-    "Four tabs" to "Today, Crew, Stats and Plan. Progress lives under Stats → Lifts and Notes under Plan → Notes. New features unlock as you go."
+    "Profile tab" to "Your profile has its own tab now, between Crew and Stats. Edit profile and Customize are short lists: tap a row to change just that one thing.",
+    "Crew chat" to "A Chat tab in Crew. Reply, react, @mention and share your last workout. The crew owner can delete, pin or mute.",
+    "Crew home" to "Animated scene banners, a crest you design, crew rank from Iron to Olympian, a trophy case, crew records, a season wall and a shareable crew card.",
+    "Boss raids" to "Every week a boss shows up in your crew feed. Every pound the crew lifts does damage. Beat it for crew XP, mystery boxes and the Boss Slayer plate.",
+    "Lift together" to "At the gym with crewmates? Start a group from the ⋯ menu on Today. Everyone sees each other’s sets and rest timers, and you finish with one shared workout card.",
+    "Crew profiles" to "Tap anyone in your crew for their full profile: banner, avatar, motto, flex stats, best lift, pinned trophies, plate collection and PR timeline. Give respect once a day and vote on nicknames.",
+    "Themed plates" to "Rank plates, Legend plates for each lift, crew trophy plates, funny plates, holiday plates and 14 special finishes like Mirror Chrome, Lava and Galaxy. Plan → Plate. Engrave your name on the big plate in Edit profile.",
+    "Customize" to "App themes, backgrounds, rest timer skins, sound packs, set and PR effects, name effects, post card styles, banners and new reactions. Plus mystery boxes you can only earn.",
+    "Trophy room" to "Trophies on glass shelves in your profile. Tap one to spin it. Your crew can see yours.",
+    "Funny stuff" to "Hidden funny badges, roast lines on crew posts, the shame plate, an excuse generator, rest timer one-liners and a plate that talks back when you tap it.",
+    "Nothing gets lost" to "Deleted things go to a Trash for 30 days (Settings → Backup and restore). A full copy is saved before every update and anything missing is put back.",
+    "Calmer screens" to "Glass cards with the background art showing through, a compact Today card with one Start button, challenges in one row, a slimmer crew feed and Settings as a short list.",
+    "App tour" to "New to Overload? Take the quick tour in Settings → Help."
 )
 
 @Composable

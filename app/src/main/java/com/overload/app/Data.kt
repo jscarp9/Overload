@@ -29,6 +29,8 @@ data class Session(
     val swap: Map<String, Exercise> = emptyMap(),
     val start: Long? = null, val end: Long? = null, val pauseAt: Long? = null, val paused: Long = 0,
     val hr: HeartRate? = null,
+    val skips: Int = 0,                               // rest timer stopped early (Rest Timer Rebel)
+    val prShown: Map<String, Int> = emptyMap(),       // PR celebrated once per exercise
     val posted: Boolean = false,                      // shared to the crew feed
     @SerialName("_t") val syncT: Long? = null,        // cloud sync: last change time
     @SerialName("_xt") val syncXt: Map<String, Long>? = null // cloud sync: per-exercise change times
@@ -81,9 +83,33 @@ data class Settings(
     val titlesMine: List<String> = emptyList(),
     val arenaSnap: ArenaSnap? = null, val arenaLast: Map<String, Int> = emptyMap(),
     val recapSeen: String? = null,
+    val chatSeen: Long = 0, val chatN: Int = 0,
+    // ---- 0.14: unlocks and cosmetics (same keys as the web app) ----
+    val look: Map<String, String> = emptyMap(),             // equipped look per category (accent, rest, sound...)
+    val cos14: Map<String, List<String>> = emptyMap(),      // earned unlocks per category (mystery boxes, season finishes)
+    val boxes: Map<String, String> = emptyMap(),            // mystery boxes already opened
+    val roasts: Boolean = true, val restJokes: Boolean = true,
+    val fb: Map<String, Int> = emptyMap(),                  // funny badge facts (ghost)
+    val ghostD: GhostDay? = null,
+    val seenVer: String = "",
+    val excuses: Int = 0,
+    // ---- 0.15: crew profile ----
+    val prof: Prof = Prof(), val av: Av? = null, val flex: List<String> = listOf("best", "streak", "vol"),
+    val rim: String = "", val founder: Boolean = false, val og: Int = 0, val fban16: Int = 0,
+    // ---- 0.16 ----
+    val tour16: Int = 0,
     // ---- cloud sync ----
     val acct: Acct? = null, val schema: Int = 0
 )
+
+/** What you show on your crew profile. */
+@Serializable data class Prof(
+    val motto: String = "", val gym: String = "", val phase: String = "", val ltype: String = "", val song: String = "",
+    val acc: String = "", val tpins: List<String> = emptyList(), val fav: String = ""
+)
+/** Avatar: t = "icon" | "plate" | null (initials), v = icon or plate key, c = background colour. */
+@Serializable data class Av(val t: String? = null, val v: String? = null, val c: String? = null)
+@Serializable data class GhostDay(val d: String = "", val n: Int = 0)
 
 @Serializable data class Cosmetics(val plate: List<String> = emptyList(), val aura: List<String> = emptyList(), val frame: List<String> = emptyList(), val tag: List<String> = emptyList())
 @Serializable data class Goal(val ex: String, val w: Double, val date: String, val created: String, val doneAt: String? = null)

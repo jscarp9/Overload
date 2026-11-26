@@ -57,7 +57,15 @@ data class UiState(
     val yir: Boolean = false,          // year in review open
     val hype: Pair<Int, String> = 0 to "",
     val liftSel: String? = null, val liftRel: Boolean = false,
-    val confirm: String? = null        // "tap again" confirmations
+    val confirm: String? = null,       // "tap again" confirmations
+    // 0.14-0.17
+    val confettiKind: String = "confetti",
+    val setFx: Int = 0, val setFxKind: String = "pulse",
+    val plateTalk: Pair<Int, String> = 0 to "",
+    val restLine: String = "",
+    val chal17: Boolean = false,       // Today: challenges row opened
+    val set17: String? = null,         // Settings page open (you, workout, sync, data, founder, help, danger)
+    val jumpNotes: Int = 0             // Today ⋯ → Session notes
 )
 
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
@@ -73,8 +81,19 @@ class OverloadViewModel(app: Application) : AndroidViewModel(app) {
     val live = MutableStateFlow<Map<String, LiveInfo>>(emptyMap())
     val crew by lazy { CrewService(this) }
     val sync by lazy { SyncService(this) }
+    val trash by lazy { TrashStore(this) }
+    val chat by lazy { ChatService(this) }
+    val dash = MutableStateFlow<JsonObject?>(null)
 
     init {
+        // 0.14 update safety net: copy before this version touches anything, put back anything missing
+        val back = safetyNet(app.filesDir, data.value, json) { d -> data.value = d; saveNow() }
+        if (data.value.settings.seenVer != APP_VER) setSettings { it.copy(seenVer = APP_VER) }
+        if (back > 0) later(1500) { say("Update safety net put back $back item${if (back > 1) "s" else ""}") }
+        ghostCount()
+        viewModelScope.launch {
+            delay(1400); tourCheck()
+        }
         viewModelScope.launch {
             delay(600)
             val d = data.value
@@ -220,7 +239,89 @@ class OverloadViewModel(app: Application) : AndroidViewModel(app) {
     /** Debounced unlock check (e.g. while typing a note). */
     fun checkUnlocksSoon(ms: Long = 1500) { unlockJob?.cancel(); unlockJob = viewModelScope.launch { delay(ms); checkUnlocks() } }
 
-    fun checkUnlocks() { viewModelScope.launch(engDispatcher) { checkUnlocksNow() } }
+    fun checkUnlocks() { viewModelScope.launch(engDispatcher) { checkUnlocksNow(); grant14() } }
+
+    /** Season pass plate finishes are granted and kept forever (0.14). */
+    private fun grant14() {
+        if (data.value.plan == null) return
+        val c = ctx(); val got = FIN.values.filter { f -> f.season != null && c.eng.lvl >= f.season && f.k !in c.cos14("plate") }
+        if (got.isEmpty()) return
+        setSettings { it.copy(cos14 = it.cos14 + ("plate" to ((it.cos14["plate"] ?: emptyList()) + got.map { f -> f.k }))) }
+        got.forEachIndexed { i, f -> sayLater(600L + i * 1800L, "🎁 Season reward: ${f.name} plate finish") }
+    }
+
+    // ============================ 0.14-0.17 ============================
+    /** Ghost badge: 5 opens in a day without logging a set. */
+    private fun ghostCount() {
+        val d = data.value; if (d.plan == null) return; val t = iso(today())
+        val g = d.settings.ghostD?.takeIf { it.d == t } ?: GhostDay(t, 0); val n = g.n + 1
+        val logged = d.sessions.values.any { it.date == t && it.ex.values.any { a -> a.any(::full) } }
+        setSettings { it.copy(ghostD = GhostDay(t, n), fb = if (n >= 5 && !logged) it.fb + ("ghost" to 1) else it.fb) }
+    }
+    /** The 5-step tour shows once for new lifters (0.16). */
+    fun tourCheck() {
+        val d = data.value; if (d.settings.tour16 != 0) return
+        if (d.plan == null) { later(1500) { tourCheck() }; return }
+        if (ctx().rs.size >= 3) { setSettings { it.copy(tour16 = 1) }; return }
+        if (ui.value.sheet != null || ui.value.news) { later(1500) { tourCheck() }; return }
+        setSettings { it.copy(tour16 = 1) }; openSheet(Sheet.Tour(0))
+    }
+    /** Equip something from Customize. */
+    fun equipLook(t: String, k: String) {
+        val c = ctx(); val it0 = LOCK[t]?.items?.get(k) ?: return
+        if (t == "react") { say(if (c.owns(t, k)) "You can use this reaction" else "🔒 ${it0.how}"); return }
+        if (!c.owns(t, k)) { say("🔒 ${it0.how}"); return }
+        setSettings { it.copy(look = it.look + (t to k)) }
+        when (t) { "sound" -> playRestSound(k, true); "setfx" -> setFx(k); "prfx" -> prFx(k, ""); "nameFx", "card", "pbanner" -> crew.sync(true) }
+    }
+    /** Opens the next mystery box (earned only, never bought). */
+    fun openBox() {
+        val c = ctx(); val src = c.boxesLeft().firstOrNull() ?: return; val got = c.boxPrize(src)
+        setSettings { s0 -> s0.copy(boxes = s0.boxes + (src to (got?.let { "${it.first}:${it.second}" } ?: "dupe")),
+            cos14 = if (got != null) s0.cos14 + (got.first to ((s0.cos14[got.first] ?: emptyList()) + got.second)) else s0.cos14) }
+        openSheet(Sheet.BoxOpen(null, true)); haptic("heavy")
+        later(900) { openSheet(Sheet.BoxOpen(got, false)); if (got != null) confetti(80) }
+    }
+    fun saveProfile(p: Prof, av: Av?, flex: List<String>, rim: String) {
+        setSettings { it.copy(prof = p, av = av?.takeIf { a -> a.t != null || a.c != null }, flex = flex, rim = rim.take(24)) }
+        openSheet(Sheet.ProfilePage(myId() ?: "")); crew.sync(true); say("Profile saved")
+    }
+    fun founderUnlock(code: String) {
+        val a = data.value.settings.acct ?: run { say("Sign in first, then try again"); return }
+        viewModelScope.launch {
+            val (st, j) = postJson("$SERVER/vault/founder", buildJsonObject { put("acct", a.id); put("token", a.token); put("code", code) })
+            if (st in 200..299) { setSettings { it.copy(founder = true) }; closeSheet(); confetti(140); say("👑 Welcome, Founder"); crew.sync(true) }
+            else say(if (j.err == "wrong code") "That code isn’t right" else "Sign in first, then try again")
+        }
+    }
+    fun loadDash() {
+        dash.value = null; val a = data.value.settings.acct
+        viewModelScope.launch {
+            if (a == null) { dash.value = buildJsonObject { put("error", "Only the founder account can open this.") }; return@launch }
+            val (st, j) = postJson("$SERVER/stats/dash", buildJsonObject { put("acct", a.id); put("token", a.token) })
+            dash.value = if (st == 0) buildJsonObject { put("error", "Could not load. Check your connection.") } else if (j.err != null) buildJsonObject { put("error", if (j.err == "owner only") "Only the founder account can open this." else j.err!!) } else j
+        }
+    }
+    private var pingAt = 0L
+    /** Anonymous usage ping to Overload's own server (0.15, same as the web app; feeds the owner dashboard). */
+    fun statsPing() {
+        if (System.currentTimeMillis() - pingAt < 6 * 3600_000L || data.value.plan == null) return; pingAt = System.currentTimeMillis()
+        val p = appContext.getSharedPreferences("overload", Context.MODE_PRIVATE); var dev = p.getString("dev", "") ?: ""
+        if (!Regex("^[\\w-]{8,40}$").matches(dev)) { dev = "d-" + java.lang.Long.toString(System.currentTimeMillis(), 36) + java.lang.Long.toString((Math.random() * 1e12).toLong(), 36); p.edit().putString("dev", dev).apply() }
+        val c = ctx(); val wk = c.rs.count { it.date >= crew.curWk() }
+        viewModelScope.launch { postJson("$SERVER/stats/ping", buildJsonObject { put("dev", dev); put("name", data.value.settings.name); put("plat", "Android"); put("sa", true); put("ver", APP_VER)
+            put("crew", crewState.value?.crew?.name ?: ""); put("sync", data.value.settings.acct != null); put("wk", wk); put("tot", c.rs.size) }) }
+    }
+    fun setFx(k: String = ctx().look("setfx")) { if (k != "pulse") ui.update { it.copy(setFx = it.setFx + 1, setFxKind = k) } }
+    fun prFx(k: String = ctx().look("prfx"), name: String) {
+        ui.update { it.copy(confettiKind = k) }; confetti(if (k == "goldrain") 60 else 90); haptic("heavy")
+        say("🏆 ${if (name.isNotEmpty()) "$name PR. " else ""}${PR_LINES.random()}")
+    }
+    fun plateTalk() { haptic("tap"); ui.update { it.copy(plateTalk = (it.plateTalk.first + 1) to PLATE_LINES.random()) } }
+    fun playRestSound(k: String = ctx().look("sound"), preview: Boolean = false) {
+        if (k == "classic") { if (preview || data.value.settings.sound) runCatching { ToneGenerator(AudioManager.STREAM_ALARM, 80).startTone(ToneGenerator.TONE_PROP_BEEP2, 500) }; return }
+        SoundPack.play(k)
+    }
 
     /** Port of the web app's unlock engine: badges, rank-ups, divisions, prestige, season rewards. */
     private fun checkUnlocksNow() {
@@ -280,7 +381,7 @@ class OverloadViewModel(app: Application) : AndroidViewModel(app) {
     fun openSheet(s: Sheet?) = ui.update { it.copy(sheet = s, confirm = null) }
     fun closeSheet() = openSheet(null)
     fun setConfirm(k: String?) = ui.update { it.copy(confirm = k) }
-    fun openProfile(on: Boolean = true) = ui.update { it.copy(profile = on, settings = false) }
+    fun openProfile(on: Boolean = true) { if (on) setTab("me") else setTab("log") }
     fun closeCine() = ui.update { it.copy(cine = null) }
     fun setSub(t: String, k: String) {
         ui.update { it.copy(sub = it.sub + (t to k), editNote = if (t == "plan" && k == "notes") null else it.editNote) }
@@ -292,6 +393,7 @@ class OverloadViewModel(app: Application) : AndroidViewModel(app) {
     }
     fun yearSeen() { setSettings { it.copy(yirSeen = LocalDate.now().year) }; ui.update { it.copy(yir = false) } }
     fun togglePin(k: String) {
+        if (k !in data.value.settings.showcase && data.value.settings.showcase.size >= 3) say("Unpinned the oldest to make room")
         setSettings { s2 -> val a = s2.showcase.toMutableList(); if (k in a) a.remove(k) else { if (a.size >= 3) a.removeAt(0); a.add(k) }; s2.copy(showcase = a) }
         crew.sync(true)
     }
@@ -305,6 +407,7 @@ class OverloadViewModel(app: Application) : AndroidViewModel(app) {
     }
     fun removeGoal(i: Int) {
         if (ui.value.confirm != "g$i") { setConfirm("g$i"); say("Tap ✕ again to remove this goal"); return }
+        data.value.settings.goals.getOrNull(i)?.let { g -> trash.put("goal", "Goal: ${exName(g.ex)} ${fmtN(g.w)} $unit", json.encodeToJsonElement(g)) }
         setConfirm(null); setSettings { it.copy(goals = it.goals.filterIndexed { j, _ -> j != i }) }
     }
     fun saveBw(v: Double?) {
@@ -363,8 +466,9 @@ class OverloadViewModel(app: Application) : AndroidViewModel(app) {
         if (t == "log" && again) goToday()
         if (t == "plan") setFlag("plan")
         if (t == "crew") crew.sync(true)
+        if (t == "me") ui.update { it.copy(profile = false) }
     }
-    fun toggleSettings() = ui.update { it.copy(settings = !it.settings, profile = false) }
+    fun toggleSettings() = ui.update { it.copy(settings = !it.settings, profile = false, set17 = null) }
     fun setProg(id: String?) = ui.update { it.copy(prog = id) }
     fun setPFilter(f: String) = ui.update { it.copy(pfilter = f) }
     fun setPDay(i: Int) = ui.update { it.copy(pday = i, picker = null) }
@@ -373,11 +477,12 @@ class OverloadViewModel(app: Application) : AndroidViewModel(app) {
     fun startPlan(key: String, name: String) {
         val t = TEMPLATES.first { it.key == key }
         update { it.copy(plan = t.days(), settings = it.settings.copy(name = name.trim(), seenNews = NEWS_ID)) }
-        checkUnlocks()
+        checkUnlocks(); later(1400) { tourCheck() }
         say("You're set. Let's lift")
     }
     fun replacePlan(key: String) {
         val t = TEMPLATES.first { it.key == key }
+        data.value.plan?.let { trash.put("plan", "Your plan before switching templates", json.encodeToJsonElement(it)) }
         update { it.copy(plan = t.days()) }; say("Plan replaced")
     }
     fun editDay(idx: Int, f: (DayPlan) -> DayPlan) =
@@ -411,12 +516,22 @@ class OverloadViewModel(app: Application) : AndroidViewModel(app) {
         }
         ui.update { it.copy(picker = null) }
     }
-    fun removeEx(dayI: Int, gi: Int, ei: Int) = editDay(dayI) { day ->
+    fun removeEx(dayI: Int, gi: Int, ei: Int) {
+        data.value.plan?.getOrNull(dayI)?.let { p -> p.groups.getOrNull(gi)?.getOrNull(ei)?.let { e ->
+            trash.put("exercise", "${e.name} (from ${p.name})", buildJsonObject { put("day", dayI); put("gi", gi); put("ex", json.encodeToJsonElement(e)) }) } }
+        removeEx0(dayI, gi, ei)
+    }
+    private fun removeEx0(dayI: Int, gi: Int, ei: Int) = editDay(dayI) { day ->
         val g = day.groups.map { it.toMutableList() }.toMutableList()
         g[gi].removeAt(ei); if (g[gi].isEmpty()) g.removeAt(gi)
         day.copy(groups = g)
     }
-    fun removeGroup(dayI: Int, gi: Int) = editDay(dayI) { it.copy(groups = it.groups.filterIndexed { i, _ -> i != gi }) }
+    fun removeGroup(dayI: Int, gi: Int) {
+        data.value.plan?.getOrNull(dayI)?.let { p -> p.groups.getOrNull(gi)?.let { g ->
+            trash.put("group", "${g.joinToString(" + ") { it.name }} (from ${p.name})", buildJsonObject { put("day", dayI); put("gi", gi); put("group", json.encodeToJsonElement(g)) }) } }
+        removeGroup0(dayI, gi)
+    }
+    private fun removeGroup0(dayI: Int, gi: Int) = editDay(dayI) { it.copy(groups = it.groups.filterIndexed { i, _ -> i != gi }) }
     fun moveGroupUp(dayI: Int, gi: Int) = editDay(dayI) { day ->
         if (gi <= 0) day else day.copy(groups = day.groups.toMutableList().also { java.util.Collections.swap(it, gi, gi - 1) })
     }
@@ -458,7 +573,9 @@ class OverloadViewModel(app: Application) : AndroidViewModel(app) {
         }
         val pb = bestBefore(d.sessions, e.id, s.date)
         val isPr = pb > 0 && e1(x) > pb
-        if (isPr) { say("New PR on ${e.name}"); haptic("success") }
+        setFx()
+        if (isPr && s.prShown[e.id] == null) { editSession { it.copy(prShown = it.prShown + (e.id to 1)) }; prFx(name = e.name) }
+        else if (isPr) { say("New PR on ${e.name}"); haptic("success") }
         later(50) { checkUnlocks(); crew.sendLive() }
         val groups = todayGroups(d, u); val gr = groups.getOrNull(gi) ?: emptyList()
         if (ei < gr.size - 1) {
@@ -475,7 +592,12 @@ class OverloadViewModel(app: Application) : AndroidViewModel(app) {
         while (l.size < e.sets) l.add(SetEntry())
         l.add(SetEntry()); s.copy(ex = s.ex + (e.id to l))
     }
-    fun removeSet(e: Exercise) = editSession { s ->
+    fun removeSet(e: Exercise) {
+        val s = session(); val x = s.ex[e.id]?.lastOrNull()
+        if (x != null && full(x)) trash.put("set", "${e.name} ${fmtN(x.w!!)}×${x.r} (${s.date})", buildJsonObject { put("key", curKey()); put("id", e.id); put("set", json.encodeToJsonElement(x)) })
+        removeSet0(e)
+    }
+    private fun removeSet0(e: Exercise) = editSession { s ->
         val l = (s.ex[e.id] ?: emptyList()).dropLast(1); s.copy(ex = s.ex + (e.id to l))
     }
     fun unswap(orig: Exercise) { editSession { it.copy(swap = it.swap - orig.id) }; say("Back to ${orig.name}") }
@@ -502,18 +624,22 @@ class OverloadViewModel(app: Application) : AndroidViewModel(app) {
 
     // ---------- rest timer ----------
     fun startRest(sec: Int, next: String = "") =
-        ui.update { it.copy(rest = RestState(System.currentTimeMillis() + sec * 1000L, sec, sec, next)) }
+        ui.update { it.copy(rest = RestState(System.currentTimeMillis() + sec * 1000L, sec, sec, next), restLine = if (data.value.settings.restJokes) REST_LINES.random() else "") }
     fun restPlus() = ui.update { u -> u.copy(rest = u.rest?.let { it.copy(endAt = it.endAt + 15000, dur = it.dur + 15, buzzed = false) }) }
     fun restMinus() = ui.update { u -> u.copy(rest = u.rest?.let { it.copy(endAt = it.endAt - 15000) }) }
     fun restReset() { ui.value.rest?.let { startRest(it.base, it.next) } }
-    fun restStop() = ui.update { it.copy(rest = null) }
+    fun restStop() {
+        // Rest Timer Rebel: stopping the timer early counts as a skip
+        val r = ui.value.rest; if (r != null && r.endAt > System.currentTimeMillis()) editSession { it.copy(skips = it.skips + 1) }
+        ui.update { it.copy(rest = null) }
+    }
     private fun tickRest() {
         val r = ui.value.rest ?: return
         if (!r.buzzed && System.currentTimeMillis() >= r.endAt) {
             ui.update { it.copy(rest = it.rest?.copy(buzzed = true)) }
             if (alertPending) return // app is in the background: the notification does the alerting
             val st = data.value.settings
-            if (st.sound) try { ToneGenerator(AudioManager.STREAM_ALARM, 80).startTone(ToneGenerator.TONE_PROP_BEEP2, 500) } catch (_: Exception) {}
+            if (st.sound) playRestSound()
             if (st.vibe) try {
                 val v = getApplication<Application>().getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
                 v.vibrate(VibrationEffect.createWaveform(longArrayOf(0, 250, 120, 250), -1))
@@ -539,7 +665,7 @@ class OverloadViewModel(app: Application) : AndroidViewModel(app) {
         RestAlerts.schedule(appCtx, r.endAt, r.next); alertPending = true
     }
     fun onForeground() {
-        crew.onForeground(); sync.onForeground()
+        crew.onForeground(); sync.onForeground(); statsPing()
         if (!alertPending) return
         alertPending = false; RestAlerts.cancel(appCtx)
         // rest ended while away: the notification already pinged, so don't beep again on return
@@ -587,14 +713,14 @@ class OverloadViewModel(app: Application) : AndroidViewModel(app) {
         update { d -> d.copy(notes = if (d.notes.any { it.id == saved.id }) d.notes.map { if (it.id == saved.id) saved else it } else d.notes + saved) }
         editNote(null); say("Note saved"); checkUnlocks()
     }
-    fun deleteNote(id: String) { update { d -> d.copy(notes = d.notes.filter { it.id != id }) }; editNote(null) }
+    fun deleteNote(id: String) { data.value.notes.firstOrNull { it.id == id }?.let { n -> trash.put("note", (n.title.ifBlank { n.text }.ifBlank { "Note" }).take(40), json.encodeToJsonElement(n)) }; update { d -> d.copy(notes = d.notes.filter { it.id != id }) }; editNote(null) }
     fun showNews() = ui.update { it.copy(news = true) }
     fun closeNews() {
         ui.update { it.copy(news = false) }; if (data.value.settings.seenNews != NEWS_ID) setSettings { it.copy(seenNews = NEWS_ID) }
         later(300) { if (!weekReport()) checkUnlocks() }
     }
     fun setSettings(f: (Settings) -> Settings) = update { it.copy(settings = f(it.settings)) }
-    fun wipe() { RestAlerts.cancel(appCtx); crew.stop(); update { AppData(settings = Settings(theme = it.settings.theme, seenNews = NEWS_ID)) }; crewState.value = null; ui.update { UiState() } }
+    fun wipe() { RestAlerts.cancel(appCtx); crew.stop(); chat.reset(); update { AppData(settings = Settings(theme = it.settings.theme, seenNews = NEWS_ID)) }; crewState.value = null; ui.update { UiState() } }
 
     // ---------- backup ----------
     fun exportJson(): String {
@@ -614,6 +740,7 @@ class OverloadViewModel(app: Application) : AndroidViewModel(app) {
         val notes = c["notes"]?.let { runCatching { json.decodeFromJsonElement<List<Note>>(it) }.getOrNull() }
         val flags = c["flags"]?.let { runCatching { json.decodeFromJsonElement<Map<String, Map<String, Int>>>(it) }.getOrNull() }
         if (sessions.isEmpty() && plan == null) throw IllegalArgumentException("empty")
+        trash.put("undo-restore", "Your data from before the restore", json.encodeToJsonElement(data.value))
         update { d ->
             d.copy(
                 sessions = d.sessions + sessions,

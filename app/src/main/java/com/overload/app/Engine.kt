@@ -335,6 +335,8 @@ class Ctx(val d: AppData, val cs: CrewState?, val myId: String?, val now: LocalD
             listOf("cent", "Century", "💯", "100 sets in one week", century == 1),
             listOf("perf", "Perfectionist", "🎯", "Top of the rep range on every set (4+ sets)", perfect)
         ).forEach { h -> T(h[0] as String, h[1] as String, h[2] as String, "Hidden", if (h[4] as Boolean) 1.0 else 0.0, 1.0, h[3] as String, true) }
+        // 0.14: funny badges (hidden until earned)
+        funnyBadges(weeks, wk).forEach { f -> T(f[0] as String, f[1] as String, f[2] as String, "Funny", if (f[4] as Boolean) 1.0 else 0.0, 1.0, f[3] as String, true) }
         val R = listOf(
             listOf("fullweek", "Full Week", "🔥", "Train every planned day in a week"), listOf("overload", "Overloader", "📈", "Beat last week on 5+ lifts"),
             listOf("prhunt", "PR Hunter", "🏹", "3+ PRs in a week"), listOf("speed", "Speed Demon", "⚡", "Every timed workout under an hour (2+)"),
@@ -347,7 +349,7 @@ class Ctx(val d: AppData, val cs: CrewState?, val myId: String?, val now: LocalD
         listOf(
             listOf("col_club", "Club Collector", "🏛️", "Earn all 4 lift clubs", listOf("c0", "c1", "c2", "c3").all(::hasK)),
             listOf("col_clock", "Around the Clock", "🕛", "Earn Dawn Patrol and Night Owl", hasK("dawn") && hasK("owl")),
-            listOf("col_secret", "Secret Keeper", "🗝️", "Find every hidden badge", B.filter { it.hid }.all { it.earned }),
+            listOf("col_secret", "Secret Keeper", "🗝️", "Find every hidden badge", B.filter { it.hid && it.cat == "Hidden" }.all { it.earned }),
             listOf("col_week", "Weekly Grinder", "📆", "Earn every weekly badge once (Early Bird optional)", R.filter { it.k != "dawnwk" }.all { (it.count ?: 0) > 0 }),
             listOf("col_ms", "Milestone Master", "👑", "Reach Gold in every milestone", LADDER.keys.all { tierOf(it) >= 3 })
         ).forEach { c -> T(c[0] as String, c[1] as String, c[2] as String, "Collections", if (c[4] as Boolean) 1.0 else 0.0, 1.0, c[3] as String) }
@@ -383,6 +385,34 @@ class Ctx(val d: AppData, val cs: CrewState?, val myId: String?, val now: LocalD
         val keys = B.filter { it.earned }.map { it.k }.toMutableSet().apply { R.forEach { r -> r.list.forEach { x -> add(r.k + "@" + x) } } }
         return Eng(B, R, bcount, active, rank, elig, trial, div, frac, prestige, rname, power, season, xp, lvl, streak, best, freeze, keys,
             lifeSets, lifeVol, lifePR, rs.size, rs.firstOrNull()?.date, wk.mapValues { (_, v) -> v.map { it.date } })
+    }
+
+    // ---------- funny badges (port of the web app's funnyBadges) ----------
+    private fun funnyBadges(weeks: List<String>, wk: Map<String, List<Session>>): List<List<Any>> {
+        val legM = Regex("Quads|Hamstrings|Glutes|Calves")
+        fun legSets(s: Session) = s.ex.entries.sumOf { (id, a) -> if (legM.containsMatchIn(exMuscle(id))) a.count(::full) else 0 }
+        var run = 0; var dodger = false
+        weeks.forEachIndexed { i, w -> if (i == weeks.size - 1) return@forEachIndexed
+            val ss = wk[w] ?: emptyList(); val days = ss.map { it.date }.toSet().size
+            if (days >= 2 && ss.all { legSets(it) == 0 }) { run++; if (run >= 3) dodger = true } else run = 0 }
+        var ego = false; val lastW = HashMap<String, Pair<Double, String>>()
+        rs.forEach { s -> s.ex.forEach { (id, a) -> val m = a.filter(::full).maxOfOrNull { it.w!! } ?: 0.0; if (m <= 0) return@forEach
+            val p = lastW[id]; if (p != null && m - p.first >= (if (kg) 9.0 else 20.0) && ChronoUnit.DAYS.between(toD(p.second), toD(s.date)) <= 10) ego = true
+            lastW[id] = m to s.date } }
+        var cardio = false
+        weeks.forEachIndexed { i, w -> if (i == 0) return@forEachIndexed
+            val a = (wk[weeks[i - 1]] ?: emptyList()).map { it.date }.toSet().size; val b = (wk[w] ?: emptyList()).map { it.date }.toSet().size
+            if (a == 0 && b >= 5) cardio = true }
+        var rest = false; for (i in 1 until rs.size) if (ChronoUnit.DAYS.between(toD(rs[i - 1].date), toD(rs[i].date)) >= 8) rest = true
+        return listOf(
+            listOf("f_legs", "Leg Day Dodger", "🦵", "Skip legs 3 weeks in a row (we see you)", dodger),
+            listOf("f_ego", "Ego Lifter", "🦚", "Jump 20+ lb on a lift in a week", ego),
+            listOf("f_ghost", "Ghost", "👻", "Open the app 5 times in a day without logging a set", (st.fb["ghost"] ?: 0) > 0),
+            listOf("f_night", "Night Shift", "🌃", "Start a workout after midnight", rs.any { s -> hourOf(s.start)?.let { it < 4 } == true }),
+            listOf("f_cardio", "Cardio Is Hard", "🫠", "Zero workouts one week, then 5+ the next", cardio),
+            listOf("f_rest", "Rest Day Champion", "🛋", "Take 7 rest days in a row", rest),
+            listOf("f_rebel", "Rest Timer Rebel", "⏭", "Skip the rest timer 10 times in one workout", rs.any { it.skips >= 10 })
+        )
     }
 
     // ---------- crew badges ----------

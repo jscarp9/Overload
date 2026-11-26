@@ -13,7 +13,7 @@ android {
         minSdk = 26
         targetSdk = 35
         // Version follows the web app (overloadVersion in gradle.properties) plus a build number from CI:
-        // 0.13.1, 0.13.2, ... versionCode always goes up, also when the web version changes.
+        // 0.17.1, 0.17.2, ... versionCode always goes up, also when the web version changes.
         val base = (project.findProperty("overloadVersion") as String? ?: "0.0").trim()
         val (major, minor) = base.split(".").map { it.toInt() } + listOf(0, 0)
         val build = (System.getenv("BUILD_NUMBER") ?: "0").toInt()

@@ -1,3 +1,4 @@
+@file:OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 package com.overload.app
 
 import androidx.compose.foundation.background
@@ -17,6 +18,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.relocation.bringIntoViewRequester
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import java.time.LocalDate
 
 @Composable
@@ -32,11 +37,20 @@ fun TodayScreen(vm: OverloadViewModel, d: AppData, u: UiState, now: Long) {
         if (LocalDate.now().monthValue == 12 && c.st.yirSeen != LocalDate.now().year && c.rs.isNotEmpty())
             CardButton("🎬", "Your ${LocalDate.now().year} Year in review is here", "Tap to watch it") { vm.openYear(true) }
         Rack(vm, d, u)
-        Hero(vm, d, u, day, s, groups, now)
+        Hero17(vm, c, d, u, day, s, groups, now)
+        GroupBar(vm, now)
         if (s.end != null) Summary(vm, d, s, now)
         if (s.end != null && s.start != null && d.settings.heartRate) HeartRateCard(vm, vm.curKey(u), s)
         if (s.end != null) Analysis(vm, c, s, u)
-        ChallengesCard(vm, c, u)
+        // 0.17: challenges collapse to one slim row
+        run { val ch = c.dayChallenges(u.date); val n = ch.count { it.done }
+            Row(Modifier.fillMaxWidth().padding(bottom = 12.dp).clip(RoundedCornerShape(18.dp)).background(ov.card).clickable { vm.ui.value = vm.ui.value.copy(chal17 = !u.chal17) }.padding(horizontal = 14.dp, vertical = 12.dp),
+                verticalAlignment = Alignment.CenterVertically) {
+                OvText("🎯", 18); Spacer(Modifier.width(8.dp)); OvText("Challenges", 15, FontWeight.Bold, modifier = Modifier.weight(1f))
+                ch.forEach { x -> Box(Modifier.padding(horizontal = 2.dp).size(22.dp, 6.dp).background(if (x.done) Green else ov.soft, RoundedCornerShape(3.dp))) }
+                Sub("  $n/3"); OvText(if (u.chal17) " ⌄" else " ›", 16, FontWeight.Bold, ov.mute)
+            }
+            if (u.chal17) ChallengesCard(vm, c, u) }
         if (day.type == "off") {
             OvCard {
                 Column(Modifier.fillMaxWidth().padding(vertical = 10.dp), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -68,7 +82,9 @@ fun TodayScreen(vm: OverloadViewModel, d: AppData, u: UiState, now: Long) {
                 }
             }
             OvButton("+ Add exercise", { vm.openPicker(Picker("today")) }, Modifier.padding(bottom = 12.dp), bg = ov.ink, fg = ov.bg, wide = true)
-            OvCard {
+            val bring = remember { androidx.compose.foundation.relocation.BringIntoViewRequester() }
+            LaunchedEffect(u.jumpNotes) { if (u.jumpNotes > 0) bring.bringIntoView() }
+            OvCard(Modifier.bringIntoViewRequester(bring)) {
                 OvText("SESSION NOTES", 13, FontWeight.ExtraBold, ov.mute)
                 Spacer(Modifier.height(8.dp))
                 TextBox(s.notes, { vm.setSessionNote(it) }, "Energy, sleep, what felt strong, what hurt…", singleLine = false, minH = 90.dp)
@@ -83,28 +99,30 @@ private fun Rack(vm: OverloadViewModel, d: AppData, u: UiState) {
     val wd = weekDates(u.date); val today = LocalDate.now(); val plan = d.plan!!
     val label = if (wd[0].monthValue == wd[6].monthValue) "${MON[wd[0].monthValue - 1]} ${wd[0].dayOfMonth} – ${wd[6].dayOfMonth}"
     else "${MON[wd[0].monthValue - 1]} ${wd[0].dayOfMonth} – ${MON[wd[6].monthValue - 1]} ${wd[6].dayOfMonth}"
-    OvCard {
-        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            OvText(label, 16, FontWeight.ExtraBold, modifier = Modifier.weight(1f))
+    // 0.17: no card, plates only, today raised, green check on finished days, swipe to change weeks
+    var dx by remember { mutableStateOf(0f) }
+    Column(Modifier.fillMaxWidth().padding(bottom = 12.dp).pointerInput(Unit) {
+        detectHorizontalDragGestures(onDragStart = { dx = 0f }, onDragEnd = { if (kotlin.math.abs(dx) > 50 * density) vm.shiftWeek(if (dx < 0) 1 else -1); dx = 0f }) { _, a -> dx += a } }) {
+        Row(Modifier.fillMaxWidth().padding(horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+            OvText(label, 15, FontWeight.ExtraBold, modifier = Modifier.weight(1f))
             NavChip("‹") { vm.shiftWeek(-1) }
             if (u.date != today) { Spacer(Modifier.width(6.dp)); OvButton("Today", { vm.goToday() }, small = true) }
-            Spacer(Modifier.width(6.dp))
-            NavChip("›") { vm.shiftWeek(1) }
+            Spacer(Modifier.width(6.dp)); NavChip("›") { vm.shiftWeek(1) }
         }
         Spacer(Modifier.height(6.dp))
         Row(Modifier.fillMaxWidth()) {
             wd.forEachIndexed { i, ds ->
-                val p = plan[i]
-                val state = if (p.type == "off") "rest" else if (doneOn(d.sessions, ds, DAYS[i])) "done" else "idle"
-                Column(
-                    Modifier.weight(1f).clip(RoundedCornerShape(16.dp)).background(if (ds == u.date) ov.soft else Color.Transparent)
-                        .clickable { vm.setDate(ds, true) }.padding(vertical = 8.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Plate(colorOf(p), state, Modifier.fillMaxWidth(.9f))
-                    Spacer(Modifier.height(4.dp))
-                    OvText(if (ds == today) "Today" else DN[i], 12, FontWeight.Bold, if (ds == today) Red else ov.mute)
-                    OvText("${ds.dayOfMonth}", 15, FontWeight.ExtraBold, if (ds == u.date) Red else ov.ink)
+                val p = plan[i]; val done = doneOn(d.sessions, ds, DAYS[i])
+                val state = if (p.type == "off") "rest" else if (done) "done" else "idle"
+                Column(Modifier.weight(1f).offset(y = if (ds == today) (-4).dp else 0.dp).clip(RoundedCornerShape(16.dp)).background(if (ds == u.date) ov.card else Color.Transparent)
+                        .clickable { vm.setDate(ds, true) }.padding(vertical = 6.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Box(contentAlignment = Alignment.TopEnd) {
+                        Plate(colorOf(p), state, Modifier.fillMaxWidth(.88f))
+                        if (done) Box(Modifier.size(14.dp).background(Green, CircleShape), contentAlignment = Alignment.Center) { OvText("✓", 9, FontWeight.Black, Color.White) }
+                    }
+                    Spacer(Modifier.height(3.dp))
+                    OvText(if (ds == today) "Today" else DN[i], 11, FontWeight.Bold, if (ds == today) Red else ov.mute)
+                    OvText("${ds.dayOfMonth}", 14, FontWeight.ExtraBold, if (ds == u.date) Red else ov.ink)
                 }
             }
         }
@@ -117,58 +135,55 @@ private fun NavChip(t: String, onClick: () -> Unit) =
         OvText(t, 18, FontWeight.ExtraBold)
     }
 
+/** 0.17 compact workout card: plate with progress ring, date, day name, one Start button, ⋯ menu. */
 @Composable
-private fun Hero(vm: OverloadViewModel, d: AppData, u: UiState, day: DayPlan, s: Session, groups: List<List<Exercise>>, now: Long) {
+private fun Hero17(vm: OverloadViewModel, c: Ctx, d: AppData, u: UiState, day: DayPlan, s: Session, groups: List<List<Exercise>>, now: Long) {
     val col = pc(colorOf(day)); val off = day.type == "off"
     var tot = 0; var dn = 0
     groups.forEach { gr -> gr.forEach { e -> val l = s.ex[e.id] ?: emptyList(); tot += maxOf(e.sets, l.size); dn += l.count { it.d } } }
-    val ss = sessStats(d.sessions, s)
-    val unit = d.settings.unit
-    val today = LocalDate.now()
+    val ss = sessStats(d.sessions, s); val unit = d.settings.unit; val today = LocalDate.now()
     val whenLbl = if (u.date == today) "Today" else if (u.date < today) "Past" else "Upcoming"
     var renaming by remember(u.date) { mutableStateOf(false) }
     var newName by remember(u.date, day.name) { mutableStateOf(day.name) }
-    Box(
-        Modifier.fillMaxWidth().padding(bottom = 14.dp).clip(RoundedCornerShape(28.dp))
-            .background(Brush.linearGradient(col.grad)).padding(start = 18.dp, end = 18.dp, top = 20.dp, bottom = 18.dp)
-    ) {
-        Column {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Column(Modifier.weight(1f)) {
-                    OvText("$whenLbl · ${DN[dayIdx(u.date)]} ${MON[u.date.monthValue - 1]} ${u.date.dayOfMonth}", 14, FontWeight.SemiBold, Color.White.copy(.9f))
-                    Spacer(Modifier.height(4.dp))
-                    if (renaming) {
-                        TextBox(newName, { newName = it }, "Day name", bold = true, size = 24)
-                        Spacer(Modifier.height(6.dp))
-                        OvButton("Save", { vm.renameToday(newName); renaming = false }, small = true, bg = Color.White, fg = Color(0xFF14161C))
-                    } else Row(verticalAlignment = Alignment.CenterVertically) {
-                        Title(day.name, 40, Color.White, Modifier.weight(1f, fill = false))
-                        Spacer(Modifier.width(8.dp))
-                        Box(Modifier.size(36.dp).background(Color.White.copy(.22f), RoundedCornerShape(12.dp)).clickable { renaming = true }, contentAlignment = Alignment.Center) { OvText("✎", 18, color = Color.White) }
-                    }
-                    OvText(day.focus, 14, FontWeight.SemiBold, Color.White.copy(.9f))
-                }
-                Plate(colorOf(day), if (off) "rest" else "idle", Modifier.size(112.dp), ring = if (off) null else if (tot > 0) dn.toFloat() / tot else 0f)
+    var confirm by remember(u.date) { mutableStateOf(false) }
+    val sub = when {
+        off -> "Rest day. Recover and come back stronger"
+        s.start == null -> if (tot > 0) "$tot set${if (tot == 1) "" else "s"} · about ${maxOf(10, Math.round(tot * (day.rest + 40) / 60.0 / 5).toInt() * 5)} min" else "No exercises yet. Add some below"
+        else -> "${mins(elapsed(s, now))} · $dn/$tot sets · ${kfmt(ss.vol)} $unit" + if (s.pauseAt != null) " · Paused" else ""
+    }
+    Column(Modifier.fillMaxWidth().padding(bottom = 12.dp).clip(RoundedCornerShape(26.dp)).background(Brush.linearGradient(col.grad)).padding(14.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.size(96.dp).clickable { vm.plateTalk() }, contentAlignment = Alignment.Center) {
+                val wob = remember { androidx.compose.animation.core.Animatable(0f) }
+                LaunchedEffect(u.plateTalk.first) { if (u.plateTalk.first > 0) { repeat(4) { wob.animateTo(if (it % 2 == 0) 10f else -10f, androidx.compose.animation.core.tween(80)) }; wob.animateTo(0f) } }
+                Plate(colorOf(day), if (off) "rest" else "idle", Modifier.fillMaxSize().graphicsLayer { rotationZ = wob.value }, ring = if (off) null else if (tot > 0) dn.toFloat() / tot else 0f,
+                    label = if (off) null else (d.settings.rim.trim().ifEmpty { "OVERLOAD · ${day.name}" }).uppercase().take(26), og = myOG(c))
             }
-            if (!off) {
-                Spacer(Modifier.height(14.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    HeroStat(mins(elapsed(s, now)), if (s.pauseAt != null) "Paused" else "Time", Modifier.weight(1f))
-                    HeroStat("$dn/$tot", "Sets", Modifier.weight(1f))
-                    HeroStat(kfmt(ss.vol), "$unit moved", Modifier.weight(1f))
+            Spacer(Modifier.width(12.dp))
+            Column(Modifier.weight(1f)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    OvText("$whenLbl · ${DN[dayIdx(u.date)]} ${MON[u.date.monthValue - 1]} ${u.date.dayOfMonth}", 13, FontWeight.SemiBold, Color.White.copy(.9f))
+                    if (!renaming) OvText(" ✎", 14, color = Color.White, modifier = Modifier.clickable { renaming = true }.padding(4.dp))
                 }
-                Spacer(Modifier.height(12.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    var confirm by remember(u.date) { mutableStateOf(false) }
-                    if (s.start == null) OvButton("▶ Start workout", { vm.startWorkout() }, bg = Color.White, fg = Color(0xFF14161C))
-                    else {
-                        if (s.end == null) {
-                            OvButton(if (s.pauseAt != null) "▶ Resume" else "❚❚ Pause", { vm.togglePause() }, bg = Color.White, fg = Color(0xFF14161C))
-                            OvButton("Finish", { vm.finish() }, bg = Color.White.copy(.22f), fg = Color.White)
-                        }
-                        OvButton(if (confirm) "Tap to reset" else "↺ Reset", { if (confirm) { vm.resetWorkout(); confirm = false } else confirm = true }, bg = Color.White.copy(.22f), fg = Color.White)
-                    }
+                if (renaming) {
+                    TextBox(newName, { newName = it.take(28) }, "Day name", bold = true, size = 20)
+                    OvButton("Save", { vm.renameToday(newName); renaming = false }, Modifier.padding(top = 4.dp), small = true, bg = Color.White, fg = Color(0xFF14161C))
+                } else Title(day.name, 30, Color.White)
+                OvText(sub, 13, FontWeight.SemiBold, Color.White.copy(.9f))
+            }
+            Box(Modifier.size(36.dp).background(Color.White.copy(.22f), RoundedCornerShape(12.dp)).clickable { vm.openSheet(Sheet.TodayMore) }, contentAlignment = Alignment.Center) { OvText("⋯", 18, FontWeight.Black, Color.White) }
+        }
+        if (u.plateTalk.first > 0) { var show by remember(u.plateTalk.first) { mutableStateOf(true) }
+            LaunchedEffect(u.plateTalk.first) { kotlinx.coroutines.delay(2200); show = false }
+            if (show) OvText(u.plateTalk.second, 13, FontWeight.Bold, Color(0xFF14161C), Modifier.padding(top = 6.dp).background(Color.White, RoundedCornerShape(12.dp)).padding(horizontal = 10.dp, vertical = 5.dp)) }
+        if (!off) Row(Modifier.padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            if (s.start == null) OvButton("▶ Start workout", { vm.startWorkout() }, Modifier.weight(1f), bg = Color.White, fg = Color(0xFF14161C))
+            else {
+                if (s.end == null) {
+                    OvButton(if (s.pauseAt != null) "▶ Resume" else "❚❚ Pause", { vm.togglePause() }, Modifier.weight(1f), bg = Color.White, fg = Color(0xFF14161C))
+                    OvButton("Finish", { vm.finish() }, bg = Color.White.copy(.22f), fg = Color.White)
                 }
+                OvButton(if (confirm) "Tap to reset" else "↺", { if (confirm) { vm.resetWorkout(); confirm = false } else confirm = true }, bg = Color.White.copy(.22f), fg = Color.White)
             }
         }
     }

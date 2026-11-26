@@ -197,10 +197,11 @@ private class Bit(val x: Float, val delay: Float, val dur: Float, val rot: Float
 
 /** Falling confetti. Re-runs whenever [trigger] changes (and is > 0). */
 @Composable
-fun Confetti(trigger: Int, count: Int = 70) {
+fun Confetti(trigger: Int, count: Int = 70, kind: String = "confetti") {
     if (trigger <= 0) return
+    if (kind == "fireworks" || kind == "storm") { FxBurst(trigger, kind); return }
     val bits = remember(trigger) {
-        val cols = listOf(0xFFEF2B36, 0xFFFFBE0B, 0xFF2563FF, 0xFF16B65B, 0xFFD14DFF, 0xFFFF7A3D)
+        val cols = if (kind == "goldrain") listOf(0xFFE3C25A, 0xFFFFE07A, 0xFFC99A2E, 0xFFFFF3B0) else listOf(0xFFEF2B36, 0xFFFFBE0B, 0xFF2563FF, 0xFF16B65B, 0xFFD14DFF, 0xFFFF7A3D)
         List(count) { i -> Bit(Random.nextFloat(), Random.nextFloat() * .4f, 1.6f + Random.nextFloat() * 1.2f, Random.nextFloat() * 360f, Color(cols[i % cols.size]), Random.nextFloat() * 2 - 1) }
     }
     val t = remember(trigger) { Animatable(0f) }

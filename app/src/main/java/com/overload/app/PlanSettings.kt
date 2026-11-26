@@ -58,17 +58,12 @@ fun PlanScreen(vm: OverloadViewModel, d: AppData, u: UiState) {
                 vm.editDay(di) { x -> x.copy(rest = opts[opts.indexOfFirst { "Rest ${it / 60}:${(it % 60).toString().padStart(2, '0')}" == sel }]) }
             }
         }
-        Sub("Colour", Modifier.padding(top = 10.dp))
-        val cx by vm.engCtx.collectAsState()
-        PC.keys.chunked(7).forEach { row -> Row(Modifier.padding(top = 6.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            row.forEach { k -> val lock = cx.plateLocked(k)
-                Box(Modifier.size(38.dp).clip(androidx.compose.foundation.shape.CircleShape).background(PC.getValue(k).base)
-                    .then(if (colorOf(day) == k) Modifier.background(Color.White.copy(.35f)) else Modifier)
-                    .clickable { vm.setPlateColor(di, k) }, contentAlignment = Alignment.Center) {
-                    if (colorOf(day) == k) OvText("✓", 16, FontWeight.Black, Color.White) else if (lock.isNotEmpty()) OvText("🔒", 13)
-                }
-            }
-        } }
+        // 0.15: plate is one compact row; tapping it opens the picker with category tabs
+        Row(Modifier.fillMaxWidth().padding(top = 10.dp).clip(RoundedCornerShape(14.dp)).background(ov.soft).clickable { vm.openSheet(Sheet.PlatePick(di)) }.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
+            Plate(colorOf(day), "done", Modifier.size(40.dp)); Spacer(Modifier.width(10.dp))
+            Column(Modifier.weight(1f)) { OvText(plateName(colorOf(day)), 15, FontWeight.Bold); Sub("${PCAT[plateCat(colorOf(day))] ?: "Color"} · Tap to change") }
+            OvText("›", 20, FontWeight.Bold, ov.mute)
+        }
     }
     if (day.type != "off") {
         day.groups.forEachIndexed { gi, gr ->
@@ -137,13 +132,16 @@ private fun LabeledNum(label: String, v: Int, modifier: Modifier, onChange: (Int
         NumBox(if (v > 0) "$v" else "", "0", { onChange(it.toIntOrNull()?.coerceAtLeast(0) ?: 0) }, decimal = false, size = 16, h = 44.dp)
     }
 
-// ============================ SETTINGS ============================
+// ============================ SETTINGS (0.17: a short list, one page per section) ============================
 @Composable
 fun SettingsScreen(vm: OverloadViewModel, d: AppData) {
-    val st = d.settings; val ctx = LocalContext.current
+    val st = d.settings; val ctx = LocalContext.current; val u by vm.ui.collectAsState(); val c by vm.engCtx.collectAsState()
     var confirmWipe by remember { mutableStateOf(false) }
     val save = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri: Uri? ->
         if (uri != null) ctx.contentResolver.openOutputStream(uri)?.use { it.write(vm.exportJson().toByteArray()) }
+    }
+    val saveAll = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri: Uri? ->
+        if (uri != null) { ctx.contentResolver.openOutputStream(uri)?.use { it.write(exportAllJson(vm).toByteArray()) }; vm.setSettings { it.copy(lastBackup = System.currentTimeMillis()) }; vm.toast("Exported everything") }
     }
     val scope = rememberCoroutineScope()
     val hrPerm = rememberLauncherForActivityResult(Health.permissionContract()) { granted -> vm.enableHeartRate(granted.containsAll(Health.PERMS)) }
@@ -151,74 +149,102 @@ fun SettingsScreen(vm: OverloadViewModel, d: AppData) {
     val pick = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         if (uri != null) ctx.contentResolver.openInputStream(uri)?.use { vm.importJson(it.readBytes().decodeToString()) }
     }
+    val pages = listOf("you" to ("🙂" to "Name, theme and units"), "workout" to ("🏋️" to "Workout"), "health" to ("❤️" to "Heart rate"), "sync" to ("☁️" to "Account and sync"),
+        "data" to ("🛟" to "Backup and restore"), "founder" to ("👑" to "Founder"), "help" to ("👋" to "Help"), "danger" to ("⚠️" to "Start over")).filter { it.first != "founder" || st.founder }
+    val page = u.set17
+    if (page == null) {
+        Row(verticalAlignment = Alignment.CenterVertically) { Title("Settings", modifier = Modifier.weight(1f)); OvButton("Done", { vm.toggleSettings() }, small = true, bg = ov.ink, fg = ov.bg) }
+        Spacer(Modifier.height(12.dp))
+        if (backupDue(d) && st.acct == null) CardButton("💾", "Back up your log", (st.lastBackup?.let { "Last backup ${(System.currentTimeMillis() - it) / 86_400_000} days ago" } ?: "You haven’t backed up yet") + ". Takes 2 seconds") { vm.ui.value = u.copy(set17 = "data") }
+        OvCard { pages.forEach { (k, v) -> Row16(v.first, v.second) { vm.ui.value = vm.ui.value.copy(set17 = k) } } }
+        Column(Modifier.fillMaxWidth().padding(top = 18.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            Row(verticalAlignment = Alignment.CenterVertically) { Sub("Overload $VERSION · "); OvButton("What's new", { vm.showNews() }, small = true) }
+            Sub("© 2026 Jake Scarpa. All rights reserved.", Modifier.padding(top = 6.dp))
+        }
+        return
+    }
     Row(verticalAlignment = Alignment.CenterVertically) {
-        Title("Settings", modifier = Modifier.weight(1f)); OvButton("Done", { vm.toggleSettings() }, small = true, bg = ov.ink, fg = ov.bg)
+        OvButton("‹ Settings", { vm.ui.value = vm.ui.value.copy(set17 = null) }, small = true)
+        Title(pages.firstOrNull { it.first == page }?.second?.second ?: "", 22, modifier = Modifier.weight(1f).padding(start = 10.dp))
     }
-    SecLabel("LOOK")
-    OvCard {
-        OvText("YOUR NAME", 13, FontWeight.ExtraBold, ov.mute); Spacer(Modifier.height(8.dp))
-        TextBox(st.name, { vm.setSettings { s -> s.copy(name = it.trim()) } }, "Name")
-        Spacer(Modifier.height(14.dp)); OvText("THEME", 13, FontWeight.ExtraBold, ov.mute)
-        Row(Modifier.padding(vertical = 8.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            listOf("light" to "☀️ Light", "dark" to "🌙 Dark", "auto" to "Auto").forEach { (k, l) -> Seg(l, st.theme == k, { vm.setSettings { s -> s.copy(theme = k) } }) }
+    Spacer(Modifier.height(12.dp))
+    when (page) {
+        "you" -> OvCard {
+            OvText("YOUR NAME", 13, FontWeight.ExtraBold, ov.mute); Spacer(Modifier.height(8.dp))
+            TextBox(st.name, { vm.setSettings { s -> s.copy(name = it.trim()) } }, "Name")
+            Spacer(Modifier.height(14.dp)); OvText("THEME", 13, FontWeight.ExtraBold, ov.mute)
+            Row(Modifier.padding(vertical = 8.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                listOf("light" to "☀️ Light", "dark" to "🌙 Dark", "auto" to "Auto").forEach { (k, l) -> Seg(l, st.theme == k, { vm.setSettings { s -> s.copy(theme = k) } }) }
+            }
+            OvText("UNITS", 13, FontWeight.ExtraBold, ov.mute)
+            Row(Modifier.padding(vertical = 8.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                listOf("lb", "kg").forEach { k -> Seg(k, st.unit == k, { vm.setSettings { s -> s.copy(unit = k) } }) }
+            }
+            Sub("App theme colours, backgrounds and sounds are in Profile → Customize.", Modifier.padding(top = 6.dp))
         }
-        OvText("UNITS", 13, FontWeight.ExtraBold, ov.mute)
-        Row(Modifier.padding(vertical = 8.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            listOf("lb", "kg").forEach { k -> Seg(k, st.unit == k, { vm.setSettings { s -> s.copy(unit = k) } }) }
-        }
-    }
-    SecLabel("WORKOUT")
-    OvCard {
-        TogRow("Auto rest timer", "Starts when you finish the last exercise in a round", st.autoRest) { v -> vm.setSettings { it.copy(autoRest = v) } }
-        TogRow("Sound when rest ends", null, st.sound) { v -> vm.setSettings { it.copy(sound = v) } }
-        TogRow("Vibrate when rest ends", null, st.vibe) { v -> vm.setSettings { it.copy(vibe = v) } }
-        TogRow("Track RIR", "Adds a reps in reserve box to each set", st.rir) { v -> vm.setSettings { it.copy(rir = v) } }
-        TogRow("Keep screen on during workouts", "So the rest timer stays on screen", st.awake) { v -> vm.setSettings { it.copy(awake = v) } }
-        TogRow("Rest alerts on lock screen", "Get a ping when rest is over, even with your phone locked", st.restAlerts) { v ->
-            when {
-                !v -> vm.disableRestAlerts()
-                RestAlerts.canNotify(ctx) -> vm.enableRestAlerts(true)
-                else -> notifPerm.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+        "workout" -> OvCard {
+            TogRow("Auto rest timer", "Starts when you finish the last exercise in a round", st.autoRest) { v -> vm.setSettings { it.copy(autoRest = v) } }
+            TogRow("Sound when rest ends", null, st.sound) { v -> vm.setSettings { it.copy(sound = v) } }
+            TogRow("Vibrate when rest ends", null, st.vibe) { v -> vm.setSettings { it.copy(vibe = v) } }
+            TogRow("Track RIR", "Adds a reps in reserve box to each set", st.rir) { v -> vm.setSettings { it.copy(rir = v) } }
+            TogRow("Keep screen on during workouts", "So the rest timer stays on screen", st.awake) { v -> vm.setSettings { it.copy(awake = v) } }
+            TogRow("Rest alerts on lock screen", "Get a ping when rest is over, even with your phone locked", st.restAlerts) { v ->
+                when {
+                    !v -> vm.disableRestAlerts()
+                    RestAlerts.canNotify(ctx) -> vm.enableRestAlerts(true)
+                    else -> notifPerm.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                }
             }
         }
-    }
-    SecLabel("HEALTH")
-    OvCard {
-        TogRow("Heart rate from Samsung Health", "Average, max and a heart rate graph after each workout, through Health Connect", st.heartRate) { v ->
-            if (!v) vm.setSettings { it.copy(heartRate = false) }
-            else when (Health.status(ctx)) {
-                "AVAILABLE" -> scope.launch { if (Health.hasPerms(ctx)) vm.enableHeartRate(true) else hrPerm.launch(Health.PERMS) }
-                "NEEDS_INSTALL" -> { vm.toast("Install or update Health Connect first"); Health.openStore(ctx) }
-                else -> vm.toast("Heart rate needs Android 9 or newer")
+        "health" -> OvCard {
+            TogRow("Heart rate from Samsung Health", "Average, max and a heart rate graph after each workout, through Health Connect", st.heartRate) { v ->
+                if (!v) vm.setSettings { it.copy(heartRate = false) }
+                else when (Health.status(ctx)) {
+                    "AVAILABLE" -> scope.launch { if (Health.hasPerms(ctx)) vm.enableHeartRate(true) else hrPerm.launch(Health.PERMS) }
+                    "NEEDS_INSTALL" -> { vm.toast("Install or update Health Connect first"); Health.openStore(ctx) }
+                    else -> vm.toast("Heart rate needs Android 9 or newer")
+                }
+            }
+            if (st.heartRate) Sub("In Samsung Health: Settings → Health Connect, and allow heart rate. Starting a Weights workout on your watch gives a much more detailed graph.", Modifier.padding(bottom = 6.dp))
+        }
+        "sync" -> AccountCard(vm, d, u.confirm)
+        "data" -> {
+            OvCard {
+                Title("Backup", 20)
+                Sub("Your log, plan and notes live on this phone. Save a backup file every week or two." +
+                    (st.lastBackup?.let { " Last backup ${(System.currentTimeMillis() - it) / 86_400_000} days ago." } ?: ""))
+                Spacer(Modifier.height(10.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OvButton("💾 Save backup file", { save.launch("overload-backup-${LocalDate.now()}.json") }, bg = ov.ink, fg = ov.bg)
+                    OvButton("📂 Restore from file", { pick.launch(arrayOf("application/json", "text/plain", "*/*")) })
+                }
+                Sub("Restore also accepts a backup file from the web version.", Modifier.padding(top = 8.dp))
+            }
+            OvCard {
+                Title("Safety net", 20)
+                Sub("Deleted things wait in the Trash for 30 days. Before every update the app saves a full copy and puts back anything that goes missing.", Modifier.padding(vertical = 6.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OvButton("🗑 Trash", { vm.openSheet(Sheet.Trash) }); OvButton("📦 Export everything", { saveAll.launch("overload-everything-${LocalDate.now()}.json") })
+                }
             }
         }
-        if (st.heartRate) Sub("In Samsung Health: Settings → Health Connect, and allow heart rate. Starting a Weights workout on your watch gives a much more detailed graph.", Modifier.padding(bottom = 6.dp))
-    }
-    SecLabel("DATA")
-    val uiS by vm.ui.collectAsState()
-    AccountCard(vm, d, uiS.confirm)
-    OvCard {
-        Title("Backup", 20)
-        Sub("Your log, plan and notes live on this phone. Save a backup file every week or two." +
-            (st.lastBackup?.let { " Last backup ${(System.currentTimeMillis() - it) / 86_400_000} days ago." } ?: ""))
-        Spacer(Modifier.height(10.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            OvButton("💾 Save backup file", { save.launch("overload-backup-${LocalDate.now()}.json") }, bg = ov.ink, fg = ov.bg)
-            OvButton("📂 Restore from file", { pick.launch(arrayOf("application/json", "text/plain", "*/*")) })
+        "founder" -> OvCard { Title("👑 Founder", 20); OvButton("📊 Owner dashboard", { vm.openSheet(Sheet.Dash) }, Modifier.padding(top = 8.dp), wide = true) }
+        "help" -> OvCard {
+            Row16("👋", "Take the app tour", "How Overload works") { vm.openSheet(Sheet.Tour(0)) }
+            Row16("✨", "What's new", "Overload $APP_VER") { vm.showNews() }
+            if (!st.founder) Row16("🔑", "Founder code", "For the person who built Overload") { vm.openSheet(Sheet.Founder) }
         }
-        Sub("Restore also accepts a backup file from the web version.", Modifier.padding(top = 8.dp))
-        Spacer(Modifier.height(14.dp))
-        OvButton(if (confirmWipe) "Tap again to erase everything" else "Erase all data", { if (confirmWipe) { vm.wipe(); confirmWipe = false } else confirmWipe = true }, fg = Red)
-    }
-    Column(Modifier.fillMaxWidth().padding(top = 18.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Sub("Overload $VERSION · "); OvButton("What's new", { vm.showNews() }, small = true)
+        "danger" -> OvCard {
+            Title("Start over", 20); Sub("Erases every workout, note and your plan from this phone.", Modifier.padding(vertical = 6.dp))
+            OvButton(if (confirmWipe) "Tap again to erase everything" else "Erase all data", { if (confirmWipe) { vm.wipe(); confirmWipe = false } else confirmWipe = true }, fg = Red)
         }
-        Sub("© 2026 Jake Scarpa. All rights reserved.", Modifier.padding(top = 6.dp))
     }
 }
 
 @Composable private fun SecLabel(t: String) = OvText(t, 13, FontWeight.ExtraBold, ov.mute, Modifier.padding(start = 4.dp, top = 20.dp, bottom = 8.dp))
+
+@Composable
+fun TogRowPub(label: String, sub: String?, on: Boolean, onChange: (Boolean) -> Unit) = TogRow(label, sub, on, onChange)
 
 @Composable
 private fun TogRow(label: String, sub: String?, on: Boolean, onChange: (Boolean) -> Unit) =

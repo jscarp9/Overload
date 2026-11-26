@@ -28,6 +28,15 @@
         </activity>
         <receiver android:name=".RestAlarmReceiver" android:exported="false" />
 
+        <!-- Sharing the crew card image -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.files"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_paths" />
+        </provider>
+
         <!-- Health Connect: explains why Overload wants heart rate (Android 13 and older) -->
         <activity android:name=".PermissionsRationaleActivity" android:exported="true">
             <intent-filter>

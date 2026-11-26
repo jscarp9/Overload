@@ -27,15 +27,31 @@ fun CrewScreen(vm: OverloadViewModel, c: Ctx, u: UiState) {
     if (!vm.crew.on) { Title("Crew"); Spacer(Modifier.height(10.dp)); CrewEmpty(vm, c); return }
     val s = cs ?: run { Title("Crew"); OvCard { Sub("Loading your crew…") }; LaunchedEffect(Unit) { vm.crew.sync(true) }; return }
     LaunchedEffect(Unit) { vm.crew.connect() }
-    CrewHead(vm, s)
-    SegTabs(listOf("feed" to "Feed", "arena" to "Arena"), u.sub["crew"] ?: "feed") { vm.setSub("crew", it) }
-    if ((u.sub["crew"] ?: "feed") == "feed") {
-        LiveStrip(vm)
-        Recap(vm, s, c)
-        vm.crew.lastFinished()?.let { lf -> if (!lf.posted) CardButton("📣", "Post your ${c.plan.getOrNull(DAYS.indexOf(lf.day))?.name ?: "workout"}", "Share your breakdown with the crew") { vm.openSheet(Sheet.PostWorkout(sid(lf.date, lf.day))) } }
-        if (s.posts.isEmpty()) OvCard { Sub("No posts yet. Finish a workout and tap Post to crew, or share the code ${s.crew.code} so friends can join.") }
-        s.posts.forEach { PostCard(vm, c, it, u) }
-    } else Arena(vm, c, s, u)
+    CrewHead17(vm, s)
+    val cu = vm.chat.unread()
+    val sub = u.sub["crew"] ?: "feed"
+    SegTabs(listOf("feed" to "Feed", "chat" to "Chat" + if (cu > 0) " (${if (cu > 9) "9+" else cu})" else "", "arena" to "Arena"), sub) { vm.setSub("crew", it) }
+    when (sub) {
+        "chat" -> ChatTab(vm, c, s)
+        "feed" -> {
+            RaidCard(vm, s)
+            LiveStrip(vm)
+            Recap(vm, s, c)
+            vm.crew.lastFinished()?.let { lf -> if (!lf.posted) CardButton("📣", "Post your ${c.plan.getOrNull(DAYS.indexOf(lf.day))?.name ?: "workout"}", "Share your breakdown with the crew") { vm.openSheet(Sheet.PostWorkout(sid(lf.date, lf.day))) } }
+            if (s.posts.isEmpty()) OvCard { Sub("No posts yet. Finish a workout and tap Post to crew, or share the code ${s.crew.code} so friends can join.") }
+            // 0.17: all "joined the crew" posts collapse into one line
+            val joins = s.posts.filter { it.type == "join" }; var joinShown = false
+            s.posts.forEach { p ->
+                if (p.type != "join") PostCard(vm, c, p, u)
+                else if (!joinShown) { joinShown = true
+                    val names = joins.map { vm.crew.member2(it.by)?.name ?: "Someone" }.distinct()
+                    val nm = if (names.size > 3) names.take(3).joinToString(", ") + " and ${names.size - 3} more" else if (names.size > 1) names.dropLast(1).joinToString(", ") + " and " + names.last() else names.first()
+                    OvText("👋 $nm joined the crew · ${ago(joins.first().ts)}", 13, FontWeight.SemiBold, ov.mute, Modifier.padding(start = 6.dp, bottom = 12.dp))
+                }
+            }
+        }
+        else -> ArenaTabs(vm, c, s, u) { Arena(vm, c, s, u) }
+    }
 }
 
 @Composable
@@ -121,6 +137,12 @@ fun PostBody(c: Ctx, p: Post, preview: Boolean) {
     val d = p.data
     when (p.type) {
         "join" -> OvText("Joined the crew 👋", 15, modifier = Modifier.padding(top = 8.dp))
+        "trophy" -> { val t = CTROPHY.firstOrNull { it[1] == d.name }
+            Row(Modifier.padding(top = 8.dp).fillMaxWidth().background(hex("#ffd76a", .18f), RoundedCornerShape(16.dp)).padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
+                OvText(t?.get(2) ?: "🏆", 30); Spacer(Modifier.width(10.dp)); Column { Sub("Crew trophy unlocked"); OvText(d.name.ifEmpty { "Trophy" }, 17, FontWeight.Black) } } }
+        "raid" -> Row(Modifier.padding(top = 8.dp).fillMaxWidth().background(hex("#8b5cf6", .15f), RoundedCornerShape(16.dp)).padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
+            BossView(d.boss, Modifier.size(56.dp)); Spacer(Modifier.width(10.dp)); Column { Sub("Boss defeated"); OvText(d.name.ifEmpty { "Boss" }, 17, FontWeight.Black); Sub("${d.dmg.size} lifters took it down") } }
+        "group" -> GroupPostBodyFor(c, p)
         "rank" -> Row(Modifier.padding(top = 8.dp).fillMaxWidth().background(Color(RANKS[d.rank.coerceIn(0, 7)].light).copy(.25f), RoundedCornerShape(16.dp)).padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
             Emblem(d.rank.coerceIn(0, 7), Modifier.size(48.dp)); Spacer(Modifier.width(10.dp)); Column { Sub("Ranked up to"); OvText(d.rname.ifEmpty { RANKS[d.rank.coerceIn(0, 7)].name }, 18, FontWeight.Black) } }
         else -> {
@@ -148,10 +170,10 @@ fun PostBody(c: Ctx, p: Post, preview: Boolean) {
 private fun PostHead(vm: OverloadViewModel, p: Post, preview: Boolean, menu: (() -> Unit)?) {
     val m = vm.crew.member(p.by); val pr = m?.profile
     Row(verticalAlignment = Alignment.CenterVertically) {
-        Avatar(p.by, m?.name ?: "Former member"); Spacer(Modifier.width(10.dp))
+        Box(Modifier.clickable { if (m != null) vm.openSheet(Sheet.ProfilePage(p.by)) }) { MemberAvatar(vm, p.by, m?.name ?: "Former member") }; Spacer(Modifier.width(10.dp))
         Column(Modifier.weight(1f)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                OvText(m?.name ?: "Former member", 15, FontWeight.Bold); Spacer(Modifier.width(6.dp))
+                NameText(m?.name ?: vm.crew.member2(p.by)?.name ?: "Former member", pr?.nameFx ?: "", 15, founder = pr?.founder == true, shame = vm.crew.shamed(p.by)); Spacer(Modifier.width(6.dp))
                 if (pr != null) { Emblem(pr.rank.coerceIn(0, 7), Modifier.size(18.dp)); OvText(" ${pr.rname}", 12, FontWeight.Bold, ov.mute) }
                 if (pr?.tag?.isNotEmpty() == true) { Spacer(Modifier.width(6.dp)); Chip(pr.tag, Color(0xFF14161C), Color.White) }
             }
@@ -163,26 +185,38 @@ private fun PostHead(vm: OverloadViewModel, p: Post, preview: Boolean, menu: (()
 
 @Composable
 private fun PostCard(vm: OverloadViewModel, c: Ctx, p: Post, u: UiState) {
-    val me = vm.myId(); val cs = vm.crewState.value
-    val canDel = p.by == me || cs?.crew?.owner == me
-    OvCard {
+    val me = vm.myId(); val cs = vm.crewState.value; val own = cs?.crew?.owner == me
+    val canDel = p.by == me || own
+    val style = vm.crew.member(p.by)?.profile?.card ?: ""
+    val cardBg = when (style) { "carbon" -> Brush.linearGradient(listOf(hex("#1a1b1f"), hex("#2e3036"))); "gold" -> Brush.linearGradient(listOf(hex("#7a5410", .35f), hex("#ffe07a", .25f)))
+        "ice" -> Brush.linearGradient(listOf(hex("#e9f8ff", .6f), hex("#8fd3ff", .35f))); "neon" -> Brush.linearGradient(listOf(hex("#0d0f14"), hex("#2a0f2e"))); else -> null }
+    OvCard(if (cardBg != null) Modifier.background(cardBg, RoundedCornerShape(24.dp)) else Modifier) {
         PostHead(vm, p, false, if (canDel) ({ if (u.confirm != "p${p.id}") { vm.setConfirm("p${p.id}"); vm.toast("Tap ⋯ again to delete this post") } else { vm.setConfirm(null); vm.crew.deletePost(p.id) } }) else null)
         PostBody(c, p, false)
-        Row(Modifier.padding(top = 10.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            REACTS.forEach { (k, e) -> val a = p.reacts[k] ?: emptyList(); val on = me != null && me in a
-                OvText(e + if (a.isNotEmpty()) " ${a.size}" else "", 14, FontWeight.Bold, modifier = Modifier.background(if (on) Red.copy(.15f) else ov.soft, RoundedCornerShape(12.dp))
-                    .then(if (on) Modifier.border(1.dp, Red.copy(.5f), RoundedCornerShape(12.dp)) else Modifier).clickable { vm.crew.react(p.id, k) }.padding(horizontal = 12.dp, vertical = 7.dp)) }
+        if (c.st.roasts) roastLine(p, c.unit)?.let { Sub("🤖 $it", Modifier.padding(top = 6.dp)) }
+        // 0.17: only reactions with counts show, ＋ opens the full row
+        val open = u.confirm == "rx${p.id}"
+        Row(Modifier.padding(top = 10.dp).horizontalScrollC(), horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
+            val keys = if (open) c.reactKeys() else p.reacts.filter { it.value.isNotEmpty() }.keys.toList()
+            keys.forEach { k -> val a = p.reacts[k] ?: emptyList(); val on = me != null && me in a
+                Box(Modifier.background(if (on) Red.copy(.15f) else ov.soft, RoundedCornerShape(12.dp)).then(if (on) Modifier.border(1.dp, Red.copy(.5f), RoundedCornerShape(12.dp)) else Modifier)
+                    .clickable { vm.crew.react(p.id, k); if (open) vm.setConfirm(null) }.padding(horizontal = 12.dp, vertical = 7.dp), contentAlignment = Alignment.Center) {
+                    Row(verticalAlignment = Alignment.CenterVertically) { if (k == "crest") CrestView(cs?.crew?.crest, 0, Modifier.size(16.dp)) else OvText(RE14[k] ?: "🔥", 14); if (a.isNotEmpty()) OvText(" ${a.size}", 14, FontWeight.Bold) } } }
+            OvText(if (open) "✕" else "＋", 14, FontWeight.Bold, modifier = Modifier.background(ov.soft, RoundedCornerShape(12.dp)).clickable { vm.setConfirm(if (open) null else "rx${p.id}") }.padding(horizontal = 12.dp, vertical = 7.dp))
             OvText("💬" + if (p.comments.isNotEmpty()) " ${p.comments.size}" else "", 14, FontWeight.Bold, modifier = Modifier.background(ov.soft, RoundedCornerShape(12.dp)).clickable { vm.openSheet(Sheet.Comments(p.id)) }.padding(horizontal = 12.dp, vertical = 7.dp))
+            if (own && p.type == "workout") OvText("🏛", 14, modifier = Modifier.background(ov.soft, RoundedCornerShape(12.dp)).clickable { vm.openSheet(Sheet.HofPost(p.id)) }.padding(horizontal = 10.dp, vertical = 7.dp))
         }
-        p.comments.takeLast(2).forEach { cm -> OvText("${vm.crew.member(cm.by)?.name ?: "?"}  ${cm.text}", 14, modifier = Modifier.padding(top = 6.dp)) }
+        p.comments.takeLast(2).forEach { cm -> OvText("${vm.crew.member2(cm.by)?.name ?: "?"}  ${cm.text}", 14, modifier = Modifier.padding(top = 6.dp)) }
     }
 }
+
+@Composable
+private fun GroupPostBodyFor(c: Ctx, p: Post) { val vm: OverloadViewModel = androidx.lifecycle.viewmodel.compose.viewModel(); GroupPostBody(vm, p) }
 
 // ---------- arena ----------
 @Composable
 private fun Arena(vm: OverloadViewModel, c: Ctx, s: CrewState, u: UiState) {
     val mode = u.sub["arena"] ?: "all"; val me = vm.myId()
-    SegTabs(listOf("all" to "All-time", "week" to "This week", "lifts" to "Lifts"), mode) { vm.setSub("arena", it) }
     if (mode == "lifts") { LiftBoard(vm, c, s, u); return }
     val order = vm.crew.arenaOrder(mode).filter { it.profile != null }; val t = vm.crew.titleHolders(); val snap = c.st.arenaSnap?.pos ?: emptyMap()
     if (order.isEmpty()) { OvCard { Sub("Rankings show up once crew members open the app.") }; return }
@@ -191,7 +225,7 @@ private fun Arena(vm: OverloadViewModel, c: Ctx, s: CrewState, u: UiState) {
         listOf(1 to 2, 0 to 1, 2 to 3).forEach { (idx, place) -> val m = order.getOrNull(idx)
             if (m == null) Spacer(Modifier.weight(1f)) else {
                 val p = m.profile!!; val tt = t.entries.firstOrNull { it.value == m.id }?.let { e -> vm.crew.titles.first { it.k == e.key } }
-                Column(Modifier.weight(1f).clip(RoundedCornerShape(20.dp)).background(ov.card).clickable { vm.openSheet(Sheet.MemberInfo(m.id)) }.padding(8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                Column(Modifier.weight(1f).clip(RoundedCornerShape(20.dp)).background(ov.card).clickable { vm.openSheet(Sheet.ProfilePage(m.id)) }.padding(8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                     if (tt != null) OvText("${tt.icon} ${tt.name}", 10, FontWeight.Bold, ov.mute, align = TextAlign.Center)
                     FramedEmblem(p.rank.coerceIn(0, 7), p.frame, p.aura, Modifier.size(if (place == 1) 74.dp else 58.dp))
                     OvText(m.name, 14, FontWeight.Bold, align = TextAlign.Center); OvText("${p.rname} · ${value(m)}", 11, color = ov.mute, align = TextAlign.Center)
@@ -203,8 +237,8 @@ private fun Arena(vm: OverloadViewModel, c: Ctx, s: CrewState, u: UiState) {
     OvCard {
         order.forEachIndexed { i, m -> val p = m.profile!!; val prev = snap[m.id]; val mv = if (mode == "all" && prev != null) prev - i else 0
             val tk = t.filter { it.value == m.id }.keys.mapNotNull { k -> vm.crew.titles.firstOrNull { it.k == k } }
-            Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(if (m.id == me) Red.copy(.08f) else Color.Transparent).clickable { vm.openSheet(Sheet.MemberInfo(m.id)) }.padding(vertical = 8.dp, horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-                OvText("${i + 1}", 15, FontWeight.Black, ov.mute, Modifier.width(24.dp)); Avatar(m.id, m.name, 34); Spacer(Modifier.width(8.dp))
+            Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(if (m.id == me) Red.copy(.08f) else Color.Transparent).clickable { vm.openSheet(Sheet.ProfilePage(m.id)) }.padding(vertical = 8.dp, horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                OvText("${i + 1}", 15, FontWeight.Black, ov.mute, Modifier.width(24.dp)); MemberAvatar(vm, m.id, m.name, 34); Spacer(Modifier.width(8.dp))
                 Column(Modifier.weight(1f)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         OvText(m.name, 15, FontWeight.Bold); if (m.ok) OvText(" ✓", 12, FontWeight.Black, Green)
@@ -245,7 +279,6 @@ private fun Arena(vm: OverloadViewModel, c: Ctx, s: CrewState, u: UiState) {
             else { OvText("None this week", 15, FontWeight.Bold); OvButton("Set one", { vm.openSheet(Sheet.SetChallenge) }, Modifier.padding(top = 6.dp), small = true) }
         }
     }
-    AwardsCard(vm, s)
 }
 
 @Composable
@@ -267,8 +300,8 @@ private fun LiftBoard(vm: OverloadViewModel, c: Ctx, s: CrewState, u: UiState) {
     OvCard {
         if (rows.isEmpty()) Sub("Nobody here yet.")
         rows.forEachIndexed { i, (x, r) -> val (m, l, e) = x
-            Row(Modifier.fillMaxWidth().clickable { vm.openSheet(Sheet.MemberInfo(m.id)) }.padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                OvText(listOf("🥇", "🥈", "🥉").getOrElse(i) { "${i + 1}" }, 16, modifier = Modifier.width(28.dp)); Avatar(m.id, m.name, 34); Spacer(Modifier.width(8.dp))
+            Row(Modifier.fillMaxWidth().clickable { vm.openSheet(Sheet.ProfilePage(m.id)) }.padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                OvText(listOf("🥇", "🥈", "🥉").getOrElse(i) { "${i + 1}" }, 16, modifier = Modifier.width(28.dp)); MemberAvatar(vm, m.id, m.name, 34); Spacer(Modifier.width(8.dp))
                 Column(Modifier.weight(1f)) { OvText(m.name, 15, FontWeight.Bold); Sub("Best ${vm.crew.mine(l.w, m.profile!!.unit).roundToInt()} × ${l.r}") }
                 OvText(if (rel) String.format("%.2f×", r) else "${e.roundToInt()} ${c.unit}", 15, FontWeight.Black)
             }
@@ -278,7 +311,7 @@ private fun LiftBoard(vm: OverloadViewModel, c: Ctx, s: CrewState, u: UiState) {
 }
 
 @Composable
-private fun AwardsCard(vm: OverloadViewModel, s: CrewState) {
+fun AwardsCardPublic(vm: OverloadViewModel, s: CrewState) {
     if (s.members.size < 2) return
     val d = LocalDate.now().dayOfMonth; val mo = vm.crew.monthKey(); val pm = vm.crew.prevMonthKey()
     if (d <= 7) { val w = vm.crew.awardWinners(pm); if (w.isNotEmpty()) OvCard { H3("🎖️ ${vm.crew.monthName(pm)} crew awards")
@@ -326,22 +359,11 @@ fun CrewSettingsSheet(vm: OverloadViewModel, c: Ctx, u: UiState) {
     }
     H3("Members", Modifier.padding(top = 14.dp))
     s.members.forEach { m -> Row(Modifier.fillMaxWidth().padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
-        Avatar(m.id, m.name, 34); Spacer(Modifier.width(10.dp))
+        MemberAvatar(vm, m.id, m.name, 34); Spacer(Modifier.width(10.dp))
         Column(Modifier.weight(1f)) { OvText(m.name + (if (m.id == s.crew.owner) " · owner" else "") + (if (m.id == me) " · you" else ""), 15, FontWeight.Bold); Sub(m.profile?.rname ?: "Hasn’t synced yet") }
         if (own && m.id != me) OvButton(if (u.confirm == "k${m.id}") "Tap to confirm" else "Remove", { if (u.confirm != "k${m.id}") vm.setConfirm("k${m.id}") else { vm.setConfirm(null); vm.crew.kick(m.id) } }, small = true)
     } }
-    if (own) {
-        H3("Crew banner", Modifier.padding(top = 14.dp))
-        BANNERS.entries.chunked(3).forEach { row -> Row(Modifier.padding(top = 6.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            row.forEach { (k, v) -> val ok = s.crew.level >= v.third
-                Box(Modifier.weight(1f).height(48.dp).clip(RoundedCornerShape(14.dp)).background(Brush.linearGradient(listOf(Color(v.first), Color(v.second))))
-                    .then(if (s.crew.banner == k) Modifier.border(3.dp, ov.ink, RoundedCornerShape(14.dp)) else Modifier)
-                    .clickable { if (ok) vm.crew.banner(k) else vm.toast("Your crew unlocks that banner at a higher level") }, contentAlignment = Alignment.Center) {
-                    if (!ok) OvText("🔒 Lv ${v.third}", 12, FontWeight.Bold, Color.White)
-                }
-            }
-        } }
-    }
+    if (own) CrewOwnerExtras(vm, s)
     Sub("Crew pings (lock-screen alerts for posts) aren’t available on Android yet. You still see everything in 🔔 Activity.", Modifier.padding(top = 14.dp))
     Row(Modifier.padding(top = 12.dp), verticalAlignment = Alignment.CenterVertically) {
         Column(Modifier.weight(1f)) { OvText("Bodyweight (${c.unit})", 15, FontWeight.SemiBold); Sub("Optional. Only used for the relative lift boards") }
@@ -350,14 +372,14 @@ fun CrewSettingsSheet(vm: OverloadViewModel, c: Ctx, u: UiState) {
     OvButton(if (u.confirm == "leave") "Tap again to leave" else "Leave crew", { if (u.confirm != "leave") vm.setConfirm("leave") else { vm.setConfirm(null); vm.crew.leave() } }, Modifier.padding(top = 14.dp), fg = Red, wide = true)
 }
 
+/** Head-to-head, best lifts, their plan and rival button (inside a crewmate's profile page). */
 @Composable
-fun MemberSheet(vm: OverloadViewModel, c: Ctx, id: String) {
+fun MemberExtras(vm: OverloadViewModel, c: Ctx, id: String) {
     val m = vm.crew.member(id) ?: return; val p = m.profile ?: MemberProfile(); val me = vm.myId(); val mine = vm.crew.member(me)?.profile; val isMe = id == me
-    SheetHead(m.name) { vm.closeSheet() }
-    Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-        FramedEmblem(p.rank.coerceIn(0, 7), p.frame, p.aura, Modifier.size(110.dp)); Title(p.rname.ifEmpty { "Unranked" }, 26)
-        if (p.tag.isNotEmpty()) Chip(p.tag, Color(0xFF14161C), Color.White)
-        Sub("Rank Power ${p.power.roundToInt()} · 🔥 ${p.streak} week${if (p.streak == 1) "" else "s"} · ${p.bcount} badges")
+    Row(Modifier.fillMaxWidth().padding(top = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+        FramedEmblem(p.rank.coerceIn(0, 7), p.frame, p.aura, Modifier.size(64.dp)); Spacer(Modifier.width(10.dp))
+        Column { Title(p.rname.ifEmpty { "Unranked" }, 20); if (p.tag.isNotEmpty()) Chip(p.tag, Color(0xFF14161C), Color.White)
+            Sub("Rank Power ${p.power.roundToInt()} · 🔥 ${p.streak} week${if (p.streak == 1) "" else "s"} · ${p.bcount} badges") }
     }
     if (p.show.isNotEmpty()) Row(Modifier.padding(top = 10.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         p.show.forEach { b -> Column(Modifier.weight(1f).background(ov.soft, RoundedCornerShape(14.dp)).padding(8.dp), horizontalAlignment = Alignment.CenterHorizontally) { OvText(b.getOrElse(0) { "" }, 22); OvText(b.getOrElse(1) { "" }, 11, FontWeight.Bold, ov.mute, align = TextAlign.Center) } }

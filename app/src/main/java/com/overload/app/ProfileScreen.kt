@@ -19,90 +19,10 @@ import androidx.compose.ui.unit.dp
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
-// ============================ PROFILE ============================
+// ============================ PROFILE PIECES ============================
+// (0.16: the profile page itself is ProfileTab in Profile16.kt)
 @Composable
-fun ProfileScreen(vm: OverloadViewModel, c: Ctx) {
-    val e = c.eng; val st = c.st; val nx = RANKS.getOrNull(e.rank + 1)
-    Row(verticalAlignment = Alignment.CenterVertically) { Title("Profile", modifier = Modifier.weight(1f)); OvButton("Done", { vm.openProfile(false) }, small = true, bg = ov.ink, fg = ov.bg) }
-    Spacer(Modifier.height(10.dp))
-    OvCard {
-        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-            FramedEmblem(e.rank, st.frame, st.aura, Modifier.size(140.dp))
-            Sub("Rank ${e.rank + 1} of 8 · Rank Power ${e.power}", Modifier.padding(top = 6.dp))
-            Title(e.rname, 36)
-            if (st.tag.isNotEmpty()) Chip(st.tag, Color(0xFF14161C), Color.White)
-            Sub(st.name.ifBlank { "Lifter" } + (e.since?.let { val d = toD(it); " · Member since ${MON[d.monthValue - 1]} ${d.year}" } ?: ""))
-            OvText("🔥 ${e.streak} week streak · ❄️ ${e.freeze} freeze${if (e.freeze == 1) "" else "s"}", 15, FontWeight.Bold, modifier = Modifier.padding(top = 8.dp))
-            val show = st.showcase.mapNotNull { e.badge(it) }
-            Row(Modifier.fillMaxWidth().padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                (0..2).forEach { i -> val b = show.getOrNull(i)
-                    Column(Modifier.weight(1f).height(74.dp).clip(RoundedCornerShape(16.dp)).background(ov.soft).then(if (b != null) Modifier.clickable { vm.openSheet(Sheet.BadgeInfo(b.k)) } else Modifier).padding(6.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-                        OvText(b?.icon ?: "＋", 22, color = if (b != null) ov.ink else ov.mute); OvText(b?.name ?: "Pin a badge", 11, FontWeight.Bold, ov.mute, align = TextAlign.Center)
-                    }
-                }
-            }
-            Row(Modifier.padding(top = 10.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) { OvButton("🎨 Frames and auras", { vm.openSheet(Sheet.Look) }, small = true) }
-        }
-    }
-    val t = e.trial
-    when {
-        t != null -> OvCard {
-            OvText("🔥 PROMOTION TRIAL · ${RANKS[t.tier].name.uppercase()}", 13, FontWeight.ExtraBold, ov.mute)
-            Sub("You've earned a shot at ${RANKS[t.tier].name}. Pass this week's trial to rank up. Miss it and you just try again next week.", Modifier.padding(vertical = 6.dp))
-            LabeledBar("Train on your planned days", t.days, t.need); LabeledBar("Beat last week on lifts", t.beat, t.needBeat)
-        }
-        nx != null -> OvCard {
-            OvText("NEXT: ${nx.name.uppercase()}", 13, FontWeight.ExtraBold, ov.mute)
-            Sub("Unlocks ${UNLOCKS[e.rank + 1]!!.lowercase()}. Hitting both bars starts your promotion trial.", Modifier.padding(vertical = 6.dp))
-            LabeledBar("Active weeks (2+ workouts)", e.active, nx.weeks); LabeledBar("Badges earned", e.bcount, nx.badges)
-        }
-        else -> OvCard {
-            OvText("PRESTIGE", 13, FontWeight.ExtraBold, ov.mute)
-            Sub("Every 13 more active weeks and 15 more badges adds a ★ to your Olympian emblem.", Modifier.padding(vertical = 6.dp))
-            LabeledBar("Active weeks to next ★", e.active - 52 - 13 * e.prestige, 13); LabeledBar("Badges to next ★", e.bcount - 60 - 15 * e.prestige, 15)
-        }
-    }
-    if (c.feat("season")) SeasonCard(vm, e)
-    if (c.feat("liftranks")) LiftRanksCard(vm, c)
-    if (c.feat("mastery")) MasteryCard(c)
-    OvCard {
-        H3("Lifetime")
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            StatTile("${e.workouts}", "Workouts", Modifier.weight(1f)); StatTile(loc(e.lifeSets), "Sets", Modifier.weight(1f))
-            StatTile(lifeFmt(e.lifeVol), "${c.unit} moved", Modifier.weight(1f)); StatTile("${e.lifePR}", "PRs", Modifier.weight(1f))
-        }
-    }
-    OvCard {
-        H3("Rank ladder"); Sub("Each rank has 3 divisions: III, II, then I.")
-        RANKS.forEachIndexed { i, r ->
-            Row(Modifier.fillMaxWidth().padding(vertical = 6.dp).alpha(if (i <= e.rank) 1f else .65f), verticalAlignment = Alignment.CenterVertically) {
-                Emblem(i, Modifier.size(40.dp)); Spacer(Modifier.width(10.dp))
-                Column(Modifier.weight(1f)) { OvText(r.name, 16, FontWeight.Bold); Sub(if (i == 0) "Start here" else "${r.weeks} active weeks · ${r.badges} badges · ${UNLOCKS[i]}") }
-                OvText(if (i <= e.rank) "✓" else "🔒", 16, FontWeight.Black, if (i <= e.rank) Green else ov.mute)
-            }
-        }
-    }
-    OvCard {
-        H3("Milestones"); Sub("Each one levels up: Bronze, Silver, Gold, Platinum, Diamond, Legend.", Modifier.padding(bottom = 8.dp))
-        LADDER.keys.chunked(3).forEach { row ->
-            Row(Modifier.padding(bottom = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                row.forEach { cat -> LadderTile(vm, e, cat, Modifier.weight(1f)) }; repeat(3 - row.size) { Spacer(Modifier.weight(1f)) }
-            }
-        }
-    }
-    OvCard { H3("Weekly badges"); Sub("Earn these again every week. Tap any badge to pin it.", Modifier.padding(bottom = 8.dp)); BadgeGrid(e.R, e.rank >= 2) { vm.openSheet(Sheet.BadgeInfo(it.k)) } }
-    listOf("Lift clubs", "Consistency", "Collections", "Quests", "Crew", "Hidden").forEach { cat ->
-        val list = e.B.filter { it.cat == cat }; if (list.isEmpty()) return@forEach
-        OvCard {
-            H3(cat)
-            when (cat) { "Collections" -> Sub("Finish a set to unlock a bonus badge and a profile frame.", Modifier.padding(bottom = 8.dp)); "Crew" -> Sub("Earned with your crew.", Modifier.padding(bottom = 8.dp)) }
-            BadgeGrid(list, e.rank >= 2) { vm.openSheet(Sheet.BadgeInfo(it.k)) }
-        }
-    }
-    val y = LocalDate.now().year
-    CardButton("🎬", "$y Year in review", if (LocalDate.now().monthValue == 12) "Your year is ready" else "Preview it now. The full one drops in December") { vm.openYear(true) }
-}
+fun LadderTilePub(vm: OverloadViewModel, e: Eng, cat: String, modifier: Modifier) = LadderTile(vm, e, cat, modifier)
 
 @Composable
 private fun LadderTile(vm: OverloadViewModel, e: Eng, cat: String, modifier: Modifier) {

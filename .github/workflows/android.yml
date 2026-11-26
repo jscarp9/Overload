@@ -18,7 +18,7 @@ jobs:
           fetch-depth: 0   # need tags to find the last release number
 
       # Version = the web app's version (overloadVersion in gradle.properties) + a build number:
-      # 0.13.1, 0.13.2, ... The count restarts at .1 when overloadVersion changes.
+      # 0.17.1, 0.17.2, ... The count restarts at .1 when overloadVersion changes.
       - name: Work out version
         id: ver
         run: |
