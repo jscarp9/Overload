@@ -812,6 +812,87 @@ html[data-mode=dark] .c17{border-color:rgba(255,255,255,.07)}
 .ph20 .ph20btns .ic20{background:rgba(127,127,127,.12);border-color:rgba(127,127,127,.25);color:var(--ink)}
 .cb20 .cb2in{padding-top:22px;padding-right:96px}
 .cb20 .cb2crest{margin-top:4px}
+/* 0.21 */
+.sh21{position:relative;margin:14px 6px 4px;padding:0 4px}
+.sh21row{display:flex;justify-content:center;gap:10px;position:relative;z-index:1}
+.md21{flex:0 1 104px;display:flex;flex-direction:column;align-items:center;gap:2px;border:0;background:none;color:var(--ink);padding:0 2px 8px;cursor:pointer;font:inherit;min-width:0}
+.md21i{position:relative;display:block;line-height:0;filter:drop-shadow(0 6px 10px rgba(0,0,0,.35))}
+.md21i::after{content:"";position:absolute;left:12%;right:12%;bottom:-6px;height:10px;border-radius:50%;background:radial-gradient(closest-side,rgba(255,214,120,.35),transparent);pointer-events:none}
+.md21 b{font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin-top:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.md21 i{font-style:normal;font-size:10px;font-weight:600;color:var(--mute);letter-spacing:.04em}
+.md21.add .md21e{width:84px;height:84px;margin-top:0;border-radius:50%;border:1.5px dashed rgba(127,127,127,.4);display:grid;place-items:center;color:var(--mute);font-size:20px}
+.md21.add b{color:var(--mute)}
+.sh21ledge{position:absolute;left:4%;right:4%;bottom:44px;height:7px;border-radius:4px;background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,.04));box-shadow:0 1px 0 rgba(255,255,255,.12) inset,0 8px 18px -6px rgba(0,0,0,.5);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+html[data-mode=light] .sh21ledge{background:linear-gradient(180deg,rgba(0,0,0,.10),rgba(0,0,0,.03))}
+.md21svg.dim{filter:grayscale(1);opacity:.45}
+.md21svg.shn .md21sw{animation:md21sw 4.8s ease-in-out infinite}
+@keyframes md21sw{0%,62%{transform:translateX(0) rotate(20deg)}100%{transform:translateX(150px) rotate(20deg)}}
+.md21svg .md21sw{transform-box:view-box;transform-origin:60px 60px}
+@media (prefers-reduced-motion:reduce){.md21svg.shn .md21sw{animation:none;opacity:0}}
+.md21big{display:flex;justify-content:center;margin:4px 0 6px;filter:drop-shadow(0 12px 18px rgba(0,0,0,.4))}
+.md21tier{font-weight:800;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);margin-bottom:6px}
+.bdg .bi.bi21{font-size:0;line-height:0;height:auto;display:flex;justify-content:center;margin-bottom:2px}
+.pinrow .pi.pi21{width:42px;font-size:0;line-height:0}
+.sh21.mem{margin:14px 0 6px}.sh21.mem .md21{cursor:default}
+/* tap to edit */
+.tap21{cursor:pointer;position:relative}
+.dot21{position:absolute;top:10px;right:10px;z-index:3;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:13px;color:#fff;background:rgba(8,9,12,.5);border:1px solid rgba(255,255,255,.35);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);animation:dot21 2.2s ease-in-out infinite;pointer-events:none}
+.dot21.av{top:auto;left:-2px;right:auto;bottom:-2px;width:24px;height:24px;font-size:12px}
+@keyframes dot21{0%,100%{box-shadow:0 0 0 0 rgba(232,185,35,.55)}50%{box-shadow:0 0 0 7px rgba(232,185,35,0)}}
+.pe21av{display:flex;flex-direction:column;align-items:center;gap:6px;margin:4px auto 12px;border:0;background:none;color:var(--accent);font:700 13px Inter,sans-serif;cursor:pointer}
+/* plan */
+.tip21{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:-2px 2px 10px;font-size:13px;color:var(--mute)}
+.tip21 button{border:0;background:none;color:var(--accent);font:800 13px Inter,sans-serif;cursor:pointer;padding:4px}
+.pd21{display:flex;align-items:center;gap:12px;margin:4px 2px 10px}
+.pd21p{flex:none;width:54px;height:54px;border:0;background:none;padding:0;cursor:pointer;filter:drop-shadow(0 6px 12px rgba(0,0,0,.35))}
+.pd21p svg{width:100%;height:100%}
+.pd21t{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:2px;border:0;background:none;color:var(--ink);text-align:left;padding:4px 0;cursor:pointer;font:inherit}
+.pd21t b{font-size:24px;font-weight:900;letter-spacing:-.02em;line-height:1.1}
+.pd21t span{font-size:13.5px;color:var(--mute);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.pd21t em{font-style:normal;font-size:11px;font-weight:800;letter-spacing:.04em;padding:2px 8px;border-radius:99px;background:rgba(232,185,35,.14);color:#e3c25a;margin-top:3px}
+.pd21m{flex:none;width:38px;height:38px;border-radius:50%;border:1px solid rgba(127,127,127,.25);background:rgba(127,127,127,.1);color:var(--ink);font-size:18px;font-weight:900;cursor:pointer;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.pm21{display:flex;flex-direction:column;margin:-4px 2px 12px;border-radius:16px;overflow:hidden;border:1px solid rgba(127,127,127,.2);background:rgba(127,127,127,.08);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+.pm21 button{border:0;background:none;color:var(--ink);text-align:left;padding:13px 16px;font:700 14.5px Inter,sans-serif;cursor:pointer}
+.pm21 button+button{border-top:1px solid rgba(127,127,127,.15)}
+.pe21{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 2px 14px;padding:14px;border-radius:18px;border:1px solid rgba(127,127,127,.18);background:rgba(127,127,127,.07);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+.pe21 label{display:flex;flex-direction:column;gap:4px;min-width:0}.pe21 label.w{grid-column:1/-1}
+.pe21 label span{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--mute)}
+.pe21 .field,.pe21 select{width:100%;min-height:42px}
+.pe21 #pd21done{grid-column:1/-1;min-height:42px}
+.ex21list{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.sg21,.ss21{position:relative}
+.ss21{padding-left:14px;margin:6px 0}
+.ss21::before{content:"";position:absolute;left:3px;top:24px;bottom:6px;width:3px;border-radius:2px;background:linear-gradient(180deg,var(--accent),rgba(127,127,127,.15));box-shadow:0 0 10px var(--accent)}
+.ss21h{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);margin:0 0 4px 2px}
+.ex21{width:100%;display:flex;align-items:center;gap:12px;padding:9px 12px;border-radius:16px;border:1px solid rgba(127,127,127,.14);background:rgba(127,127,127,.06);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);color:var(--ink);text-align:left;cursor:pointer;font:inherit}
+.ss21 .ex21+.ex21,.ss21 .ed21+.ex21{margin-top:6px}
+.ex21.open{border-color:rgba(127,127,127,.3);border-bottom-left-radius:6px;border-bottom-right-radius:6px}
+.ex21l{flex:none;min-width:30px;height:30px;padding:0 6px;border-radius:10px;display:grid;place-items:center;font-size:12px;font-weight:900;background:rgba(127,127,127,.14);color:var(--mute)}
+.ex21n{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.ex21n b{font-size:16px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ex21n span{font-size:13px;color:var(--mute);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ex21c{color:var(--mute);font-size:18px;font-weight:700}
+.ed21{margin-top:2px;padding:12px;border-radius:6px 6px 16px 16px;border:1px solid rgba(127,127,127,.3);border-top:0;background:rgba(127,127,127,.09);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);display:flex;flex-direction:column;gap:10px}
+.ed21r{display:grid;grid-template-columns:1.5fr 1fr;gap:8px}.ed21r .field,.ed21r select{min-height:42px;width:100%}
+.stps21{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stp21{display:flex;flex-direction:column;gap:4px;align-items:center}
+.stp21>span{font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--mute)}
+.stp21>div{display:flex;align-items:center;width:100%;border-radius:12px;background:rgba(127,127,127,.12);overflow:hidden}
+.stp21 button{flex:none;width:30px;height:40px;border:0;background:none;color:var(--ink);font-size:18px;font-weight:800;cursor:pointer}
+.stp21 input{flex:1;min-width:0;width:100%;border:0;background:none;color:var(--ink);text-align:center;font:800 17px Inter,sans-serif;-moz-appearance:textfield;padding:0}
+.stp21 input::-webkit-inner-spin-button,.stp21 input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.lnk21{align-self:flex-start;border:0;background:none;color:var(--accent);font:700 13.5px Inter,sans-serif;cursor:pointer;padding:4px 2px}
+.ssadd{margin:6px 0 2px 2px}
+.cue21{min-height:40px}
+.acts21{display:flex;flex-wrap:wrap;gap:6px}
+.acts21 button{border:1px solid rgba(127,127,127,.22);background:rgba(127,127,127,.08);color:var(--ink);border-radius:99px;padding:7px 12px;font:700 12.5px Inter,sans-serif;cursor:pointer}
+.acts21 button.rm{margin-left:auto;color:#ef4b55;border-color:rgba(239,75,85,.35)}
+.add21{display:grid;grid-template-columns:1.4fr 1fr;gap:8px;margin:4px 0 18px}
+.add21 .btn{min-height:50px}
+/* arena: rankings toggle */
+.seg20{transform:none;max-width:240px;margin:2px auto 10px;padding:3px}
+.seg20 button{min-height:34px;font-size:13px}
+.pe16 .r15 .sub{max-width:150px}
 </style>
 </head>
 <body>
@@ -936,8 +1017,8 @@ function plateSVG(color,state,opts={}){const id='p'+(pid++),c=PC[color]||PC.red,
 /* ---------- today ---------- */
 function counts(){const s=cur();let tot=0,dn=0;todayGroups().forEach(gr=>gr.forEach(e=>{tot+=Math.max(+e.sets||2,(s.ex[e.id]||[]).length);dn+=(s.ex[e.id]||[]).filter(x=>x&&x.d).length}));return[dn,tot]}
 
-const VERSION=BETA?'0.20 beta':'0.20';
-const NEWS=[['Cleaner profile','Your name sits centered, your info is one line, pinned badges are small icons, and Edit and Share live in the banner corner.'],['Cleaner crew screen','Crew stats sit inside the banner, the Arena has 4 tabs, and the podium people aren’t repeated in the list below.'],['Holiday Drops','Lift on a holiday to unlock a whole matching set. The crew gets a bonus if 3 of you lift.']];
+const VERSION=BETA?'0.21 beta':'0.21';
+const NEWS=[['Medals on your shelf','Pinned badges are now real medals, in bronze, silver, gold and up. Tap one to see how rare it is.'],['Tap to customize','Tap your banner or your plate on your profile to change them. Edit profile is just the personal stuff now.'],['Cleaner Plan page','Each exercise is one line. Tap it to change sets and reps. Supersets show as a glowing bracket.']];
 const isDark=()=>document.documentElement.dataset.mode==='dark';
 function applyTheme(){const t=st.set.theme||'auto',mq=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)');const m=t==='auto'?(mq&&mq.matches?'dark':'light'):t;document.documentElement.dataset.mode=m;const mt=document.querySelector('meta[name=theme-color]');if(mt)mt.setAttribute('content',m==='dark'?'#07080c':'#f7f5f1')}
 function todayGroups(){const p=pd(),sw=(cur().swap)||{};return p.groups.map(gr=>gr.map(e=>sw[e.id]||e))}
@@ -1147,7 +1228,7 @@ function saveRename(){const r=$('rename');if(!r)return;const v=r.value.trim();if
 main.addEventListener('focusout',e=>{if(e.target.id==='rename')setTimeout(saveRename,0)});
 main.addEventListener('keydown',e=>{if(e.target.id==='rename'&&e.key==='Enter'){e.preventDefault();e.target.blur();return}if(e.target.id==='psearch'&&e.key==='Enter'){e.preventDefault();const q=e.target.value.trim();if(!q)return;const hit=LIB.find(x=>x[0].toLowerCase()===q.toLowerCase());if(hit)addFromPicker(...hit);else addFromPicker(q,'Other',8,12)}});
 main.addEventListener('click',async e=>{const b=e.target.closest('button');if(!b)return;const d=st.plan&&st.plan.days[st.pday];
- if(await click20(b))return;if(await click18(b))return;if(await click17(b))return;if(await click16(b))return;if(await click15(b))return;if(await click14(b))return;if(await crewClick(b))return;
+ if(await click21(b))return;if(await click20(b))return;if(await click18(b))return;if(await click17(b))return;if(await click16(b))return;if(await click15(b))return;if(await click14(b))return;if(await crewClick(b))return;
  if(await acctClick(b))return;if(await click13(b))return;
  if(b.id==='openprof'){st.profile=true;render();window.scrollTo({top:0});return}
  if(b.id==='pclose2'){st.profile=false;render();return}
@@ -1254,7 +1335,7 @@ function renderSheet(){const el=$('sheet'),sh=st.sheet;if(!sh){el.innerHTML='';r
 $('sheet').addEventListener('input',e=>{if(e.target.id==='bwin'){const v=parseFloat(e.target.value);st.set.bw=v>0&&v<1000?v:'';saveSet()}});
 $('sheet').addEventListener('click',async e=>{if(e.target.id==='sheetbg'){if(st.sheet&&st.sheet.type==='news')markNews();st.sheet=null;renderSheet();return}const b=e.target.closest('button');if(!b)return;
  if(b.id==='sheetx'){if(st.sheet&&st.sheet.back){st.sheet=st.sheet.back;renderSheet();return}st.sheet=null;st.confirm=null;renderSheet();return}
- if(await sheetClick19(b))return;if(await sheetClick18(b))return;if(await sheetClick17(b))return;if(await sheetClick16(b))return;if(await sheetClick15(b))return;if(await sheetClick14(b))return;if(await crewSheetClick(b))return;if(await acctSheetClick(b))return;if(await sheetClick13(b))return;
+ if(await sheetClick21(b))return;if(await sheetClick19(b))return;if(await sheetClick18(b))return;if(await sheetClick17(b))return;if(await sheetClick16(b))return;if(await sheetClick15(b))return;if(await sheetClick14(b))return;if(await crewSheetClick(b))return;if(await acctSheetClick(b))return;if(await sheetClick13(b))return;
  if(b.id==='newsok'){markNews();st.sheet=null;renderSheet();setTimeout(()=>{if(!weekReport())checkUnlocks()},300);return}
  if(b.id==='shareprof2'){st.sheet={type:'share',title:'Share your rank'};renderSheet();const r=await profileCard();if(st.sheet&&st.sheet.type==='share'){st.sheet.url=r.url;st.sheet.file=r.file;renderSheet()}return}
  if(b.id==='missno'){missGuard=false;st.sheet=null;renderSheet();mirrorNow();return}
@@ -3361,6 +3442,181 @@ arena15=function(){const k=st.sub.arena2||'rank';
  else if(k==='rec')h+=crewRecords()+seasonWall();else h+=jokeAwards()+(typeof awardsHTML==='function'?awardsHTML():'');return h};
 async function click20(b){const d=b.dataset;if(d.arena20){st.sub.arena2=d.arena20;render();return true}if(d.arena17){const a=d.arena17;if(a.startsWith('r_')){st.sub.arena2='rank';st.sub.arena=a.slice(2)}else st.sub.arena2=a;render();return true}return false}
 function boot20(){try{const L=st.set.look;if(L&&OLDF20[L.pbanner]){L.pbanner=OLDF20[L.pbanner];saveSet()}}catch(e){}}
+/* ---------- 0.21: medal awards ---------- */
+const MTL21={bronze:['#ffe3c8','#c98a4f','#6b3a17','#2a1406','Bronze','#7a2a1c','#e8a46a'],silver:['#ffffff','#c6cfdb','#5f6a79','#1d232c','Silver','#1f3f73','#d9e1ec'],gold:['#fff5c9','#e8b923','#8a6209','#2e1f02','Gold','#7a1020','#f3cf5a'],plat:['#f0fffc','#93e2d8','#2f7b74','#0d302d','Platinum','#0f4f4a','#c4f5ee'],diam:['#eef6ff','#8cc4ff','#2457a8','#0b1e47','Diamond','#13255a','#a8d0ff'],legend:['#fbe8ff','#d083ff','#5a1a80','#200631','Legend','#3a0f57','#eab0ff'],obs:['#d7dbe3','#4a505c','#15181d','#050608','Secret','#121418','#d4a93c']};
+const TIER21=['bronze','silver','gold','plat','diam','legend'];
+const IC21={dumbbell:'M3 10v4M6 7.5v9M18 7.5v9M21 10v4M6 12h12',flame:'M12 3c1 3 5 5 5 10a5 5 0 0 1-10 0c0-3 2-4.5 2-6.5 1.2 1 2 2.2 2 3.5 1-2 1-5 1-7z',stack:'M4 19h16M6 15h12M8 11h8M10 7h4',check:'M5 12.5l4.5 4.5L19 7.5',trophy:'M8 4h8v5a4 4 0 0 1-8 0zM8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8.5 20h7M10 17h4',calendar:'M5 6h14v13H5zM5 10h14M9 4v4M15 4v4M9 14h2M13 14h2',pencil:'M5 19l1-4L16 5l3 3L9 18zM14 7l3 3',compass:'M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18zM15.5 8.5l-2 5-5 2 2-5z',scale:'M12 4v16M8 20h8M5 7h14M5 7l-2.5 6h5zM19 7l-2.5 6h5z',sunrise:'M3 17h18M7 17a5 5 0 0 1 10 0M12 6v3M5.6 10.6l2 1.6M18.4 10.6l-2 1.6M8 20.5h8',moon:'M16 4a8 8 0 1 0 4 12A7 7 0 0 1 16 4z',loop:'M5 12a7 7 0 0 1 12-5l2 2M19 4v5h-5M19 12a7 7 0 0 1-12 5l-2-2M5 20v-5h5',shield:'M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6zM12 7v10',leaf:'M5 19c0-9 5-14 14-14 0 9-5 14-14 14zM5 19l8-8',hourglass:'M7 3h10M7 21h10M8 3c0 5 8 6 8 9s-8 4-8 9M16 3c0 5-8 6-8 9s8 4 8 9',bolt:'M13 3L5 13h6l-1 8 8-10h-6z',target:'M12 4a8 8 0 1 0 0 16a8 8 0 1 0 0-16zM12 8a4 4 0 1 0 0 8a4 4 0 1 0 0-8zM12 11.2a.8.8 0 1 0 0 1.6a.8.8 0 1 0 0-1.6z',people:'M8 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM16 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM3 19c0-3 2-5 5-5s5 2 5 5M11 19c0-3 2-5 5-5s5 2 5 5',mountain:'M2.5 19l6.5-11 4 6.5 3-4 5.5 8.5zM7.5 10.5l1.5 1.5 1.5-1',megaphone:'M4 10v4h3l8 4.5V5.5L7 10zM18 9.5a3.5 3.5 0 0 1 0 5M7 14l1.2 5',swords:'M4 4l11 11M20 4L9 15M12.5 17.5l5-5M6.5 12.5l5 5M4 20l3-3M20 20l-3-3',hands:'M2.5 11l4-4 4 2 2.5-1.5L16 9l5.5 2M6.5 12l4 4a1.4 1.4 0 0 0 2-2M10 15.5l1.6 1.6a1.4 1.4 0 0 0 2-2M12.4 17.4l.8.8a1.4 1.4 0 0 0 2-2l-4-4M16 9l-3.5 3',flag:'M6 21V4M6 4h11l-2.5 4L17 12H6',columns:'M4 20h16M5 9h14M12 4l8 5H4zM7 9v11M12 9v11M17 9v11',clock:'M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18zM12 7v5l3.5 2',key:'M15.5 3.5a5 5 0 1 0 0 10 5 5 0 0 0 0-10zM12 12l-8.5 8.5M5.5 18.5l2 2M8.5 15.5l2 2',crown:'M4 17l-1-9 5 4 4-7 4 7 5-4-1 9zM4 20h16',chart:'M4 20h16M6 16l4-5 3 3 6-7M15 7h4v4',arrow:'M4 20L19 5M13 5h6v6M4 20l3.5-.5M4 20l.5-3.5',map:'M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2zM9 4v14M15 6v14',broom:'M19 3l-7.5 7.5M8 10l6 6-3 5H4v-7z',star:'M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6-5.3-3-5.3 3 1.2-6-4.5-4.1 6-.7z'};
+const MK21={w:[[1,10,25,50,100,250],'dumbbell'],s:[[2,4,8,12,26,52],'flame'],t:[[100,500,1000,2500,5000],'check'],p:[[1,10,25,50,100],'trophy']};
+const MFIX21={pm:['gold','calendar'],nt:['silver','pencil'],ex:['silver','compass'],bal:['silver','scale'],dawn:['obs','sunrise'],owl:['obs','moon'],back:['obs','loop'],wknd:['obs','shield'],hol:['obs','leaf'],mara:['obs','hourglass'],spd:['obs','bolt'],cent:['obs','#100'],perf:['obs','target'],squad:['plat','people'],cmil:['plat','mountain'],hype:['plat','megaphone'],rival:['plat','swords'],recruit:['plat','hands'],team:['plat','flag'],col_club:['legend','columns'],col_clock:['legend','clock'],col_secret:['legend','key'],col_week:['legend','calendar'],col_ms:['legend','crown']};
+const MWK21={fullweek:'flame',overload:'chart',prhunt:'arrow',speed:'bolt',dawnwk:'sunrise',quest:'map',sweep:'broom'};
+function medalOf21(k,name,count){k=String(k||'');let m='silver',ic=null;
+ const a=k.match(/^([wstp])(\d+)$/);if(a&&MK21[a[1]]){const i=MK21[a[1]][0].indexOf(+a[2]);if(i>=0){m=TIER21[Math.min(5,i)];ic=MK21[a[1]][1]}}
+ if(!ic){const v=k.match(/^v(\d)$/);if(v){m=TIER21[Math.min(5,+v[1])];ic='stack'}}
+ if(!ic){const c=k.match(/^c(\d)$/);if(c){m=TIER21[Math.min(5,+c[1])];const n=String(name||'').match(/^\d+/);ic='#'+(n?n[0]:'')}}
+ if(!ic&&MFIX21[k]){[m,ic]=MFIX21[k]}
+ if(!ic&&MWK21[k]){ic=MWK21[k];const n=+count||0;m=n>=25?'plat':n>=10?'gold':n>=3?'silver':'bronze'}
+ return {m,ic}}
+let mid21=0;
+const MT21={bronze:['#ffe6cc','#e8ab72','#b5703a','#6e3c17','#2e1606'],silver:['#ffffff','#e6ebf1','#adb7c3','#677382','#262d36'],gold:['#fffbe2','#f7d97c','#d6a63a','#8a6212','#3c2905'],plat:['#f5fffd','#cdf3ee','#88d1c8','#3d8880','#123532'],diam:['#f3f9ff','#c8e2ff','#82b6f2','#3965b5','#0f2252'],legend:['#fdf2ff','#ebc6ff','#ba7cea','#682a98','#24083a'],obs:['#8d95a3','#545b68','#2c3139','#15181d','#050607']};
+const GEO21=(()=>{const cx=60,cy=60;let reed='',gl='',rings='',leaves='';
+ for(let i=0;i<90;i++){const t=i*Math.PI/45,c=Math.cos(t),s=Math.sin(t);reed+=`M${(cx+51.2*c).toFixed(2)} ${(cy+51.2*s).toFixed(2)}L${(cx+54*c).toFixed(2)} ${(cy+54*s).toFixed(2)}`}
+ for(let i=0;i<72;i++){const t=i*Math.PI/36,c=Math.cos(t),s=Math.sin(t);gl+=`M${(cx+9*c).toFixed(2)} ${(cy+9*s).toFixed(2)}L${(cx+35*c).toFixed(2)} ${(cy+35*s).toFixed(2)}`}
+ for(let r=12;r<35;r+=2.6)rings+=`<circle cx="${cx}" cy="${cy}" r="${r.toFixed(1)}"/>`;
+ const L=(a,side)=>{const t=a*Math.PI/180,x=cx+29.5*Math.cos(t),y=cy+29.5*Math.sin(t),rot=a+(side>0?60:-60);return `<ellipse cx="${x.toFixed(2)}" cy="${y.toFixed(2)}" rx="3.6" ry="1.5" transform="rotate(${rot.toFixed(1)} ${x.toFixed(2)} ${y.toFixed(2)})"/>`};
+ for(let a=100;a<=215;a+=13)leaves+=L(a,1);for(let a=80;a>=-35;a-=13)leaves+=L(a,-1);return{reed,gl,rings,leaves}})();
+function medal21(k,o){o=o||{};const {m,ic}=medalOf21(k,o.name,o.count),C=MT21[m],id='md'+(mid21++),sz=o.size||64,cx=60,cy=60,G=GEO21;
+ const ink=m==='obs'?['#fff1b8','#e8b923','#8a6209']:[C[0],C[2],C[4]],band=sz>=56&&o.text!==false;
+ const shine=!o.dim&&['gold','plat','diam','legend'].includes(m);
+ const nm=esc(String(o.name||'').toUpperCase()),fs=nm.length>16?5.4:nm.length>13?6.2:7.2,tier=MTL21[m][4].toUpperCase();
+ let face;
+ if(ic&&ic[0]==='#'){const t=ic.slice(1),f=t.length>=3?19:23;face=`<g font-family="Inter,system-ui,sans-serif" font-weight="900" font-size="${f}" text-anchor="middle"><text x="${cx+1}" y="${cy+8}" fill="${C[4]}" opacity=".7">${t}</text><text x="${cx-.5}" y="${cy+6.5}" fill="${ink[0]}">${t}</text><text x="${cx}" y="${cy+7}" fill="url(#${id}i)">${t}</text></g>`}
+ else if(ic&&IC21[ic]){const p=IC21[ic];face=`<g transform="translate(${cx} ${cy}) scale(1.32) translate(-12 -12)" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="${p}" stroke="${C[4]}" stroke-opacity=".7" stroke-width="3.2" transform="translate(.8 1)"/><path d="${p}" stroke="${ink[0]}" stroke-width="2.6" transform="translate(-.45 -.45)"/><path d="${p}" stroke="url(#${id}i)" stroke-width="2.2"/></g>`}
+ else face=`<text x="${cx}" y="${cy+9}" text-anchor="middle" font-size="26">${esc(o.emoji||'⭐')}</text>`;
+ return `<svg class="md21svg${o.dim?' dim':''}${shine?' shn':''}" viewBox="0 0 120 120" width="${sz}" height="${sz}" aria-hidden="true"><defs>
+ <linearGradient id="${id}r" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${C[0]}"/><stop offset=".18" stop-color="${C[1]}"/><stop offset=".38" stop-color="${C[3]}"/><stop offset=".52" stop-color="${C[1]}"/><stop offset=".7" stop-color="${C[2]}"/><stop offset=".86" stop-color="${C[3]}"/><stop offset="1" stop-color="${C[4]}"/></linearGradient>
+ <linearGradient id="${id}v" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${C[0]}"/><stop offset=".5" stop-color="${C[2]}"/><stop offset="1" stop-color="${C[4]}"/></linearGradient>
+ <linearGradient id="${id}w" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${C[4]}"/><stop offset=".5" stop-color="${C[3]}"/><stop offset="1" stop-color="${C[0]}"/></linearGradient>
+ <radialGradient id="${id}b" cx=".4" cy=".35" r=".75"><stop offset="0" stop-color="${C[2]}"/><stop offset=".7" stop-color="${C[3]}"/><stop offset="1" stop-color="${C[4]}"/></radialGradient>
+ <radialGradient id="${id}f" cx=".36" cy=".3" r=".85"><stop offset="0" stop-color="${C[0]}"/><stop offset=".35" stop-color="${C[1]}"/><stop offset=".75" stop-color="${C[2]}"/><stop offset="1" stop-color="${C[3]}"/></radialGradient>
+ <linearGradient id="${id}i" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${ink[0]}"/><stop offset=".55" stop-color="${ink[1]}"/><stop offset="1" stop-color="${ink[2]}"/></linearGradient>
+ <radialGradient id="${id}s" cx=".3" cy=".22" r=".5"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+ <path id="${id}t" d="M18 60 A42 42 0 0 1 102 60"/><path id="${id}u" d="M13.5 60 A46.5 46.5 0 0 0 106.5 60"/>
+ <clipPath id="${id}k"><circle cx="60" cy="60" r="54"/></clipPath></defs>
+ <circle cx="60" cy="63" r="54" fill="${C[4]}"/><circle cx="60" cy="60" r="54" fill="url(#${id}r)"/>
+ <path d="${G.reed}" stroke="${C[4]}" stroke-opacity=".45" stroke-width=".9"/>
+ <circle cx="60" cy="60" r="49.5" fill="none" stroke="url(#${id}v)" stroke-width="2"/>
+ ${band?`<circle cx="60" cy="60" r="48.5" fill="url(#${id}b)"/><g font-family="Inter,system-ui,sans-serif" font-weight="800" letter-spacing="1.6" text-anchor="middle">
+ <text font-size="${fs}" fill="${C[0]}" opacity=".55" dy=".7"><textPath href="#${id}t" startOffset="50%">${nm}</textPath></text>
+ <text font-size="${fs}" fill="${C[4]}"><textPath href="#${id}t" startOffset="50%">${nm}</textPath></text>
+ <text font-size="6" fill="${C[0]}" opacity=".55" dy="-.4"><textPath href="#${id}u" startOffset="50%">★ ${tier} ★</textPath></text>
+ <text font-size="6" fill="${C[4]}" dy="-1"><textPath href="#${id}u" startOffset="50%">★ ${tier} ★</textPath></text></g>`:''}
+ <circle cx="60" cy="60" r="${band?37.5:48}" fill="none" stroke="url(#${id}w)" stroke-width="2.4"/>
+ <circle cx="60" cy="60" r="${band?36.3:46.8}" fill="url(#${id}f)"/>
+ <g transform="translate(60 60) scale(${band?1:1.28}) translate(-60 -60)">
+ <path d="${G.gl}" stroke="${C[0]}" stroke-opacity=".16" stroke-width=".5"/>
+ <g fill="none" stroke="${C[3]}" stroke-opacity=".14" stroke-width=".45">${G.rings}</g>
+ <g fill="${C[1]}" stroke="${C[3]}" stroke-width=".5" opacity=".9">${G.leaves}</g>${face}</g>
+ <g clip-path="url(#${id}k)"><ellipse cx="46" cy="38" rx="44" ry="30" fill="url(#${id}s)"/>${shine?`<rect class="md21sw" x="-40" y="-10" width="18" height="140" fill="#fff" opacity=".35" transform="rotate(20 60 60)"/>`:''}</g>
+ ${o.count>1?`<g><rect x="80" y="94" width="34" height="18" rx="9" fill="#0b0c10" stroke="${C[1]}" stroke-width="1.2"/><text x="97" y="107" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-weight="800" font-size="11" fill="#fff">×${o.count>99?'99+':o.count}</text></g>`:''}
+ </svg>`}
+function tierName21(k,name,count){const {m}=medalOf21(k,name,count);return MTL21[m][4]}
+function badgeMedal21(b,size,dim){return medal21(b.k,{name:b.name,count:b.count,emoji:b.icon,size,dim})}
+
+/* profile shelf */
+function shelf21(show){const slots=[0,1,2].map(i=>{const b=show[i];if(b)return `<button class="md21" data-bdg="${esc(b.k)}" aria-label="${esc(b.name)}"><span class="md21i">${badgeMedal21(b,84)}</span><b>${esc(b.name)}</b><i>${tierName21(b.k,b.name,b.count)}${b.count?` · ×${b.count}`:''}</i></button>`;
+  return `<button class="md21 add" id="pinpick" aria-label="Pin a badge"><span class="md21e">＋</span><b>Pin</b><i>Badge</i></button>`});
+ return `<div class="sh21"><div class="sh21row">${slots.join('')}</div><div class="sh21ledge"></div></div>`}
+{const _r=renderProfile16;renderProfile16=function(){let h=_r();try{
+  const E=engine(),show=(st.set.showcase||[]).map(k=>E.B.find(x=>x.k===k)||E.R.find(x=>x.k===k)).filter(Boolean);
+  h=h.replace(/<div class="ph20pins">[\s\S]*?<\/div><\/div>/,shelf21(show)+'</div>');
+  const T=st.set.tap21||{};
+  h=h.replace('<div class="ph16ban">',`<div class="ph16ban tap21" data-tap21="ban" role="button" tabindex="0" aria-label="Change banner">${T.ban?'':'<span class="dot21">✎</span>'}`);
+  h=h.replace('<div class="ph16ban ph16plain">',`<div class="ph16ban ph16plain tap21" data-tap21="ban" role="button" tabindex="0" aria-label="Add a banner">${T.ban?'':'<span class="dot21">✎</span>'}`);
+  h=h.replace('<span class="ph16av">',`<span class="ph16av tap21" data-tap21="av" role="button" tabindex="0" aria-label="Change plate and avatar">${T.av?'':'<span class="dot21 av">✎</span>'}`);
+ }catch(e){}return h}}
+function openEdit21(sec){const P=JSON.parse(JSON.stringify(st.set.prof||{}));st.sheet={type:'profedit',p:P,av:{...(st.set.av||{})},flex:(st.set.flex||['best','streak','vol']).slice(),rim:st.set.rim||'',sec,direct:1};renderSheet()}
+function tap21(k){st.set.tap21=st.set.tap21||{};if(!st.set.tap21[k]){st.set.tap21[k]=1;saveSet()}openEdit21(k==='ban'?'banner':'plate21');render()}
+function commit21(sh){grab16(sh);st.set.prof=sh.p;st.set.av=sh.av&&(sh.av.t||sh.av.c)?sh.av:null;st.set.flex=sh.flex;st.set.rim=(sh.rim||'').slice(0,24);saveSet();st.sheet=null;renderSheet();render();try{syncCrew(true)}catch(e){}toast('Saved')}
+
+/* edit profile: personal stuff only, plate + banner live on the profile itself */
+PE16.push(['plate21','💿','Plate and avatar']);
+const PEHIDE21=['banner','avatar','tpins','fav','rim','plate21'];
+{const _p=profEdit16;profEdit16=function(sh){
+ if(!sh.sec){const rows=PE16.filter(([k])=>!PEHIDE21.includes(k)&&(k!=='jersey'||st.cs)).map(([k,i,l])=>row16(`data-pesec="${k}"`,i,l,pe16Val(sh,k))).join('');
+  return `<div class="ghd"><h2>Edit profile</h2><button class="btn sm" id="sheetx">Cancel</button></div><button class="pe21av" data-pesec="plate21" aria-label="Change plate and avatar">${avatar({id:myId(),name:st.set.name,profile:{av:sh.av||{}}},64)}<span>Change plate</span></button><div class="card rows15 pe16">${rows}</div><button class="btn acc wide" id="profsave" style="min-height:52px;margin-top:6px">Save profile</button><p class="sub" style="text-align:center;margin-top:10px">Tip: tap your banner or plate on your profile to change them.</p>`}
+ if(sh.sec==='plate21'){const av=sh.av||{},P=sh.p,E=eng14(),ownPl=Object.keys(PC).filter(x=>!plateLocked(x)&&finOwned(x,E)),fav=ownPl.filter(x=>FIN[x]);
+  const head=`<div class="ghd">${sh.direct?'<span></span>':'<button class="btn sm" id="pe16back">‹ Back</button>'}<h2 style="margin:0">Plate and avatar</h2><button class="btn sm acc" id="pe16back2">Done</button></div>`;
+  return head+`<div class="pe16sec"><div style="text-align:center;margin:6px 0 10px">${avatar({id:myId(),name:st.set.name,profile:{av}},84)}</div>
+  ${ownPl.length?`<div class="glbl">USE A PLATE</div><div class="lkrow lk16">${ownPl.map(x=>`<button class="lkc${av.t==='plate'&&av.v===x?' on':''}" data-av="plate:${x}"><span class="lki2">${plateSVG(x,'done')}</span></button>`).join('')}</div>`:''}
+  <div class="glbl">OR AN ICON</div><div class="lkrow lk16"><button class="lkc${!av.t?' on':''}" data-av="init:">Initials</button>${AV_ICONS.map(i=>`<button class="lkc${av.t==='icon'&&av.v===i?' on':''}" data-av="icon:${i}">${i}</button>`).join('')}</div>
+  <div class="glbl">ICON COLOR</div><div class="lkrow lk16">${AV_COLS.map(c=>`<button class="lkc${av.c===c?' on':''}" data-avc="${c}"><i style="background:${c}"></i></button>`).join('')}</div>
+  <div class="glbl">FAVORITE PLATE</div>${fav.length?`<div class="lkrow lk16"><button class="lkc${!P.fav?' on':''}" data-pset="fav:">None</button>${fav.map(x=>`<button class="lkc${P.fav===x?' on':''}" data-pset="fav:${x}"><span class="lki2">${plateSVG(x,'done')}</span></button>`).join('')}</div>`:'<p class="sub">Unlock special plates to show one off.</p>'}
+  <div class="glbl">NAME ON YOUR PLATE</div><input class="field" id="rimin" maxlength="24" placeholder="${esc((st.set.name||'Your name').toUpperCase())}" value="${esc(sh.rim||'')}"><p class="sub">Engraved around the big plate on Today.</p></div>`}
+ let h=_p(sh);if(sh.direct&&sh.sec==='banner')h=h.replace('<button class="btn sm" id="pe16back">‹ Back</button>','<span></span>');return h}}
+
+/* ---------- arena: no more Lifts board ---------- */
+{const _a=arenaHTML;arenaHTML=function(){if(st.sub.arena==='lifts')st.sub.arena='all';return _a().replace(/<button data-seg="arena:lifts"[^>]*>Lifts<\/button>/,'')}}
+
+/* ---------- plan page refresh ---------- */
+const fmtRest21=v=>`${Math.floor(v/60)}:${String(v%60).padStart(2,'0')}`;
+renderPlan=function(){const d=st.plan.days[st.pday],col=colorOf(d),off=d.type==='off',f=FIN[col];
+ let h=`<div class="days">${DN.map((n,i)=>{const dd=st.plan.days[i];return `<button data-pday="${i}" aria-pressed="${i===st.pday}">${n}<i style="background:${dd.type==='off'?'#c9cdd4':PC[colorOf(dd)][0]}"></i></button>`}).join('')}</div>`;
+ if(!st.set.ptip21)h+=`<div class="tip21"><span>Set each day once. It repeats every week.</span><button id="ptip21" aria-label="Got it">Got it</button></div>`;
+ const sub=off?'Rest day':[d.focus||'Add a focus',`Rest ${fmtRest21(+d.rest||90)}`].join(' · ');
+ h+=`<div class="pd21"><button class="pd21p" id="platepick" aria-label="Change plate">${plateSVG(col,'done')}</button><button class="pd21t" id="pd21edit" aria-expanded="${!!st.pd21}"><b>${esc(d.name||'Untitled day')}</b><span>${esc(sub)}</span>${f?`<em>${esc(f[0])}</em>`:''}</button><button class="pd21m" id="pd21more" aria-label="More options">⋯</button></div>`;
+ if(st.pd21m)h+=`<div class="pm21"><button id="copyday">📋 Copy this day to other days</button><button id="tpl21">🗂 Templates</button></div>`;
+ if(st.pd21)h+=`<div class="pe21"><label><span>Name</span><input class="field" data-pf2="name" value="${esc(d.name)}" placeholder="Day name"></label><label><span>Type</span><select data-pf2="type">${Object.entries(TYPES).map(([k,t])=>`<option value="${k}"${d.type===k?' selected':''}>${t[0]}</option>`).join('')}</select></label>${off?'':`<label class="w"><span>Focus</span><input class="field" data-pf2="focus" value="${esc(d.focus)}" placeholder="e.g. Chest and back"></label><label><span>Rest between rounds</span><select data-pf2="rest">${[30,45,60,75,90,105,120,150,180,240].map(v=>`<option value="${v}"${+d.rest===v?' selected':''}>${fmtRest21(v)}</option>`).join('')}</select></label>`}<button class="btn sm acc" id="pd21done">Done</button></div>`;
+ if(!off){h+=`<div class="ex21list">`;
+  d.groups.forEach((gr,gi)=>{const L=String.fromCharCode(65+gi),ss=gr.length>1;
+   h+=`<div class="${ss?'ss21':'sg21'}">${ss?`<div class="ss21h">Superset ${L}</div>`:''}`;
+   gr.forEach((e,ei)=>{const key=gi+'-'+ei,open=st.pex21===key;
+    h+=`<button class="ex21${open?' open':''}" data-pex21="${key}"><span class="ex21l">${ss?L+(ei+1):L}</span><span class="ex21n"><b>${esc(e.name||'Exercise')}</b><span>${e.sets||0} × ${e.lo||0}${e.hi&&+e.hi!==+e.lo?'–'+e.hi:''} · ${esc(e.m||'')}${e.cue?' · 📝':''}</span></span><span class="ex21c">${open?'⌃':'›'}</span></button>`;
+    if(open){const stp=(fld,lbl)=>`<div class="stp21"><span>${lbl}</span><div><button data-st21="${key}:${fld}:-1" aria-label="Less ${lbl}">−</button><input type="number" inputmode="numeric" data-ef="${fld}" data-g="${gi}" data-e="${ei}" value="${e[fld]}" aria-label="${lbl}"><button data-st21="${key}:${fld}:1" aria-label="More ${lbl}">+</button></div></div>`;
+     h+=`<div class="ed21"><div class="ed21r"><input class="field" data-ef="name" data-g="${gi}" data-e="${ei}" value="${esc(e.name)}" aria-label="Exercise name"><select data-ef="m" data-g="${gi}" data-e="${ei}" aria-label="Muscle">${MUSCLES.map(x=>`<option${x===e.m?' selected':''}>${x}</option>`).join('')}</select></div>
+     <div class="stps21">${stp('sets','Sets')}${stp('lo','Min reps')}${stp('hi','Max reps')}</div>
+     ${e.cue||st.note21===key?`<input class="field cue21" data-ef="cue" data-g="${gi}" data-e="${ei}" value="${esc(e.cue||'')}" placeholder="Form cue or note" aria-label="Form cue">`:`<button class="lnk21" data-note21="${key}">＋ Add note</button>`}
+     <div class="acts21">${gi>0?`<button data-gup="${gi}">↑ Move up</button>`:''}${gi<d.groups.length-1?`<button data-gdn21="${gi}">↓ Move down</button>`:''}${!ss?`<button data-padd="${gi}">＋ Superset</button>`:''}<button class="rm" data-edel21="${key}">Remove</button></div></div>`}});
+   if(st.picker&&st.picker.ctx==='plan'&&st.picker.gi===gi)h+=pickerHTML();else if(ss)h+=`<button class="lnk21 ssadd" data-padd="${gi}">＋ Add to superset ${L}</button>`;
+   h+=`</div>`});
+  if(!d.groups.length)h+=`<p class="sub" style="text-align:center;padding:18px 0">No exercises yet. Add your first one below.</p>`;
+  h+=`</div>`;
+  h+=st.picker&&st.picker.ctx==='plan'&&st.picker.gi===-1?pickerHTML():`<div class="add21"><button class="btn go" data-padd="-1">＋ Exercise</button><button class="btn" id="ss21new">＋ Superset</button></div>`}
+ if(st.tpl21)h+=`<div class="sec" id="tplsec"><h3>Templates</h3><p class="sub">Replaces the whole week. Your logged history stays.</p><div class="tpl">${Object.entries(TEMPLATES).map(([k,t])=>`<button data-tpl="${k}">${plateSVG(t.c,'done')}<span><b>${st.confirm==='t'+k?'Tap again to replace your plan':t.label}</b><span class="sub">${t.desc}</span></span></button>`).join('')}</div></div>`;
+ return h};
+let undo21=null;
+function showUndo21(msg){const el=$('undo18');if(!el)return;el.innerHTML=`<span>${esc(msg)}</span><button id="undo21b">Undo</button>`;el.classList.add('on');clearTimeout(el._t);el._t=setTimeout(()=>{el.classList.remove('on');undo21=null},6000)}
+function doUndo21(){if(!undo21)return;const u=undo21,d=st.plan.days[u.day];if(d){if(u.group)d.groups.splice(Math.min(u.gi,d.groups.length),0,[u.ex]);else if(d.groups[u.gi])d.groups[u.gi].splice(Math.min(u.ei,d.groups[u.gi].length),0,u.ex);else d.groups.push([u.ex]);saveP();render();toast(u.ex.name+' is back')}undo21=null;const el=$('undo18');if(el)el.classList.remove('on')}
+{const _af=addFromPicker;addFromPicker=function(...a){const chain=st.ss21&&st.picker&&st.picker.ctx==='plan'&&st.picker.gi===-1;const r=_af.apply(this,a);if(chain){st.ss21=0;const d=st.plan.days[st.pday];st.picker={ctx:'plan',gi:d.groups.length-1};render();toast('Now pick the exercise to pair with it');const pk=$('pick');if(pk)pk.scrollIntoView({behavior:'smooth',block:'center'})}return r}}
+
+async function click21(b){const d=b.dataset,day=st.plan&&st.plan.days[st.pday];
+ if(b.id==='ptip21'){st.set.ptip21=1;saveSet();render();return true}
+ if(b.id==='pd21edit'){st.pd21=!st.pd21;st.pd21m=false;render();return true}
+ if(b.id==='pd21done'){st.pd21=false;render();return true}
+ if(b.id==='pd21more'){st.pd21m=!st.pd21m;render();return true}
+ if(b.id==='tpl21'){st.tpl21=true;st.pd21m=false;render();const t=$('tplsec');if(t)t.scrollIntoView({behavior:'smooth',block:'start'});return true}
+ if(b.id==='copyday'){st.pd21m=false}
+ if(d.pday!==undefined){st.pex21=null;st.pd21=false;st.pd21m=false;st.note21=null}
+ if(d.pex21){st.pex21=st.pex21===d.pex21?null:d.pex21;st.note21=null;st.picker=null;render();return true}
+ if(d.note21){st.note21=d.note21;render();const i=document.querySelector('.cue21');if(i)i.focus();return true}
+ if(d.st21&&day){const [key,f,dl]=d.st21.split(':'),[gi,ei]=key.split('-').map(Number),e=day.groups[gi]&&day.groups[gi][ei];if(!e)return true;
+  let v=Math.max(f==='sets'?1:1,(+e[f]||0)+(+dl));if(f!=='sets')v=Math.min(100,v);else v=Math.min(20,v);e[f]=v;
+  if(f==='lo'&&+e.hi<v)e.hi=v;if(f==='hi'&&+e.lo>v)e.lo=v;saveP();render();return true}
+ if(d.gdn21!==undefined&&day){const i=+d.gdn21;if(i<day.groups.length-1){[day.groups[i+1],day.groups[i]]=[day.groups[i],day.groups[i+1]];if(st.pex21){const [g,e]=st.pex21.split('-').map(Number);if(g===i)st.pex21=(i+1)+'-'+e}saveP();render()}return true}
+ if(d.gup!==undefined&&st.pex21&&day){const i=+d.gup,[g,e]=st.pex21.split('-').map(Number);if(i>0&&g===i)st.pex21=(i-1)+'-'+e;return false}
+ if(d.edel21&&day){const [gi,ei]=d.edel21.split('-').map(Number),gr=day.groups[gi],ex=gr&&gr[ei];if(!ex)return true;
+  try{trashPutSync('exercise',`${ex.name} (from ${day.name||'plan'})`,{day:st.pday,gi,ex:JSON.parse(JSON.stringify(ex))})}catch(x){}
+  gr.splice(ei,1);const group=!gr.length;if(group)day.groups.splice(gi,1);undo21={day:st.pday,gi,ei,ex:JSON.parse(JSON.stringify(ex)),group};st.pex21=null;saveP();render();showUndo21(ex.name+' removed');return true}
+ if(b.id==='ss21new'){st.ss21=1;st.picker={ctx:'plan',gi:-1};render();const pk=$('pick');if(pk)pk.scrollIntoView({behavior:'smooth',block:'center'});return true}
+ if(b.id==='undo21b'){doUndo21();return true}
+ return false}
+
+/* ---------- sheets: medals in badge, pin picker, crew member ---------- */
+async function sheetClick21(b){const sh=st.sheet,d=b.dataset;if(!sh)return false;
+ if(sh.type==='profedit'&&sh.direct&&(b.id==='pe16back2'||b.id==='pe16back')){commit21(sh);return true}
+ if(sh.type==='profedit'&&sh.direct&&b.id==='sheetx'){st.sheet=null;renderSheet();return true}
+ if(sh.type==='pinpick'&&d.tpin21){const P=st.set.prof=st.set.prof||{},a=P.tpins=P.tpins||[],i=a.indexOf(d.tpin21);if(i>=0)a.splice(i,1);else{if(a.length>=3)a.shift();a.push(d.tpin21)}saveSet();renderSheet();try{syncCrew(true)}catch(e){}return true}
+ if(sh.type==='badge'&&b.id==='pinswap21'){st.sheet={type:'pinpick',back:sh};renderSheet();return true}
+ return false}
+function patch21(){const sh=st.sheet,el=$('sheet');if(!sh||!el)return;const box=el.querySelector('.sheet');if(!box)return;const E=engine();
+ if(sh.type==='badge'){const b=E.B.find(x=>x.k===sh.k)||E.R.find(x=>x.k===sh.k);const big=box.querySelector('div[style*="font-size:64px"]');if(b&&big){const earned=b.earned||b.count>0;big.removeAttribute('style');big.className='md21big';big.innerHTML=b.hid&&!earned?medal21('zz',{emoji:'❔',size:130,dim:true}):badgeMedal21(b,130,!earned);
+   const rar=box.querySelector('.rar');if(rar&&earned){const t=document.createElement('div');t.className='md21tier';t.textContent=tierName21(b.k,b.name,b.count)+' medal';rar.parentNode.insertBefore(t,rar)}
+   const pin=box.querySelector('#pinb');if(pin&&(st.set.showcase||[]).length>=3&&!(st.set.showcase||[]).includes(b.k)){const s=document.createElement('p');s.className='sub';s.style.textAlign='center';s.textContent='Your shelf holds 3. Pinning this replaces the oldest one.';pin.parentNode.insertBefore(s,pin)}}}
+ if(sh.type==='pinpick'){box.querySelectorAll('.pinrow[data-pinb2]').forEach(r=>{const k=r.dataset.pinb2,b=E.B.find(x=>x.k===k)||E.R.find(x=>x.k===k),pi=r.querySelector('.pi');if(b&&pi){pi.innerHTML=badgeMedal21(b,38);pi.classList.add('pi21')}});
+  if(!box.querySelector('.tp21')){const earned=trophies().filter(t=>t.earned),tp=(st.set.prof&&st.set.prof.tpins)||[];const w=document.createElement('div');w.className='tp21';
+   w.innerHTML=`<h3 style="margin:18px 0 4px">Trophies</h3><p class="sub">Up to 3 show on your crew card. ${tp.length}/3 pinned.</p>${earned.length?`<div class="lkrow lk16">${earned.map(t=>`<button class="lkc${tp.includes(t.k)?' on':''}" data-tpin21="${esc(t.k)}"><span class="lki2">${trophySVG(t)}</span>${esc(t.name.slice(0,18))}</button>`).join('')}</div>`:'<p class="sub">Win trophies with your crew and pin them here.</p>'}`;box.appendChild(w)}
+  const h2=box.querySelector('.ghd h2');if(h2)h2.textContent='Your shelf'}
+ if(sh.type==='member'){const m=(typeof memberOf2==='function'?memberOf2:memberOf)(sh.id),p=m&&m.profile;const sc=box.querySelector('.showc');if(sc&&p&&p.show){sc.className='sh21 mem';sc.innerHTML=`<div class="sh21row">${p.show.map(x=>`<div class="md21"><span class="md21i">${medal21(x[2]||'',{name:x[1],count:x[3],emoji:x[0],size:72})}</span><b>${esc(x[1])}</b>${x[2]?`<i>${tierName21(x[2],x[1],x[3])}</i>`:''}</div>`).join('')}</div><div class="sh21ledge"></div>`}}
+ if(sh.type==='crinfo'||box.querySelector('#bwin')){const bw=box.querySelector('#bwin');if(bw){const t=bw.closest('.tog');if(t)t.style.display='none'}}}
+{const _rs=renderSheet;renderSheet=function(){const r=_rs.apply(this,arguments);try{patch21()}catch(e){}return r}}
+{const _pp=profPage;profPage=function(id){const h=_pp(id);try{if(!h)return h;const m=memberData(id),sh=(m&&m.profile&&m.profile.show)||[];if(!sh.length)return h;
+ const shelf=`<div class="sh21 mem"><div class="sh21row">${sh.slice(0,3).map(x=>`<div class="md21"><span class="md21i">${medal21(x[2]||'',{name:x[1],count:x[3],emoji:x[0],size:72})}</span><b>${esc(x[1])}</b>${x[2]?`<i>${tierName21(x[2],x[1],x[3])}</i>`:''}</div>`).join('')}</div><div class="sh21ledge"></div></div>`;
+ return h.replace('<div class="ppresp">',shelf+'<div class="ppresp">')}catch(e){return h}}}
+{const _lt=ladderTile;ladderTile=function(cat){const h=_lt(cat);try{const E=engine(),list=E.B.filter(b=>b.cat===cat),n=list.filter(b=>b.earned).length,b=n?list[n-1]:list[0];if(!b)return h;return h.replace(/<div class="bi">[\s\S]*?<\/div>/,`<div class="bi bi21">${badgeMedal21(b,54,!n)}</div>`)}catch(e){return h}}}
+{const _bt=badgeTile;badgeTile=function(b,on){const h=_bt(b,on);try{const earned=on||b.earned||b.count>0;return h.replace(/<div class="bi">[\s\S]*?<\/div>/,`<div class="bi bi21">${b.hid&&!earned?medal21('zz',{emoji:'❔',size:46,dim:true}):badgeMedal21(b,54,!earned)}</div>`)}catch(e){return h}}}
+{const _mp=myProfile;myProfile=function(){const p=_mp();try{const E=engine();p.show=(st.set.showcase||[]).map(k=>{const b=E.B.find(x=>x.k===k)||E.R.find(x=>x.k===k);return b?[b.icon,b.name,b.k,b.count||0]:null}).filter(Boolean)}catch(e){}return p}}
+function boot21(){document.addEventListener('click',e=>{const t=e.target.closest('[data-tap21]');if(t&&!e.target.closest('button')){tap21(t.dataset.tap21)}});
+ document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.dataset&&e.target.dataset.tap21){e.preventDefault();tap21(e.target.dataset.tap21)}});
+ const u=$('undo18');if(u)u.addEventListener('click',e=>{if(e.target.id==='undo21b')doUndo21()})}
 /* ---------- background art ---------- */
 const ICONS={
  dumbbell:'<rect x="4" y="34" width="9" height="32" rx="3"/><rect x="13" y="24" width="12" height="52" rx="4"/><rect x="25" y="45" width="50" height="10" rx="3"/><path d="M33 45v10M38 45v10M62 45v10M67 45v10"/><rect x="75" y="24" width="12" height="52" rx="4"/><rect x="87" y="34" width="9" height="32" rx="3"/>',
@@ -3427,7 +3683,7 @@ async function sheetClick13(b){const d=b.dataset,sh=st.sheet;if(!sh)return false
  addEventListener('online',()=>{if(st.set.acct)syncNow(true);if(crewOn())wsConnect()});
  document.addEventListener('visibilitychange',()=>{if(document.hidden){if(ws){try{ws.close()}catch(e){}}return}if(st.set.acct)syncNow();if(crewOn()){wsConnect();setTimeout(sendLive,500)}})})();
 
-boot20();boot15();boot14();boot16();boot18();boot19();loadCounter();crewLoop();if(crewOn()){saveCrewId();setTimeout(()=>syncCrew(true),2500)}
+boot20();boot15();boot14();boot16();boot18();boot19();boot21();loadCounter();crewLoop();if(crewOn()){saveCrewId();setTimeout(()=>syncCrew(true),2500)}
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&crewOn())syncCrew()});
 if(st.plan&&!Array.isArray(st.set.seen))checkUnlocks();
 splash().then(()=>{if(st.plan&&st.set.seenVer!==VERSION){st.sheet={type:'news'};renderSheet()}else if(!weekReport()){checkUnlocks()}checkMissing().then(()=>mirrorNow())});
