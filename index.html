@@ -749,6 +749,26 @@ html[data-mode=dark] .c17{border-color:rgba(255,255,255,.07)}
 #gear{position:relative}#gear.gdot::after{content:'';position:absolute;top:7px;right:7px;width:8px;height:8px;border-radius:50%;background:#ef2b36;box-shadow:0 0 0 2px var(--bg)}
 .recap .rgrid div{background:none!important;padding:4px 2px!important}
 .ghd #set17back+h2{font-size:22px;line-height:1.15;flex:1;text-align:center}
+/* 0.18 */
+.crest2{overflow:visible}
+.cb2crest .crest2{width:64px;height:auto}
+.cr18prev{text-align:center;margin:4px 0 6px}.cr18prev svg{width:220px;height:auto;max-width:70%}
+.cr18prev.sm svg{width:150px}
+.cr18g{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px}
+.cr18t{border:1px solid rgba(127,127,127,.2);background:rgba(127,127,127,.08);border-radius:16px;padding:8px 4px 6px;display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--ink);font:700 12px Inter,sans-serif;cursor:pointer}
+.cr18t.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent) inset}
+.cr18t.lk{opacity:.55}
+.tg-cf{background:linear-gradient(90deg,#2c3038,#4a4f57);color:#eef1f5!important;border:1px solid #9aa0aa}
+.nf-cofounder{background:linear-gradient(90deg,#5d636d,#ffffff,#9aa0aa,#5d636d);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent!important;animation:nfs 3s linear infinite}
+.pp18act{display:flex;gap:8px;justify-content:center;margin:14px 0 6px}
+.pp18act .btn{opacity:.75}
+.rep18{padding:8px 0;border-top:1px solid rgba(127,127,127,.15);font-size:14px}
+.priv18 h3{margin:14px 0 4px;font-size:16px}.priv18 p{font-size:14px;line-height:1.5;color:var(--ink)}.priv18 p.sub{color:var(--mute)}
+.srow{transition:transform .12s}
+.srow.del18{background:rgba(239,43,54,.18)!important;border-radius:12px}
+.undo18{position:fixed;left:50%;bottom:104px;transform:translate(-50%,20px);opacity:0;pointer-events:none;z-index:80;display:flex;gap:14px;align-items:center;padding:12px 16px;border-radius:16px;background:#14161c;color:#fff;font:600 14px Inter,sans-serif;box-shadow:0 12px 30px -10px rgba(0,0,0,.6);transition:all .2s}
+.undo18.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+.undo18 button{border:0;background:none;color:#7fb2ff;font:800 14px Inter,sans-serif;cursor:pointer}
 </style>
 </head>
 <body>
@@ -873,8 +893,8 @@ function plateSVG(color,state,opts={}){const id='p'+(pid++),c=PC[color]||PC.red,
 /* ---------- today ---------- */
 function counts(){const s=cur();let tot=0,dn=0;todayGroups().forEach(gr=>gr.forEach(e=>{tot+=Math.max(+e.sets||2,(s.ex[e.id]||[]).length);dn+=(s.ex[e.id]||[]).filter(x=>x&&x.d).length}));return[dn,tot]}
 
-const VERSION=BETA?'0.17 beta':'0.17';
-const NEWS=[['Background art is back','The glowing line art shows on every screen again, and it can’t quietly disappear anymore. If you ever turned on Minimal, it’s now called Dim art and keeps a soft version.'],['Glass look','Cards are see-through glass now, so the art shows through, and lots of boxes are gone.'],['Cleaner Today','A slim week strip, a compact workout card with one Start button, and challenges in one row. Lift together and Need an excuse? live in the ⋯ menu.'],['Slimmer crew feed','New members show as one line, and reactions stay tucked away until you tap ＋.'],['Simpler Settings and Arena','Settings is a short list, and the Arena has one row of tabs.']];
+const VERSION=BETA?'0.18 beta':'0.18';
+const NEWS=[['New crew crests','Build your crest from a shape, pattern, emblem, metal, border and ribbon. It earns stars, wings, a crown and laurels as your crew ranks up.'],['Faster logging','Hold a set’s number to copy it to the next set. Swipe a set left to remove it, with Undo. “Same as last time” fills your sets from your last session (⋯ menu).'],['Invite friends','Share an invite from your crew settings in one tap.'],['Block and report','Open someone’s profile to block or report them. Only the crew owner sees reports.'],['Privacy','See what’s saved and shared in Settings → Help → Privacy.']];
 const isDark=()=>document.documentElement.dataset.mode==='dark';
 function applyTheme(){const t=st.set.theme||'auto',mq=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)');const m=t==='auto'?(mq&&mq.matches?'dark':'light'):t;document.documentElement.dataset.mode=m;const mt=document.querySelector('meta[name=theme-color]');if(mt)mt.setAttribute('content',m==='dark'?'#07080c':'#f7f5f1')}
 function todayGroups(){const p=pd(),sw=(cur().swap)||{};return p.groups.map(gr=>gr.map(e=>sw[e.id]||e))}
@@ -916,7 +936,7 @@ function exBlock(e,gi,ei,glen,col){const s=cur(),sets=s.ex[e.id]||[],l=last(e.id
  for(let i=0;i<n;i++){const x=sets[i]||{},la=l?(l.ex[e.id]||[]):[],lx=la[i]||la[la.length-1]||null,pw=sg?sg.w:(lx&&lx.w?lx.w:''),pr=sg?sg.r:(lx&&lx.r?lx.r:'');
   rows+=`<div class="srow${x.d?' done':''}" id="row-${e.id}-${i}"><span class="n">${i+1}<em id="m-${e.id}-${i}">${better(x,la[i])?'↑':''}</em></span><input type="number" inputmode="decimal" step="any" placeholder="${pw!==''?esc(pw):'0'}" value="${x.w??''}" data-ex="${esc(e.id)}" data-i="${i}" data-k="w" aria-label="${esc(e.name)} set ${i+1} weight"><input type="number" inputmode="numeric" placeholder="${pr!==''?esc(pr):'0'}" value="${x.r??''}" data-ex="${esc(e.id)}" data-i="${i}" data-k="r" aria-label="${esc(e.name)} set ${i+1} reps">${rir?`<input type="number" inputmode="numeric" placeholder="RIR" value="${x.q??''}" data-ex="${esc(e.id)}" data-i="${i}" data-k="q" aria-label="${esc(e.name)} set ${i+1} reps in reserve">`:''}<button class="ck" data-ck="${esc(e.id)}" data-i="${i}" data-g="${gi}" data-e="${ei}" aria-label="Complete set ${i+1}">${CK}</button></div>`}
  const open=st.menu===key,cf=st.confirm==='x'+key;
- const menu=`<div class="menuwrap"><button class="more" data-more="${key}" aria-label="More options for ${esc(e.name)}" aria-expanded="${open}">⋯</button>${open?`<div class="menu" role="menu"><button data-act="plates" data-key="${key}">🏋️ Plate calculator</button><button data-act="warm" data-key="${key}">🔥 Warm-ups</button><button data-act="nhist" data-key="${key}">📝 Notes history</button>${isSw?`<button data-act="unswap" data-key="${key}">↩︎ Undo swap (back to ${esc(orig.name)})</button>`:`<button data-act="swap" data-key="${key}">🔄 Swap for today</button>`}<button class="dz" data-act="del" data-key="${key}">${cf?'Tap again to remove':'🗑 Remove from plan'}</button></div>`:''}</div>`;
+ const menu=`<div class="menuwrap"><button class="more" data-more="${key}" aria-label="More options for ${esc(e.name)}" aria-expanded="${open}">⋯</button>${open?`<div class="menu" role="menu"><button data-act="plates" data-key="${key}">🏋️ Plate calculator</button><button data-act="fill" data-key="${key}">↺ Same as last time</button><button data-act="warm" data-key="${key}">🔥 Warm-ups</button><button data-act="nhist" data-key="${key}">📝 Notes history</button>${isSw?`<button data-act="unswap" data-key="${key}">↩︎ Undo swap (back to ${esc(orig.name)})</button>`:`<button data-act="swap" data-key="${key}">🔄 Swap for today</button>`}<button class="dz" data-act="del" data-key="${key}">${cf?'Tap again to remove':'🗑 Remove from plan'}</button></div>`:''}</div>`;
  const lastLine=l?`Last ${md(l.date)}: <b>${fmt(l.ex[e.id])}</b>${sg?` · <span class="try">Try ${sg.w}×${sg.r}</span>`:''}`:'First time. Set your baseline';
  const swapPick=st.picker&&st.picker.ctx==='swap'&&st.picker.key===key?pickerHTML():'';
  return `<div class="ex${rir?' rir':''}"><div class="exh"><span class="badge" style="background:${PC[col][0]}">${letter}</span><h3>${esc(e.name)}${isSw?'<span class="swapped">SWAPPED</span>':''}</h3><span class="tgt">${e.sets||2} × ${e.lo||'?'}–${e.hi||'?'}</span>${menu}</div><div class="meta">${esc(e.m)} · ${lastLine}${be?` · Best ${be}`:''}</div>${swapPick}${st.warm[e.id]?warmHTML(e):''}${e.cue?`<div class="cue">${esc(e.cue)}</div>`:''}${lastNote(e.id)?`<div class="lnote">Last note: ${esc(lastNote(e.id))}</div>`:''}<div id="tag-${e.id}">${tagFor(e)}</div><div class="shead"><span>Set</span><span>${U()}</span><span>Reps</span>${rir?'<span>RIR</span>':''}<span></span></div>${rows}<textarea class="exnote" rows="1" data-exnote="${esc(e.id)}" placeholder="Note for today (seat, grip, how it felt)" aria-label="Note for ${esc(e.name)}">${esc((s.exNotes||{})[e.id]||'')}</textarea><div class="exfoot"><button class="btn sm" data-addset="${esc(e.id)}">+ Set</button>${sets.length>(+e.sets||2)?`<button class="btn sm" data-rmset="${esc(e.id)}">− Set</button>`:''}</div></div>`}
@@ -1084,7 +1104,7 @@ function saveRename(){const r=$('rename');if(!r)return;const v=r.value.trim();if
 main.addEventListener('focusout',e=>{if(e.target.id==='rename')setTimeout(saveRename,0)});
 main.addEventListener('keydown',e=>{if(e.target.id==='rename'&&e.key==='Enter'){e.preventDefault();e.target.blur();return}if(e.target.id==='psearch'&&e.key==='Enter'){e.preventDefault();const q=e.target.value.trim();if(!q)return;const hit=LIB.find(x=>x[0].toLowerCase()===q.toLowerCase());if(hit)addFromPicker(...hit);else addFromPicker(q,'Other',8,12)}});
 main.addEventListener('click',async e=>{const b=e.target.closest('button');if(!b)return;const d=st.plan&&st.plan.days[st.pday];
- if(await click17(b))return;if(await click16(b))return;if(await click15(b))return;if(await click14(b))return;if(await crewClick(b))return;
+ if(await click18(b))return;if(await click17(b))return;if(await click16(b))return;if(await click15(b))return;if(await click14(b))return;if(await crewClick(b))return;
  if(await acctClick(b))return;if(await click13(b))return;
  if(b.id==='openprof'){st.profile=true;render();window.scrollTo({top:0});return}
  if(b.id==='pclose2'){st.profile=false;render();return}
@@ -1191,7 +1211,7 @@ function renderSheet(){const el=$('sheet'),sh=st.sheet;if(!sh){el.innerHTML='';r
 $('sheet').addEventListener('input',e=>{if(e.target.id==='bwin'){const v=parseFloat(e.target.value);st.set.bw=v>0&&v<1000?v:'';saveSet()}});
 $('sheet').addEventListener('click',async e=>{if(e.target.id==='sheetbg'){if(st.sheet&&st.sheet.type==='news')markNews();st.sheet=null;renderSheet();return}const b=e.target.closest('button');if(!b)return;
  if(b.id==='sheetx'){if(st.sheet&&st.sheet.back){st.sheet=st.sheet.back;renderSheet();return}st.sheet=null;st.confirm=null;renderSheet();return}
- if(await sheetClick17(b))return;if(await sheetClick16(b))return;if(await sheetClick15(b))return;if(await sheetClick14(b))return;if(await crewSheetClick(b))return;if(await acctSheetClick(b))return;if(await sheetClick13(b))return;
+ if(await sheetClick18(b))return;if(await sheetClick17(b))return;if(await sheetClick16(b))return;if(await sheetClick15(b))return;if(await sheetClick14(b))return;if(await crewSheetClick(b))return;if(await acctSheetClick(b))return;if(await sheetClick13(b))return;
  if(b.id==='newsok'){markNews();st.sheet=null;renderSheet();setTimeout(()=>{if(!weekReport())checkUnlocks()},300);return}
  if(b.id==='shareprof2'){st.sheet={type:'share',title:'Share your rank'};renderSheet();const r=await profileCard();if(st.sheet&&st.sheet.type==='share'){st.sheet.url=r.url;st.sheet.file=r.file;renderSheet()}return}
  if(b.id==='missno'){missGuard=false;st.sheet=null;renderSheet();mirrorNow();return}
@@ -2653,7 +2673,7 @@ function sheet15(sh){
  if(sh.type==='grpcard')return `<div class="ghd"><h2>Lifted together</h2><button class="btn sm" id="sheetx">Done</button></div>${groupPostHTML(sh.post)}<p class="sub">Posted to your crew feed.</p>`;
  if(sh.type==='hofp'){const p=(st.cs.posts||[]).find(x=>x.id===sh.ref);return `<div class="ghd"><h2>Hall of Fame</h2><button class="btn sm" id="sheetx">Cancel</button></div>${p?postHTML(p,true):''}<div class="glbl">WHY IT’S LEGENDARY</div><input class="field" id="hoftxt" maxlength="80" placeholder="First 405 deadlift in crew history" value="${esc(p&&p.cap||'')}"><button class="btn acc wide" id="hofsave" style="min-height:52px;margin-top:12px">Induct</button>`}
  if(sh.type==='dash')return dashSheet(sh);
- if(sh.type==='founder')return `<div class="ghd"><h2>Founder code</h2><button class="btn sm" id="sheetx">Cancel</button></div><p class="sub">For the person who built Overload. Unlocks the Founder plate, title and banner on your account.</p><input class="field" id="fcode" autocapitalize="characters" placeholder="FNDR-XXXXXX-…"><button class="btn acc wide" id="fsave" style="min-height:52px;margin-top:12px">Unlock</button>`;
+ if(sh.type==='founder')return `<div class="ghd"><h2>Founder code</h2><button class="btn sm" id="sheetx">Cancel</button></div><p class="sub">For the people who built Overload. A Founder or Co-Founder code unlocks its own plate, title and banners on your account.</p><input class="field" id="fcode" autocapitalize="characters" placeholder="FNDR-XXXXXX-…"><button class="btn acc wide" id="fsave" style="min-height:52px;margin-top:12px">Unlock</button>`;
  return null}
 async function sheetClick15(b){const sh=st.sheet,d=b.dataset;if(!sh)return false;
  if(d.crc){sh.crc=d.crc;document.querySelectorAll('[data-crc]').forEach(x=>x.classList.toggle('on',x===b));return true}
@@ -2813,7 +2833,7 @@ function profEdit16(sh){const k=sh.sec;
  if(!k){const rows=PE16.filter(([k])=>k!=='jersey'||st.cs).map(([k,i,l])=>row16(`data-pesec="${k}"`,i,l,pe16Val(sh,k))).join('');
   return `<div class="ghd"><h2>Edit profile</h2><button class="btn sm" id="sheetx">Cancel</button></div><div style="text-align:center;margin:4px 0 12px">${avatar({id:myId(),name:st.set.name,profile:{av:sh.av||{}}},64)}</div><div class="card rows15 pe16">${rows}</div><button class="btn acc wide" id="profsave" style="min-height:52px;margin-top:6px">Save profile</button>`}
  const lbl=(PE16.find(x=>x[0]===k)||[,,''])[2],head=`<div class="ghd"><button class="btn sm" id="pe16back">‹ Back</button><h2 style="margin:0">${lbl}</h2><button class="btn sm acc" id="pe16back2">Done</button></div>`;
- if(k==='banner'){const E=engine();return head+`<div class="scgrid">${Object.entries(LOCK.pbanner.items).filter(([b,it])=>b!=='founder'||it[3](E)).sort((a,c)=>(c[0]==='founder')-(a[0]==='founder')).map(([b,it])=>{const ok=owns('pbanner',b,E),on=myBanner()===b||(b==='none'&&!myBanner());return `<button class="scb${ok?'':' lk'}${on?' on':''}" data-look="pbanner:${b}" aria-pressed="${on}">${b==='none'?'<div class="scnone">None</div>':sceneSVG(b,8,'pk'+b)}<span>${esc(it[0])}${ok?'':' 🔒'}</span></button>`}).join('')}</div><p class="sub">Locked ones show how to unlock them when you tap.</p>`}
+ if(k==='banner'){const E=engine();return head+`<div class="scgrid">${Object.entries(LOCK.pbanner.items).filter(([b,it])=>!FONLY18.includes(b)||it[3](E)).sort((a,c)=>FO18(a[0])-FO18(c[0])).map(([b,it])=>{const ok=owns('pbanner',b,E),on=myBanner()===b||(b==='none'&&!myBanner());return `<button class="scb${ok?'':' lk'}${on?' on':''}" data-look="pbanner:${b}" aria-pressed="${on}">${b==='none'?'<div class="scnone">None</div>':sceneSVG(b,8,'pk'+b)}<span>${esc(it[0])}${ok?'':' 🔒'}</span></button>`}).join('')}</div><p class="sub">Locked ones show how to unlock them when you tap.</p>`}
  const P=sh.p,E=eng14(),av=sh.av||{},ownPl=Object.keys(PC).filter(x=>!plateLocked(x)&&finOwned(x,E)),inp=(f,ph,max)=>`<input class="field" data-pe="${f}" maxlength="${max}" placeholder="${ph}" value="${esc(P[f]||'')}">`;
  const chips=(f,L)=>`<div class="lkrow lk16">${L.map(t=>`<button class="lkc${P[f]===t?' on':''}" data-pset="${f}:${t}">${t}</button>`).join('')}</div>`;
  let part='';
@@ -2958,6 +2978,186 @@ async function sheetClick17(b){const sh=st.sheet;if(!sh)return false;
 {const _s=sheet15;sheet15=function(sh){if(sh.type==='tmore')return `<div class="ghd"><h2>Today</h2><button class="btn sm" id="sheetx">Done</button></div><div class="card rows15">${crewOn()?row16('t17grp','👥','Lift together','Train with your crew live'):''}${row16('t17exc','🎲','Need an excuse?','The generator, for emergencies')}${row16('t17note','📝','Session notes','Jump to today’s notes')}</div>`;return _s(sh)}}
 /* crew tab dot when the weekly recap is waiting; gear dot when a backup is due */
 function dots17(){try{const dw=new Date().getDay(),rc=crewOn()&&st.cs&&[1,2,3].includes(dw)&&st.set.recapSeen!==curWk();const c=$('t-crew');if(c&&rc&&!(st.tab==='crew'&&!st.profile&&!st.settings))c.classList.add('dot');const g=$('gear');if(g)g.classList.toggle('gdot',bkDue()&&!st.set.acct&&!st.settings)}catch(e){}}
+/* =====================================================================
+   0.18: crest builder, co-founder, founder banners, faster logging,
+   invites, privacy, block/report, one popup at a time
+   ===================================================================== */
+/* ---------- crests ---------- */
+const FONLY18=['vault','fblue','throne','cofounder','founder'];const FO18=k=>{const i=FONLY18.indexOf(k);return i<0?99:i};
+const CR_METAL={steel:['Steel',['#f4f6f9','#b8bec8','#6b717c','#e3e6eb'],0],bronze:['Bronze',['#ffd9b0','#c8834a','#6e3c16','#f0b783'],1],silver:['Silver',['#ffffff','#cfd4dc','#7d838e','#eef1f5'],2],gold:['Gold',['#fff4c4','#e3b84a','#7a5410','#ffe08a'],3],black:['Black chrome',['#7a7d86','#2a2c31','#050506','#4a4d55'],5],founders:['Founders gold',['#fff4c4','#e3b84a','#7a5410','#ffe08a'],'f']};
+const CR_SHAPE={shield:['Shield','M0 -58 L46 -44 L46 4 C46 34 24 52 0 62 C-24 52 -46 34 -46 4 L-46 -44 Z'],kite:['Kite','M0 -60 C24 -60 46 -50 46 -30 C46 10 26 40 0 64 C-26 40 -46 10 -46 -30 C-46 -50 -24 -60 0 -60 Z'],seal:['Seal','M0 -56 A56 56 0 1 1 0 56 A56 56 0 1 1 0 -56 Z'],hex:['Hex','M0 -60 L52 -30 L52 30 L0 60 L-52 30 L-52 -30 Z']};
+const CR_PAT={plain:'Plain',chevron:'Chevron',stripes:'Stripes',split:'Split',quarter:'Quartered'};
+const CR_BORDER={plain:'Clean',rope:'Rope',studs:'Studded'};
+const DB=`<rect x="-40" y="-3" width="80" height="6" rx="2"/><rect x="-36" y="-14" width="7" height="28" rx="2"/><rect x="-28" y="-10" width="5" height="20" rx="2"/><rect x="29" y="-14" width="7" height="28" rx="2"/><rect x="23" y="-10" width="5" height="20" rx="2"/>`;
+const CR_EMB={barbells:['Crossed dumbbells',`<g transform="rotate(-35)">${DB}</g><g transform="rotate(35)">${DB}</g>`],
+ bull:['Bull',`<path d="M-34 -30 C-30 -16 -22 -12 -14 -14 L-10 -18 L10 -18 L14 -14 C22 -12 30 -16 34 -30 C36 -14 30 -4 18 -4 L16 6 L12 22 C8 30 4 34 0 34 C-4 34 -8 30 -12 22 L-16 6 L-18 -4 C-30 -4 -36 -14 -34 -30 Z"/><path d="M-10 0 L-5 4 L-10 7 Z M10 0 L5 4 L10 7 Z" fill="var(--eye)" stroke="none"/><circle cx="0" cy="29" r="5" fill="none" stroke="var(--eye)" stroke-width="1.6"/>`],
+ wolf:['Wolf',`<path d="M-26 -34 L-14 -14 L-6 -16 L0 -12 L6 -16 L14 -14 L26 -34 L28 -6 L22 8 L12 18 L6 30 L0 34 L-6 30 L-12 18 L-22 8 L-28 -6 Z"/><path d="M-14 -2 L-5 2 L-12 5 Z M14 -2 L5 2 L12 5 Z M-4 22 L0 26 L4 22 Z" fill="var(--eye)" stroke="none"/>`],
+ eagle:['Eagle',`<path d="M0 -26 C5 -26 8 -22 8 -17 L14 -12 L8 -10 C8 -4 6 2 4 6 C18 0 34 -10 46 -24 C44 -8 36 4 24 10 C32 10 38 8 42 6 C36 16 24 22 12 22 L8 34 L0 30 L-8 34 L-12 22 C-24 22 -36 16 -42 6 C-38 8 -32 10 -24 10 C-36 4 -44 -8 -46 -24 C-34 -10 -18 0 -4 6 C-6 2 -8 -4 -8 -10 C-8 -20 -5 -26 0 -26 Z"/><circle cx="3" cy="-19" r="1.6" fill="var(--eye)" stroke="none"/>`],
+ skull:['Skull',`<path d="M0 -30 C18 -30 28 -18 28 -2 C28 8 22 14 18 16 L18 26 L-18 26 L-18 16 C-22 14 -28 8 -28 -2 C-28 -18 -18 -30 0 -30 Z"/><path d="M-16 -4 C-16 -12 -4 -12 -4 -2 C-4 4 -16 6 -16 -4 Z M16 -4 C16 -12 4 -12 4 -2 C4 4 16 6 16 -4 Z M0 6 L-4 13 L4 13 Z" fill="var(--eye)" stroke="none"/><path d="M-10 18 V26 M-3 18 V26 M4 18 V26 M11 18 V26" stroke="var(--eye)" stroke-width="2"/>`],
+ kettle:['Kettlebell',`<path d="M-16 -8 L-16 -18 C-16 -34 16 -34 16 -18 L16 -8 L9 -8 L9 -18 C9 -26 -9 -26 -9 -18 L-9 -8 Z"/><path d="M-22 8 C-22 -8 -10 -12 0 -12 C10 -12 22 -8 22 8 C22 22 12 30 0 30 C-12 30 -22 22 -22 8 Z"/><rect x="-14" y="28" width="28" height="5" rx="2"/>`],
+ crown:['Crown',`<g transform="scale(1.3)"><path d="M-20 4 L-24 -18 L-11 -8 L0 -26 L11 -8 L24 -18 L20 4 Z"/><rect x="-20" y="6" width="40" height="6" rx="2"/></g>`],
+ bolt:['Lightning',`<path d="M8 -34 L-20 4 L-2 4 L-10 34 L20 -6 L2 -6 Z"/>`],
+ flame:['Flame',`<path d="M2 -34 C10 -20 26 -10 24 10 C22 26 10 34 0 34 C-12 34 -24 24 -22 8 C-20 -4 -10 -8 -8 -20 C-2 -14 0 -8 0 -2 C6 -8 8 -20 2 -34 Z"/>`],
+ star:['Star',`<path d="M0 -32 L9 -10 L32 -10 L14 4 L20 28 L0 14 L-20 28 L-14 4 L-32 -10 L-9 -10 Z"/>`]};
+const CR_ICONMAP={barbell:'barbells',skull:'skull',crown:'crown',bolt:'bolt',wolf:'wolf',flame:'flame',star:'star',none:'barbells'};
+function crNorm(cr){cr={...(cr||{})};if(!CR_SHAPE[cr.shape])cr.shape=cr.shape==='plate'||cr.shape==='circle'?'seal':'shield';if(!CR_EMB[cr.emb])cr.emb=CR_ICONMAP[cr.icon]||'barbells';if(!CR_PAT[cr.pat])cr.pat='plain';if(!CR_METAL[cr.metal])cr.metal='steel';if(!CR_BORDER[cr.border])cr.border='plain';cr.c1=/^#[0-9a-f]{6}$/i.test(cr.c1||'')?cr.c1:'#b8222c';cr.c2=/^#[0-9a-f]{6}$/i.test(cr.c2||'')?cr.c2:'#14161c';if(cr.rib==null)cr.rib=cr.txt||'';return cr}
+function crPat(k,id,c1,c2){if(k==='chevron')return `<pattern id="${id}" width="24" height="24" patternUnits="userSpaceOnUse"><rect width="24" height="24" fill="${c1}"/><path d="M0 18 L12 6 L24 18 L24 24 L12 12 L0 24 Z" fill="${c2}" opacity=".45"/></pattern>`;
+ if(k==='stripes')return `<pattern id="${id}" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(30)"><rect width="14" height="14" fill="${c1}"/><rect width="6" height="14" fill="${c2}" opacity=".45"/></pattern>`;
+ if(k==='quarter')return `<pattern id="${id}" x="-60" y="-60" width="120" height="120" patternUnits="userSpaceOnUse"><rect width="120" height="120" fill="${c1}"/><rect width="60" height="60" fill="${c2}"/><rect x="60" y="60" width="60" height="60" fill="${c2}"/></pattern>`;
+ if(k==='split')return `<linearGradient id="${id}" x1="0" y1="0" x2="1" y2="0"><stop offset=".5" stop-color="${c1}"/><stop offset=".5" stop-color="${c2}"/></linearGradient>`;
+ return `<radialGradient id="${id}" cx="50%" cy="35%" r="70%"><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></radialGradient>`}
+crestSVG=function(cr0,rank,size){const cr=crNorm(cr0),fc=cr.metal==='founders',r=fc?7:(rank||0),s=size||52,small=s<48,id='cq'+(pid++),M=CR_METAL[cr.metal][1],shp=CR_SHAPE[cr.shape][1];
+ const c1=fc?'#08080a':cr.c1,c2=fc?'#2a2418':cr.c2,dark=metalDark(cr.metal),embF=fc?`url(#${id}m)`:dark?'#15161a':`url(#${id}m)`;
+ let deco='',top='',rib='';
+ if(!small){if(r>=5)deco+=`<g fill="url(#${id}m)">${[-1,1].map(q=>`<path transform="scale(${q},1)" d="M48 -30 C78 -40 96 -24 100 -4 C88 -14 76 -14 66 -8 C80 -6 88 4 90 16 C78 6 66 4 56 8 C64 12 68 20 68 28 C58 18 50 14 46 14 Z"/>`).join('')}</g>`;
+  if(r>=7)deco+=`<g fill="url(#${id}m)" stroke="${M[2]}" stroke-width=".5">${[-1,1].map(q=>Array.from({length:7},(_,i)=>{const a=(118+i*15)*Math.PI/180,x=Math.cos(a)*66*q,y=Math.sin(a)*66+8,rot=q*(i*15+28);return `<path d="M${x.toFixed(1)} ${(y-9).toFixed(1)} Q${(x+4).toFixed(1)} ${y.toFixed(1)} ${x.toFixed(1)} ${(y+9).toFixed(1)} Q${(x-4).toFixed(1)} ${y.toFixed(1)} ${x.toFixed(1)} ${(y-9).toFixed(1)} Z" transform="rotate(${rot} ${x.toFixed(1)} ${y.toFixed(1)})"/>`}).join('')).join('')}</g>`;
+  if(r>=6)top=`<g transform="translate(0 -70)" fill="url(#${id}m)" stroke="${M[2]}" stroke-width=".8"><path d="M-22 6 L-26 -14 L-12 -4 L0 -22 L12 -4 L26 -14 L22 6 Z"/><circle cx="0" cy="-22" r="3"/><circle cx="-26" cy="-14" r="2.4"/><circle cx="26" cy="-14" r="2.4"/></g>`;
+  else if(r>=2){const n=r>=4?3:r>=3?2:1;top=`<g fill="url(#${id}m)">${Array.from({length:n},(_,i)=>`<path transform="translate(${(i-(n-1)/2)*16} -70)" d="M0 -7 L2 -2 L7 -2 L3 1.5 L4.5 7 L0 3.6 L-4.5 7 L-3 1.5 L-7 -2 L-2 -2 Z"/>`).join('')}</g>`}
+  const t=String(cr.rib||'').toUpperCase().slice(0,26);
+  if(t){const fs=Math.min(9.5,150/t.length).toFixed(1);rib=`<g transform="translate(0 ${cr.shape==='seal'?50:56})"><path d="M-70 -2 L-56 -10 L-56 12 L-70 4 L-62 1 Z M70 -2 L56 -10 L56 12 L70 4 L62 1 Z" fill="${fc?'#000':shade(c1,-.45)}"/><path d="M-58 -12 Q0 -2 58 -12 L58 10 Q0 20 -58 10 Z" fill="${fc?'#121216':c1}" stroke="url(#${id}m)" stroke-width="1.6"/><path id="${id}rp" d="M-54 3 Q0 13 54 3" fill="none"/><text style="font:900 ${fs}px Archivo,'Inter Display',Inter,sans-serif;letter-spacing:${t.length>14?1:1.6}px" fill="${fc?'#e3b84a':'#fff'}"><textPath href="#${id}rp" startOffset="50%" text-anchor="middle">${esc(t)}</textPath></text></g>`}}
+ const vb=small?'-62 -66 124 132':'-110 -105 220 200',h=small?s*132/124:s*200/220;
+ return `<svg class="crest crest2${r>=6&&!small?' crest-glow':''}" viewBox="${vb}" width="${s}" height="${h.toFixed(0)}" aria-hidden="true" style="--eye:${fc?'#08080a':cr.c1}"><defs><linearGradient id="${id}m" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${M[0]}"/><stop offset=".35" stop-color="${M[1]}"/><stop offset=".65" stop-color="${M[2]}"/><stop offset="1" stop-color="${M[3]}"/></linearGradient>${crPat(cr.pat,id+'p',c1,c2)}<linearGradient id="${id}s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".28"/><stop offset=".45" stop-color="#fff" stop-opacity="0"/></linearGradient><clipPath id="${id}c"><path d="${shp}"/></clipPath></defs>
+ ${deco}<path d="${shp}" fill="rgba(0,0,0,.45)" transform="translate(0 4) scale(1.1)"/><path d="${shp}" fill="url(#${id}m)" transform="scale(1.1)"/><path d="${shp}" fill="${M[2]}" transform="scale(1.04)"/><path d="${shp}" fill="url(#${id}p)"/>
+ ${cr.border==='rope'?`<path d="${shp}" fill="none" stroke="url(#${id}m)" stroke-width="3" stroke-dasharray="4 2" transform="scale(.9)"/>`:cr.border==='studs'?`<path d="${shp}" fill="none" stroke="url(#${id}m)" stroke-width="3.6" stroke-dasharray=".1 9" stroke-linecap="round" transform="scale(.9)"/>`:`<path d="${shp}" fill="none" stroke="url(#${id}m)" stroke-width="1.2" transform="scale(.88)"/>`}
+ <g clip-path="url(#${id}c)"><path d="M-60 -70 L60 -70 L60 -10 Q0 10 -60 -10 Z" fill="url(#${id}s)"/></g>
+ <g transform="translate(0 -2)" fill="${embF}" stroke="${fc?'#7a5410':M[2]}" stroke-width=".8" style="color:${M[1]}"><g transform="translate(0 2.5)" opacity=".45" fill="#000" stroke="none">${CR_EMB[cr.emb][1]}</g>${CR_EMB[cr.emb][1]}</g>${top}${rib}</svg>`}
+function metalDark(m){return m==='black'}
+function shade(hex,amt){const n=parseInt(hex.slice(1),16);let r=n>>16,g=n>>8&255,b=n&255;const f=v=>Math.max(0,Math.min(255,Math.round(v+(amt<0?v*amt:(255-v)*amt))));return '#'+[f(r),f(g),f(b)].map(v=>v.toString(16).padStart(2,'0')).join('')}
+function crestSheet18(sh){const c=crNorm(sh.crest),R=crewRankInfo().r,fc=!!(st.cs&&st.cs.crew.fcrew),k=sh.sec;
+ const prev=`<div class="cr18prev">${crestSVG(c,R,190)}</div>`;
+ if(!k){const rows=[['shape','🛡','Shape',CR_SHAPE[c.shape][0]],['pat','▦','Pattern',CR_PAT[c.pat]],['col','🎨','Colors',`<i class="sw16" style="background:${c.c1}"></i> <i class="sw16" style="background:${c.c2}"></i>`],['emb','🐂','Emblem',CR_EMB[c.emb][0]],['metal','⚙️','Metal',CR_METAL[c.metal][0]],['border','◎','Border',CR_BORDER[c.border]],['rib','🎗','Ribbon',c.rib?esc(c.rib):'None']];
+  return `<div class="ghd"><h2>Crew crest</h2><button class="btn sm" id="sheetx">Cancel</button></div>${prev}<p class="sub" style="text-align:center">Stars, wings, a crown and laurels get added as your crew ranks up.</p><div class="card rows15">${rows.map(([a,i,l,v])=>row16(`data-crsec="${a}"`,i,l,v)).join('')}</div><button class="btn acc wide" id="crsave18" style="min-height:52px">Save crest</button>`}
+ const L={shape:'Shape',pat:'Pattern',col:'Colors',emb:'Emblem',metal:'Metal',border:'Border',rib:'Ribbon'}[k];
+ const head=`<div class="ghd"><button class="btn sm" id="cr18back">‹ Back</button><h2 style="margin:0">${L}</h2><button class="btn sm acc" id="cr18back2">Done</button></div><div class="cr18prev sm">${crestSVG(c,R,130)}</div>`;
+ const tile=(key,val,label,lock)=>`<button class="cr18t${c[key]===val?' on':''}${lock?' lk':''}" data-cr="${key}:${val}"${lock?` data-crlock="${esc(lock)}"`:''}>${crestSVG({...c,[key]:val,rib:''},0,54)}<span>${label}${lock?' 🔒':''}</span></button>`;
+ let body='';
+ if(k==='shape')body=Object.entries(CR_SHAPE).map(([v,x])=>tile('shape',v,x[0])).join('');
+ else if(k==='pat')body=Object.entries(CR_PAT).map(([v,x])=>tile('pat',v,x)).join('');
+ else if(k==='emb')body=Object.entries(CR_EMB).map(([v,x])=>tile('emb',v,x[0])).join('');
+ else if(k==='border')body=Object.entries(CR_BORDER).map(([v,x])=>tile('border',v,x)).join('');
+ else if(k==='metal')body=Object.entries(CR_METAL).filter(([v])=>v!=='founders'||fc).map(([v,x])=>{const req=x[2],lock=req==='f'?(fc?'':'Founder crew only'):(R>=req?'':RANKS[req][0]+' crew rank');return tile('metal',v,x[0],lock)}).join('');
+ else if(k==='col')return head+`<div class="glbl">MAIN COLOR</div><div class="lkrow lk16">${AV_COLS.concat(['#14161c','#f2f3f6']).map(x=>`<button class="lkc${c.c1===x?' on':''}" data-cr="c1:${x}"><i style="background:${x}"></i></button>`).join('')}</div><div class="glbl">SECOND COLOR</div><div class="lkrow lk16">${AV_COLS.concat(['#14161c','#f2f3f6']).map(x=>`<button class="lkc${c.c2===x?' on':''}" data-cr="c2:${x}"><i style="background:${x}"></i></button>`).join('')}</div>`;
+ else if(k==='rib')return head+`<input class="field" id="crrib" maxlength="26" placeholder="${esc((st.cs.crew.name||'').toUpperCase().slice(0,26))}" value="${esc(c.rib||'')}"><p class="sub">Your crew name or motto, up to 26 letters. Leave empty for no ribbon.</p>`;
+ return head+`<div class="cr18g">${body}</div>`}
+{const _s14=sheet14;sheet14=function(sh){if(sh.type==='crest')return crestSheet18(sh);return _s14(sh)}}
+
+/* ---------- co-founder ---------- */
+const SILVER=[['#fff6cf','#ffffff'],['#e8c55c','#d5dae2'],['#9c7424','#7d838e'],['#f3d77a','#eef1f5'],['#fff3c0','#ffffff'],['#d9b04a','#b9c0cb'],['#6e5014','#5d636d'],['#5a410f','#4a4f57'],['#7a5a18','#6b717b'],['#fff2bd','#ffffff'],['#4a3510','#2c3038'],['#16110a','#101216'],['#e3c25a','#cfd4dc']];
+function silverize(svg,pairs){let o=svg;(pairs||SILVER).forEach(([a,b])=>{o=o.split(a).join(b)});return o}
+function cofounderPlate(o){return silverize(founderPlate(o)).replace(/FOUNDER · 001/g,'CO-FOUNDER · 002').replace(/>001</g,'>002<')}
+FIN.cofounder=['Co-Founder 002',['#0b0b0d','#2a2a2e','#000000'],'Only the co-founder of Overload',()=>!!st.set.cofounder,'special'];
+if(typeof PC==='object'&&!PC.cofounder)PC.cofounder=PC.founder;
+{const _p=plateSVG;plateSVG=function(c,state,o){if(c==='cofounder'&&state!=='idle'&&state!=='rest')return cofounderPlate(o);return _p(c,state,o)}}
+XSC.cofounder=['Co-Founder','Co-founder only'];
+LOCK.pbanner.items.cofounder=['Co-Founder','','Co-founder only',()=>!!st.set.cofounder];
+/* ---------- the founder's own banners (different from the crew banner) ---------- */
+Object.assign(XSC,{vault:['The Vault','Founder only'],fblue:['The Blueprint','Founder only'],throne:['The Throne','Founder only']});
+Object.assign(LOCK.pbanner.items,{vault:['The Vault','','Founder only',()=>!!st.set.founder],fblue:['The Blueprint','','Founder only',()=>!!st.set.founder],throne:['The Throne','','Founder only',()=>!!st.set.founder]});
+{const _x=xScene;xScene=function(k,uid){if(k==='cofounder')return silverize(_x('founder',uid)).replace(/FOUNDING CREW · EST 2026 · OVERLOAD · FOUNDER 001 ·/,'CO-FOUNDER · OVERLOAD · EST 2026 · 002 ·').replace(/FOUNDER · 001 · THE ORIGINAL · OVERLOAD · FOUNDER · 001/,'CO-FOUNDER · 002 · OVERLOAD · CO-FOUNDER · 002');
+ if(k==='vault'||k==='fblue'||k==='throne')return founderScene(k,uid);return _x(k,uid)}}
+function founderScene(k,uid){const u=(uid||'f'+(pid++)).replace(/[^\w-]/g,''),R=(n,a,b)=>a+(hashS(u+n)%1000)/1000*(b-a);let o=`<defs><linearGradient id="${u}g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff2bd"/><stop offset=".4" stop-color="#e8c55c"/><stop offset=".75" stop-color="#8a6a1f"/><stop offset="1" stop-color="#f3d77a"/></linearGradient><radialGradient id="${u}r" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#f3d77a" stop-opacity=".55"/><stop offset="1" stop-color="#f3d77a" stop-opacity="0"/></radialGradient></defs><rect width="380" height="130" fill="#060606"/>`;
+ if(k==='vault'){const bolts=Array.from({length:10},(_,i)=>{const a=i*Math.PI/5;return `<rect x="-5" y="-71" width="10" height="16" rx="3" transform="rotate(${i*36})" fill="url(#${u}g)" stroke="#5a410f" stroke-width=".6"/>`}).join('');
+  o+=`<g opacity=".18" stroke="#e8c55c" stroke-width=".5">${Array.from({length:16},(_,i)=>`<path d="M0 ${i*9} H190"/>`).join('')}</g>
+  <circle cx="290" cy="65" r="110" fill="url(#${u}r)"><animate attributeName="opacity" values=".55;1;.55" dur="4s" repeatCount="indefinite"/></circle>
+  <g transform="translate(290 65)"><circle r="78" fill="#0c0b09" stroke="url(#${u}g)" stroke-width="3"/><circle r="70" fill="none" stroke="#e8c55c" stroke-width=".7" stroke-dasharray="2 3"/>${bolts}<circle r="54" fill="#121009" stroke="url(#${u}g)" stroke-width="2"/>${Array.from({length:24},(_,i)=>`<circle cx="${(48*Math.cos(i*Math.PI/12)).toFixed(1)}" cy="${(48*Math.sin(i*Math.PI/12)).toFixed(1)}" r="1.3" fill="#e8c55c"/>`).join('')}
+   <g><animateTransform attributeName="transform" type="rotate" values="0;40;40;-20;-20;0" keyTimes="0;.2;.45;.65;.85;1" dur="9s" repeatCount="indefinite"/><circle r="36" fill="none" stroke="url(#${u}g)" stroke-width="4"/>${Array.from({length:6},(_,i)=>`<g transform="rotate(${i*60})"><rect x="-2.5" y="-46" width="5" height="22" rx="2" fill="url(#${u}g)"/><circle cy="-47" r="4.5" fill="url(#${u}g)"/></g>`).join('')}</g>
+   <circle r="20" fill="#0a0907" stroke="url(#${u}g)" stroke-width="2"/><text y="6" text-anchor="middle" style="font:900 15px Archivo,'Inter Display',Inter,sans-serif;letter-spacing:1px" fill="url(#${u}g)">001</text></g>
+  <path d="M212 65 A78 78 0 0 1 290 -13" stroke="#fff2bd" stroke-width="2" fill="none" opacity=".5"><animate attributeName="opacity" values=".1;.7;.1" dur="3s" repeatCount="indefinite"/></path>
+  <text x="18" y="20" style="font:800 7px Archivo,Inter,sans-serif;letter-spacing:4px" fill="#e8c55c" opacity=".6">THE VAULT · FOUNDER 001</text>`}
+ else if(k==='fblue'){const L=(d,len,dl)=>`<path d="${d}" stroke="#e8c55c" stroke-width="1.2" fill="none" stroke-dasharray="${len}" stroke-dashoffset="${len}"><animate attributeName="stroke-dashoffset" values="${len};0;0;${len}" keyTimes="0;.45;.9;1" dur="10s" begin="${dl}s" repeatCount="indefinite"/></path>`;
+  o+=`<g stroke="#e8c55c" stroke-width=".4" opacity=".16">${Array.from({length:39},(_,i)=>`<path d="M${i*10} 0 V130"/>`).join('')}${Array.from({length:14},(_,i)=>`<path d="M0 ${i*10} H380"/>`).join('')}</g>
+  ${L('M290 65 m-52 0 a52 52 0 1 1 104 0 a52 52 0 1 1 -104 0',330,0)}${L('M290 65 m-40 0 a40 40 0 1 1 80 0 a40 40 0 1 1 -80 0',252,.4)}${L('M290 65 m-14 0 a14 14 0 1 1 28 0 a14 14 0 1 1 -28 0',90,.8)}
+  ${L('M120 65 H238',118,1)}${L('M342 65 H372',30,1.2)}${L('M238 6 V124',118,1.4)}${L('M342 6 V124',118,1.4)}${L('M238 10 H342',104,1.8)}${L('M120 50 V80',30,1.1)}
+  <g opacity="0"><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;.35;.45;.9;1" dur="10s" repeatCount="indefinite"/><text x="290" y="8" text-anchor="middle" style="font:700 6px Inter,sans-serif;letter-spacing:1px" fill="#e8c55c">⌀ 450 MM · 45 LB</text>
+  <g transform="translate(70 92) rotate(-8)"><rect x="-52" y="-14" width="104" height="28" rx="3" fill="none" stroke="url(#${u}g)" stroke-width="2"/><text y="5" text-anchor="middle" style="font:900 12px Archivo,'Inter Display',Inter,sans-serif;letter-spacing:2px" fill="url(#${u}g)">FOUNDER 001</text></g></g>
+  <text x="14" y="18" style="font:700 7px Inter,sans-serif;letter-spacing:3px" fill="#e8c55c" opacity=".6">ORIGINAL SPEC · OVERLOAD · 2026</text>`}
+ else if(k==='throne'){const dust=Array.from({length:22},(_,i)=>{const x=R('x'+i,200,330).toFixed(0),d=R('d'+i,4,9).toFixed(1),b=(-R('b'+i,0,9)).toFixed(1);return `<circle cx="${x}" cy="-5" r="${R('r'+i,.5,1.6).toFixed(1)}" fill="#f3d77a"><animate attributeName="cy" values="-5;135" dur="${d}s" begin="${b}s" repeatCount="indefinite"/><animate attributeName="opacity" values="0;1;0" dur="${d}s" begin="${b}s" repeatCount="indefinite"/></circle>`}).join('');
+  o+=`<defs><linearGradient id="${u}c" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff2bd" stop-opacity=".45"/><stop offset="1" stop-color="#fff2bd" stop-opacity="0"/></linearGradient></defs>
+  <path d="M248 -10 L282 -10 L340 130 L190 130 Z" fill="url(#${u}c)"><animate attributeName="opacity" values=".7;1;.7" dur="5s" repeatCount="indefinite"/></path>${dust}
+  <g transform="translate(265 112)">${[0,1,2].map(i=>`<ellipse cy="${-i*9}" rx="${46-i*6}" ry="7" fill="#15130e" stroke="url(#${u}g)" stroke-width="1.4"/>`).join('')}</g>
+  <g transform="translate(265 58)"><animateTransform attributeName="transform" type="translate" values="265 60;265 54;265 60" dur="4s" repeatCount="indefinite"/><path d="M-30 14 L-36 -16 L-17 -2 L0 -28 L17 -2 L36 -16 L30 14 Z" fill="url(#${u}g)" stroke="#6e5014" stroke-width="1"/><rect x="-30" y="15" width="60" height="7" rx="3" fill="url(#${u}g)"/><circle cy="-28" r="4" fill="#fff6cf"/><circle cx="-36" cy="-16" r="3" fill="#fff6cf"/><circle cx="36" cy="-16" r="3" fill="#fff6cf"/><circle cy="4" r="3.5" fill="#c8202b"/></g>
+  <rect y="126" width="380" height="4" fill="url(#${u}g)" opacity=".7"/><text x="18" y="22" style="font:900 9px Archivo,'Inter Display',Inter,sans-serif;letter-spacing:6px" fill="url(#${u}g)">THE ORIGINAL</text>`}
+ return `<svg class="scene" viewBox="0 0 380 130" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${o}</svg>`}
+myBanner=function(){const k=look('pbanner');if(k!=='none')return k;return st.set.founder?'vault':st.set.cofounder?'cofounder':''};
+{const _r=renderProfile16;renderProfile16=function(){let h=_r();if(st.set.cofounder&&!st.set.founder)h=h.replace('<div class="ph16tags">','<div class="ph16tags"><span class="tg tg-cf">Co-Founder #002</span>').replace('<h2 class="ph16n ','<h2 class="ph16n nf-cofounder ');return h}}
+{const _pp=profPage;profPage=function(id){let h=_pp(id);if(h==null)return h;const m=memberData(id)||{},p=m.profile||{};
+ if(p.cofounder&&!p.founder)h=h.replace('<div class="pptags">','<div class="pptags"><span class="tg tg-cf">Co-Founder #002</span>').replace(/<div class="ppid"><h2 class="/,'<div class="ppid"><h2 class="nf-cofounder ');
+ if(id!==myId())h+=`<div class="pp18act"><button class="btn sm" id="rep18" data-mid="${esc(id)}">Report</button><button class="btn sm" id="blk18" data-mid="${esc(id)}">${(st.set.blocked||[]).includes(id)?'Unblock':'Block'}</button></div>`;return h}}
+
+/* ---------- block and report ---------- */
+{const _f=feed17;feed17=function(posts){const B=st.set.blocked||[];return _f(B.length?posts.filter(p=>!B.includes(p.by)):posts)}}
+{const _c=chatListHTML;chatListHTML=function(){const B=st.set.blocked||[];if(!B.length||!st.chat||!st.chat.msgs)return _c();const keep=st.chat.msgs;st.chat.msgs=keep.filter(m=>!B.includes(m.by));try{return _c()}finally{st.chat.msgs=keep}}}
+const REP_WHY=['Spam','Rude or bullying','Inappropriate','Fake or cheating stats','Something else'];
+{const _cs=crewSheet;crewSheet=function(sh){let h=_cs(sh);if(h&&sh.type==='crewinfo')h=h.replace(/(<\/div>)/,'$1<button class="btn acc wide" id="invite18" style="min-height:50px;margin:4px 0 12px">📨 Invite friends</button>');if(h&&sh.type==='crewinfo'&&isOwner()){const R=(st.cs.crew.reports||[]).slice().reverse();if(R.length)h+=`<div class="card"><h3>🚩 Reports (${R.length})</h3>${R.slice(0,10).map(x=>`<div class="rep18"><b>${esc((memberOf2(x.target)||{name:'Someone'}).name)}</b> · ${esc(x.why||'')}<span class="sub"> · by ${esc((memberOf2(x.by)||{name:'Someone'}).name)} · ${ago(x.ts)}</span></div>`).join('')}<p class="sub">Reports are only visible to you as the crew owner. Nothing gets deleted automatically.</p></div>`}return h}}
+
+/* ---------- invite ---------- */
+function inviteText(){const c=st.cs.crew,u=location.origin+location.pathname+'?join='+encodeURIComponent(c.code);return {u,t:`Join my crew "${c.name}" on Overload 💪\n1. Open ${u}\n2. Add it to your Home Screen\n3. Crew tab → enter code ${c.code}`}}
+async function shareInvite(){const {u,t}=inviteText();try{if(navigator.share){await navigator.share({title:'Join my crew on Overload',text:t});return}}catch(e){if(e&&e.name==='AbortError')return}try{await navigator.clipboard.writeText(t);toast('Invite copied. Paste it to your friends')}catch(e){st.sheet={type:'invite18'};renderSheet()}}
+
+/* ---------- privacy ---------- */
+function privacyHTML(){return `<div class="ghd"><h2>Privacy</h2><button class="btn sm" id="sheetx">Done</button></div><div class="priv18">
+<p class="sub">Last updated November 2026. Plain version, no legal speak.</p>
+<h3>What stays on your phone</h3><p>Your workouts, plan, notes and settings are saved on your device. If you never sign in or join a crew, nothing leaves your phone except the basic usage counts below.</p>
+<h3>What goes to the Overload server</h3><p>If you sign in, your log is backed up so you can restore it on another phone. If you join a crew, your name, profile, rank, workout summaries, posts, reactions and chat messages are shared with that crew. The server runs on Cloudflare.</p>
+<h3>Usage stats</h3><p>The app counts how it is used so it can get better: a random device ID, phone type, app version, whether it runs from the Home Screen, and counts like workouts and sets. If you are signed in or in a crew, your name can show next to your device in the owner’s private dashboard.</p>
+<h3>What we never do</h3><p>No ads, no selling or renting your data, no tracking across other apps or sites.</p>
+<h3>Your choices</h3><p>You can stay signed out, leave a crew, block people and export everything in Settings → Backup and restore. To have your account data removed from the server, contact Jake Scarpa, the app owner.</p>
+<p class="sub">© 2026 Jake Scarpa. All rights reserved.</p></div>`}
+
+/* ---------- faster logging ---------- */
+function fillFromLast(ids){const s=ensure();let n=0;(ids||exList().map(e=>e.id)).forEach(id=>{const l=last(id);if(!l)return;const la=(l.ex[id]||[]).filter(x=>x&&(x.w||x.r));if(!la.length)return;const cur=s.ex[id]=s.ex[id]||[];la.forEach((x,i)=>{const c=cur[i]=cur[i]||{};if(c.d||c.w||c.r)return;if(x.w!=null&&x.w!=='')c.w=x.w;if(x.r!=null&&x.r!=='')c.r=x.r;n++})});if(n){saveS();render();toast(`Filled ${n} set${n>1?'s':''} from last time. Check each one off as you go`)}else toast('Nothing to fill. No earlier sets for these');return n}
+function exList(){const L=[];try{todayGroups().forEach(g=>g.forEach(e=>L.push(e)))}catch(e){}return L}
+function copySet(id,i){const s=ensure(),a=s.ex[id]=s.ex[id]||[],x=a[i];if(!x||(x.w==null&&x.r==null)){toast('Fill this set first');return}const nx=a[i+1]=a[i+1]||{};if(nx.d){toast('Next set is already done');return}nx.w=x.w;nx.r=x.r;if(x.q!=null)nx.q=x.q;saveS();haptic('tap');render();toast(`Copied to set ${i+2}`)}
+let undo18=null;
+function delSet(id,i){const s=ensure(),a=s.ex[id];if(!a||!a[i])return;const was=JSON.parse(JSON.stringify(a));a.splice(i,1);saveS();render();undo18={id,was,date:st.date,day:st.day};const el=$('undo18');if(el){el.innerHTML=`<span>Set ${i+1} removed</span><button id="undo18b">Undo</button>`;el.classList.add('on');clearTimeout(el._t);el._t=setTimeout(()=>{el.classList.remove('on');undo18=null},6000)}}
+function undoSet(){if(!undo18)return;const s=ensure();if(st.date===undo18.date){s.ex[undo18.id]=undo18.was;saveS();render();toast('Set restored')}undo18=null;const el=$('undo18');if(el)el.classList.remove('on')}
+{let lp=null;const start=(e)=>{const r=e.target.closest&&e.target.closest('.srow');if(!r||e.target.closest('input,button'))return;const m=/^row-(.+)-(\d+)$/.exec(r.id);if(!m)return;const pt=e.touches?e.touches[0]:e;r._sx=pt.clientX;r._sy=pt.clientY;r._m=m;clearTimeout(lp);lp=setTimeout(()=>{r._held=1;copySet(m[1],+m[2])},550)};
+ const move=(e)=>{const r=e.target.closest&&e.target.closest('.srow');if(!r||r._sx==null)return;const pt=e.touches?e.touches[0]:e,dx=pt.clientX-r._sx,dy=pt.clientY-r._sy;if(Math.abs(dx)>10||Math.abs(dy)>10)clearTimeout(lp);if(dx<0&&Math.abs(dx)>Math.abs(dy)){r.style.transform=`translateX(${Math.max(dx,-110)}px)`;r.classList.toggle('del18',dx<-70)}};
+ const end=(e)=>{clearTimeout(lp);const r=e.target.closest&&e.target.closest('.srow');if(!r||r._sx==null)return;const pt=e.changedTouches?e.changedTouches[0]:e,dx=pt.clientX-r._sx,m=r._m;r._sx=null;r.style.transform='';r.classList.remove('del18');if(!r._held&&dx<-70&&m)delSet(m[1],+m[2]);r._held=0};
+ document.addEventListener('touchstart',start,{passive:true});document.addEventListener('touchmove',move,{passive:true});document.addEventListener('touchend',end,{passive:true})}
+
+/* ---------- one popup at a time ---------- */
+const AUTO18=['news','rankup','badges','crewrank','report','tour','box'];let shown18=null;const queue18=[];
+{const _rs=renderSheet;renderSheet=function(){const el=$('sheet'),open=!!el.querySelector('.sheet');
+ if(st.sheet&&open&&shown18&&st.sheet!==shown18&&AUTO18.includes(st.sheet.type)&&AUTO18.includes(shown18.type)&&!st.sheet.back){if(queue18.length<5)queue18.push(st.sheet);st.sheet=shown18;return}
+ if(!st.sheet&&queue18.length){_rs();shown18=null;setTimeout(()=>{if(!st.sheet&&queue18.length){st.sheet=queue18.shift();renderSheet()}},380);return}
+ _rs();shown18=st.sheet||null}}
+
+/* ---------- clicks ---------- */
+async function click18(b){const d=b.dataset;
+ if(b.id==='undo18b'){undoSet();return true}
+ if(b.id==='invite18'){await shareInvite();return true}
+ if(b.id==='privbtn'){st.sheet={type:'priv18'};renderSheet();return true}
+ if(d.act==='fill'){const [gi,ei]=d.key.split('-').map(Number),e=(todayGroups()[gi]||[])[ei];st.menu=null;if(e)fillFromLast([e.id]);return true}
+ return false}
+async function sheetClick18(b){const sh=st.sheet,d=b.dataset;if(!sh)return false;
+ if(b.id==='t17fill'){st.sheet=null;renderSheet();fillFromLast();return true}
+ if(b.id==='invite18'){await shareInvite();return true}
+ if(b.id==='privbtn'){st.sheet={type:'priv18',back:sh};renderSheet();return true}
+ if(b.id==='fsave'){try{const r=await vaultCall('/founder',acctBody({code:(($('fcode')||{}).value||'').trim()}));if(r&&r.cofounder){st.set.cofounder=true;saveSet();st.sheet=null;renderSheet();confetti(120);toast('🥈 Welcome, Co-Founder')}else{st.set.founder=true;saveSet();st.sheet=null;renderSheet();confetti(140);toast('👑 Welcome, Founder')}syncCrew(true);render()}catch(e){toast(e.message==='wrong code'?'That code isn’t right':'Sign in first, then try again')}return true}
+ if(sh.type==='crest'){const c=sh.crest;
+  if(d.crsec){if(d.crsec==='rib'){}sh.sec=d.crsec;renderSheet();return true}
+  if(b.id==='cr18back'||b.id==='cr18back2'){const r=$('crrib');if(r)c.rib=r.value.trim().toUpperCase().slice(0,26);sh.sec=null;renderSheet();return true}
+  if(d.cr){if(d.crlock){toast('🔒 '+d.crlock);return true}const i=d.cr.indexOf(':');c[d.cr.slice(0,i)]=d.cr.slice(i+1);haptic('tap');renderSheet();return true}
+  if(b.id==='crsave18'){const r=$('crrib');if(r)c.rib=r.value.trim().toUpperCase().slice(0,26);const n=crNorm(c);const res=await crewCall('crest',{crest:n});if(!res.error){toast('Crest saved');st.sheet=null;renderSheet();render()}return true}}
+ if(b.id==='rep18'){st.sheet={type:'rep18',mid:d.mid,back:sh};renderSheet();return true}
+ if(d.rep18){const res=await crewCall('report',{target:sh.mid,why:d.rep18});if(!res||!res.error){toast('Reported. Thanks for keeping the crew good');st.sheet=sh.back||null;renderSheet()}return true}
+ if(b.id==='blk18'){const B=st.set.blocked=st.set.blocked||[],i=B.indexOf(d.mid);if(i>=0){B.splice(i,1);toast('Unblocked')}else{B.push(d.mid);toast('Blocked. You won’t see their posts or chat')}saveSet();renderSheet();render();return true}
+ return false}
+{const _s=sheet15;sheet15=function(sh){
+ if(sh.type==='priv18')return privacyHTML();
+ if(sh.type==='rep18'){const m=memberOf2(sh.mid)||{name:'this person'};return `<div class="ghd"><h2>Report ${esc(m.name)}</h2><button class="btn sm" id="sheetx">Cancel</button></div><p class="sub">Only your crew owner sees reports. They won’t know it was you unless the owner checks.</p><div class="card rows15">${REP_WHY.map(w=>row16(`data-rep18="${esc(w)}"`,'🚩',w,'')).join('')}</div>`}
+ if(sh.type==='invite18'){const {t}=inviteText();return `<div class="ghd"><h2>Invite friends</h2><button class="btn sm" id="sheetx">Done</button></div><p class="sub">Copy this and send it to your friends.</p><textarea class="field" readonly style="min-height:130px">${esc(t)}</textarea>`}
+ let h=_s(sh);
+ if(sh.type==='tmore')h=h.replace('<div class="card rows15">','<div class="card rows15">'+row16('t17fill','↺','Same as last time','Fill every set from your last session'));
+ return h}}
+{const _s16=settings16;settings16=function(){return _s16().replace('</div>',row16('privbtn','🔒','Privacy','What’s saved and shared')+'</div>')}}
+function joinCheck18(){try{if(!st.join18)return;if(st.cs){st.join18=null;return}if(!st.plan){setTimeout(joinCheck18,1000);return}if(!st.set.tour16){st.set.tour16=1;saveSet()}if(st.sheet&&st.sheet.type==='tour'){st.sheet=null;renderSheet()}st.tab='crew';st.profile=false;st.settings=false;render();setTimeout(()=>{const i=$('crcode');if(i){i.value=st.join18;toast('Invite code filled in. Tap Join')}},300)}catch(e){}}
+{const _d=dots17;dots17=function(){_d();try{if(st.join18){if(st.cs){st.join18=null;return}setTimeout(()=>{const i=$('crcode');if(i&&!i.value)i.value=st.join18||''},0)}}catch(e){}}}
+function boot18(){try{
+ if(!$('undo18')){const u=document.createElement('div');u.id='undo18';u.className='undo18';document.body.appendChild(u);u.addEventListener('click',e=>{if(e.target.id==='undo18b')undoSet()})}
+ const q=new URLSearchParams(location.search),j=q.get('join');if(j){history.replaceState(null,'',location.pathname);st.join18=j.toUpperCase().replace(/[^A-Z0-9-]/g,'').slice(0,16);joinCheck18()}
+ }catch(e){console.warn('boot18',e)}}
 /* ---------- background art ---------- */
 const ICONS={
  dumbbell:'<rect x="4" y="34" width="9" height="32" rx="3"/><rect x="13" y="24" width="12" height="52" rx="4"/><rect x="25" y="45" width="50" height="10" rx="3"/><path d="M33 45v10M38 45v10M62 45v10M67 45v10"/><rect x="75" y="24" width="12" height="52" rx="4"/><rect x="87" y="34" width="9" height="32" rx="3"/>',
@@ -3024,7 +3224,7 @@ async function sheetClick13(b){const d=b.dataset,sh=st.sheet;if(!sh)return false
  addEventListener('online',()=>{if(st.set.acct)syncNow(true);if(crewOn())wsConnect()});
  document.addEventListener('visibilitychange',()=>{if(document.hidden){if(ws){try{ws.close()}catch(e){}}return}if(st.set.acct)syncNow();if(crewOn()){wsConnect();setTimeout(sendLive,500)}})})();
 
-boot15();boot14();boot16();loadCounter();crewLoop();if(crewOn()){saveCrewId();setTimeout(()=>syncCrew(true),2500)}
+boot15();boot14();boot16();boot18();loadCounter();crewLoop();if(crewOn()){saveCrewId();setTimeout(()=>syncCrew(true),2500)}
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&crewOn())syncCrew()});
 if(st.plan&&!Array.isArray(st.set.seen))checkUnlocks();
 splash().then(()=>{if(st.plan&&st.set.seenVer!==VERSION){st.sheet={type:'news'};renderSheet()}else if(!weekReport()){checkUnlocks()}checkMissing().then(()=>mirrorNow())});
