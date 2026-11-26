@@ -69,8 +69,8 @@ fun muscleColor(m: String): Color = Color(when (m) {
 class OvColors(val bg: Color, val ink: Color, val mute: Color, val line: Color, val card: Color, val soft: Color, val dark: Boolean)
 
 // 0.17 glass look: cards are see-through so the background art shows through
-val LightOv = OvColors(Color(0xFFF7F5F1), Color(0xFF14161C), Color(0xFF6B7080), Color(0xFFE7E7EC), Color(0xA6FFFFFF), Color(0x99EEF0F4), false)
-val DarkOv = OvColors(Color(0xFF07080C), Color(0xFFF2F3F7), Color(0xFF9AA0AE), Color(0xFF242632), Color(0x8C12141C), Color(0x991A1C26), true)
+val LightOv = OvColors(Color(0xFFF7F5F1), Color(0xFF14161C), Color(0xFF6B7080), Color(0xFFE7E7EC), Color(0xCCFFFFFF), Color(0x99EEF0F4), false)
+val DarkOv = OvColors(Color(0xFF07080C), Color(0xFFF2F3F7), Color(0xFF9AA0AE), Color(0xFF242632), Color(0xB312141C), Color(0x991A1C26), true)
 val LocalOv = staticCompositionLocalOf { LightOv }
 
 @Composable
