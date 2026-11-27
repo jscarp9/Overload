@@ -1101,6 +1101,14 @@ body.drag24{user-select:none;-webkit-user-select:none}
 .tips25.ld{display:flex;flex-direction:column;gap:6px}
 .act24 .tip24{border-color:rgba(160,120,255,.45)!important;background:rgba(160,120,255,.1)!important;color:#d9c9ff!important}
 .aip25{margin:0}
+/* 0.26 coach button in the top bar */
+.coachb26{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;width:52px;height:52px;padding:0;border:0;background:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.coachb26.hide{display:none}
+.coachb26 .orb23{width:30px;height:30px}.coachb26 .orb23 i{font-size:13px}.coachb26 .orb23::before{inset:-5px}.coachb26 .orb23::after{inset:-9px}
+.coachb26 b{font:900 9.5px Inter,sans-serif;letter-spacing:.14em;text-transform:uppercase;background:linear-gradient(100deg,#fff6d0,#f3cf5a 50%,#b8860b);-webkit-background-clip:text;background-clip:text;color:transparent}
+html[data-mode=light] .coachb26 b{background:linear-gradient(100deg,#b8860b,#8a6212);-webkit-background-clip:text;background-clip:text}
+.coachb26.rest26 .orb23{filter:grayscale(.7) brightness(.8);box-shadow:none}
+.coachb26:active .orb23{transform:scale(.92)}
 </style>
 </head>
 <body>
@@ -1110,7 +1118,7 @@ body.drag24{user-select:none;-webkit-user-select:none}
 <div id="sheet"></div>
 <div class="app">
 <div class="wrap">
-  <div class="top"><div><div class="wm" id="wm">Overload</div><div class="hi" id="hi"></div></div><div style="display:flex;gap:8px"><button class="btn iconb rankb hide" id="rankbtn" aria-label="Your rank and badges"></button><button class="btn iconb" id="gear" aria-label="Settings"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button></div></div>
+  <div class="top"><div><div class="wm" id="wm">Overload</div><div class="hi" id="hi"></div></div><div style="display:flex;gap:8px;align-items:center"><button class="coachb26 hide" id="coach26" aria-label="Ask Coach"><span class="orb23"><i>✦</i></span><b>Coach</b></button><button class="btn iconb rankb hide" id="rankbtn" aria-label="Your rank and badges"></button><button class="btn iconb" id="gear" aria-label="Settings"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button></div></div>
   <main id="main"></main>
 </div>
 <div class="dock" id="dock">
@@ -1225,7 +1233,7 @@ function plateSVG(color,state,opts={}){const id='p'+(pid++),c=PC[color]||PC.red,
 /* ---------- today ---------- */
 function counts(){const s=cur();let tot=0,dn=0;todayGroups().forEach(gr=>gr.forEach(e=>{tot+=Math.max(+e.sets||2,(s.ex[e.id]||[]).length);dn+=(s.ex[e.id]||[]).filter(x=>x&&x.d).length}));return[dn,tot]}
 
-const VERSION=BETA?'0.25 beta':'0.25';
+const VERSION=BETA?'0.25.1 beta':'0.25.1';
 const NEWS=[['Meet Coach ✦','Tap ✦ Coach on your plan and just ask: swap an exercise, short on time, deload week, change your split. Coach shows the change and you tap Apply.'],['Form tips','Tap ⋯ on any exercise for quick AI form tips.'],['Weekly crew recap','Every Monday your crew gets an AI recap post with the MVP, a little roast and a challenge.']];
 const isDark=()=>document.documentElement.dataset.mode==='dark';
 function applyTheme(){const t=st.set.theme||'auto',mq=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)');const m=t==='auto'?(mq&&mq.matches?'dark':'light'):t;document.documentElement.dataset.mode=m;const mt=document.querySelector('meta[name=theme-color]');if(mt)mt.setAttribute('content',m==='dark'?'#07080c':'#f7f5f1')}
@@ -4175,6 +4183,12 @@ function hypeCheck25(){try{if(!aiOnNow()||AI23.rest||!st.cs||!st.cs.crew||hype25
 function boot25(){aiStatus();setInterval(hypeCheck25,60000);setTimeout(hypeCheck25,6000);
  document.addEventListener('input',e=>{const t=e.target;if(t.id==='co25in'&&st.sheet&&st.sheet.type==='coach25'){st.sheet.draft=t.value;t.style.height='auto';t.style.height=Math.min(120,t.scrollHeight)+'px'}});
  document.addEventListener('keydown',e=>{if(e.target.id==='co25in'&&e.key==='Enter'&&!e.shiftKey){e.preventDefault();if(st.sheet&&st.sheet.type==='coach25')send25(st.sheet,e.target.value)}})}
+/* ---------- 0.26: Coach lives in the top bar ---------- */
+{const _rp=renderPlan;renderPlan=function(){return _rp().replace(/<button class="ai23chip" id="co25open"[^>]*>[\s\S]*?<\/button>/,'')}}
+function upd26(){try{const b=$('coach26');if(b){b.classList.toggle('hide',!aiOnNow());b.classList.toggle('rest26',!!AI23.rest)}}catch(e){}}
+{const _rc=renderChrome;renderChrome=function(){_rc.apply(this,arguments);upd26()}}
+function boot26(){const b=$('coach26');if(b)b.addEventListener('click',()=>{try{haptic('tap')}catch(e){}openCoach25()});upd26();
+ const _st=aiStatus;aiStatus=async function(){await _st.apply(this,arguments);upd26()};setInterval(upd26,5000)}
 /* ---------- background art ---------- */
 const ICONS={
  dumbbell:'<rect x="4" y="34" width="9" height="32" rx="3"/><rect x="13" y="24" width="12" height="52" rx="4"/><rect x="25" y="45" width="50" height="10" rx="3"/><path d="M33 45v10M38 45v10M62 45v10M67 45v10"/><rect x="75" y="24" width="12" height="52" rx="4"/><rect x="87" y="34" width="9" height="32" rx="3"/>',
@@ -4241,7 +4255,7 @@ async function sheetClick13(b){const d=b.dataset,sh=st.sheet;if(!sh)return false
  addEventListener('online',()=>{if(st.set.acct)syncNow(true);if(crewOn())wsConnect()});
  document.addEventListener('visibilitychange',()=>{if(document.hidden){if(ws){try{ws.close()}catch(e){}}return}if(st.set.acct)syncNow();if(crewOn()){wsConnect();setTimeout(sendLive,500)}})})();
 
-boot20();boot15();boot14();boot16();boot18();boot19();boot21();boot22();boot23();boot24();boot25();loadCounter();crewLoop();if(crewOn()){saveCrewId();setTimeout(()=>syncCrew(true),2500)}
+boot20();boot15();boot14();boot16();boot18();boot19();boot21();boot22();boot23();boot24();boot25();boot26();loadCounter();crewLoop();if(crewOn()){saveCrewId();setTimeout(()=>syncCrew(true),2500)}
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&crewOn())syncCrew()});
 if(st.plan&&!Array.isArray(st.set.seen))checkUnlocks();
 splash().then(()=>{if(st.plan&&st.set.seenVer!==VERSION){st.sheet={type:'news'};renderSheet()}else if(!weekReport()){checkUnlocks()}checkMissing().then(()=>mirrorNow())});
