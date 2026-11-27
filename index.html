@@ -1067,6 +1067,40 @@ body.drag24{user-select:none;-webkit-user-select:none}
 .act24 button.rm{border-color:rgba(239,75,85,.4);background:rgba(239,75,85,.08);color:#ef4b55}
 @media (prefers-reduced-motion:reduce){.r24in{transition:none}}
 .r24.sw24 .r24in{background:#16181f}html[data-mode=light] .r24.sw24 .r24in{background:#fff}
+/* 0.25 coach chat */
+.co25{display:flex;flex-direction:column;min-height:70vh}
+.msgs25{flex:1;display:flex;flex-direction:column;gap:10px;margin:10px 0 12px}
+.hello25 p{margin:4px 2px 12px;font-size:15px;line-height:1.45;color:#dfe2e8}
+.chips25{display:flex;flex-wrap:wrap;gap:8px}
+.chips25 button{padding:10px 13px;border-radius:99px;border:1px solid rgba(243,207,90,.4);background:rgba(243,207,90,.08);color:#f3e2a6;font:700 13.5px Inter,sans-serif;cursor:pointer}
+.chips25 #ai23build{border-color:rgba(160,120,255,.5);background:rgba(160,120,255,.12);color:#d9c9ff}
+.mu25{align-self:flex-end;max-width:82%;padding:10px 14px;border-radius:18px 18px 4px 18px;background:linear-gradient(180deg,#fff6d0,#f3cf5a);color:#1d1503;font-size:15px;line-height:1.4;font-weight:600;white-space:pre-wrap;word-break:break-word}
+.ma25{display:flex;gap:10px;align-items:flex-start;max-width:92%}
+.ma25 .orb23{width:28px;height:28px;margin-top:4px}.ma25 .orb23 i{font-size:12px}.ma25 .orb23::before{inset:-4px}.ma25 .orb23::after{inset:-8px}
+.ma25>div{min-width:0;flex:1}
+.ma25 p{margin:0;padding:10px 14px;border-radius:4px 18px 18px 18px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);font-size:15px;line-height:1.45;color:#f1f2f5;white-space:pre-wrap;word-break:break-word}
+.typing p{display:flex;gap:5px;padding:14px 16px;width:max-content}.typing p i{width:7px;height:7px;border-radius:50%;background:#f3cf5a;animation:dot25 1.1s ease-in-out infinite}.typing p i:nth-child(2){animation-delay:.15s}.typing p i:nth-child(3){animation-delay:.3s}
+@keyframes dot25{0%,80%,100%{opacity:.25;transform:translateY(0)}40%{opacity:1;transform:translateY(-4px)}}
+.ch25{margin-top:8px;padding:12px;border-radius:16px;background:linear-gradient(160deg,rgba(243,207,90,.13),rgba(120,80,255,.08));border:1px solid rgba(243,207,90,.45)}
+.ch25.applied{border-color:rgba(22,182,91,.5);background:rgba(22,182,91,.08)}.ch25.no{opacity:.55}
+.ch25h{font-weight:800;font-size:14px;color:#f3e2a6;margin-bottom:6px}
+.ch25d{padding:6px 0;border-top:1px solid rgba(255,255,255,.08);font-size:13px;line-height:1.5}.ch25d b{display:block;font-size:13.5px;color:#fff}
+.ch25d span{color:#c4c8d0}.ch25d i{font-style:normal;font-weight:700;margin-right:6px}.ch25d i.p{color:#3fdc8a}.ch25d i.m{color:#ff8a7a;text-decoration:line-through}
+.ch25b{display:grid;grid-template-columns:1.3fr 1fr;gap:8px;margin-top:10px}.ch25b .cta23{padding:12px;font-size:15px}
+.ch25s{margin-top:8px;font-size:13px;font-weight:700;color:#3fdc8a}.ch25.no .ch25s{color:#9aa1ad}
+.in25{position:sticky;bottom:0;display:flex;gap:8px;align-items:flex-end;padding:8px;border-radius:22px;background:rgba(10,11,15,.92);border:1px solid rgba(243,207,90,.35);box-shadow:0 -8px 30px rgba(0,0,0,.5)}
+.in25 textarea{flex:1;min-height:40px;max-height:120px;resize:none;border:0;outline:none;background:none;color:#fff;font:500 16px Inter,sans-serif;padding:9px 8px;line-height:1.35}
+.in25 button{flex:none;width:40px;height:40px;border-radius:50%;border:0;cursor:pointer;font:900 20px Inter,sans-serif;color:#1d1503;background:linear-gradient(180deg,#fff6d0,#f3cf5a 60%,#d6a63a);box-shadow:0 0 16px rgba(243,207,90,.6)}
+.in25 button:disabled{filter:grayscale(1) brightness(.5);box-shadow:none}
+.lnk25{border:0;background:none;color:#9aa1ad;font:700 12px Inter,sans-serif;text-decoration:underline;cursor:pointer;padding:0}
+.tips25{margin-top:14px}.tips25 ol{margin:0;padding:0;list-style:none;counter-reset:t;display:flex;flex-direction:column;gap:8px}
+.tips25 li{counter-increment:t;display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:16px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);font-size:15px;line-height:1.4;color:#f1f2f5}
+.tips25 li::before{content:counter(t);flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-weight:900;font-size:12px;color:#1d1503;background:linear-gradient(180deg,#fff6d0,#f3cf5a)}
+.tp25{margin-top:8px;padding:12px 14px;border-radius:16px;background:rgba(22,182,91,.1);border:1px solid rgba(22,182,91,.35);font-size:14.5px;color:#d8f5e6}.tp25 b{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#3fdc8a;margin-bottom:2px}
+.tp25.x{background:rgba(255,90,90,.08);border-color:rgba(255,90,90,.3);color:#ffd6d6}.tp25.x b{color:#ff8a7a}
+.tips25.ld{display:flex;flex-direction:column;gap:6px}
+.act24 .tip24{border-color:rgba(160,120,255,.45)!important;background:rgba(160,120,255,.1)!important;color:#d9c9ff!important}
+.aip25{margin:0}
 </style>
 </head>
 <body>
@@ -1191,8 +1225,8 @@ function plateSVG(color,state,opts={}){const id='p'+(pid++),c=PC[color]||PC.red,
 /* ---------- today ---------- */
 function counts(){const s=cur();let tot=0,dn=0;todayGroups().forEach(gr=>gr.forEach(e=>{tot+=Math.max(+e.sets||2,(s.ex[e.id]||[]).length);dn+=(s.ex[e.id]||[]).filter(x=>x&&x.d).length}));return[dn,tot]}
 
-const VERSION=BETA?'0.24 beta':'0.24';
-const NEWS=[['A cleaner Plan page','One clean row per exercise. Tap to edit, drag ≡ to reorder, swipe left to delete.'],['Supersets in one tap','Tap the gold 🔗 between two exercises to unpair them, or the faint one to pair them.'],['✦ AI always there','The gold AI button now sits on every day of your plan.']];
+const VERSION=BETA?'0.25 beta':'0.25';
+const NEWS=[['Meet Coach ✦','Tap ✦ Coach on your plan and just ask: swap an exercise, short on time, deload week, change your split. Coach shows the change and you tap Apply.'],['Form tips','Tap ⋯ on any exercise for quick AI form tips.'],['Weekly crew recap','Every Monday your crew gets an AI recap post with the MVP, a little roast and a challenge.']];
 const isDark=()=>document.documentElement.dataset.mode==='dark';
 function applyTheme(){const t=st.set.theme||'auto',mq=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)');const m=t==='auto'?(mq&&mq.matches?'dark':'light'):t;document.documentElement.dataset.mode=m;const mt=document.querySelector('meta[name=theme-color]');if(mt)mt.setAttribute('content',m==='dark'?'#07080c':'#f7f5f1')}
 function todayGroups(){const p=pd(),sw=(cur().swap)||{};return p.groups.map(gr=>gr.map(e=>sw[e.id]||e))}
@@ -1402,7 +1436,7 @@ function saveRename(){const r=$('rename');if(!r)return;const v=r.value.trim();if
 main.addEventListener('focusout',e=>{if(e.target.id==='rename')setTimeout(saveRename,0)});
 main.addEventListener('keydown',e=>{if(e.target.id==='rename'&&e.key==='Enter'){e.preventDefault();e.target.blur();return}if(e.target.id==='psearch'&&e.key==='Enter'){e.preventDefault();const q=e.target.value.trim();if(!q)return;const hit=LIB.find(x=>x[0].toLowerCase()===q.toLowerCase());if(hit)addFromPicker(...hit);else addFromPicker(q,'Other',8,12)}});
 main.addEventListener('click',async e=>{const b=e.target.closest('button');if(!b)return;const d=st.plan&&st.plan.days[st.pday];
- if(await click24(b))return;if(await click23(b))return;if(await click22(b))return;if(await click21(b))return;if(await click20(b))return;if(await click18(b))return;if(await click17(b))return;if(await click16(b))return;if(await click15(b))return;if(await click14(b))return;if(await crewClick(b))return;
+ if(await click25(b))return;if(await click24(b))return;if(await click23(b))return;if(await click22(b))return;if(await click21(b))return;if(await click20(b))return;if(await click18(b))return;if(await click17(b))return;if(await click16(b))return;if(await click15(b))return;if(await click14(b))return;if(await crewClick(b))return;
  if(await acctClick(b))return;if(await click13(b))return;
  if(b.id==='openprof'){st.profile=true;render();window.scrollTo({top:0});return}
  if(b.id==='pclose2'){st.profile=false;render();return}
@@ -1509,7 +1543,7 @@ function renderSheet(){const el=$('sheet'),sh=st.sheet;if(!sh){el.innerHTML='';r
 $('sheet').addEventListener('input',e=>{if(e.target.id==='bwin'){const v=parseFloat(e.target.value);st.set.bw=v>0&&v<1000?v:'';saveSet()}});
 $('sheet').addEventListener('click',async e=>{if(e.target.id==='sheetbg'){if(st.sheet&&st.sheet.type==='news')markNews();st.sheet=null;renderSheet();return}const b=e.target.closest('button');if(!b)return;
  if(b.id==='sheetx'){if(st.sheet&&st.sheet.back){st.sheet=st.sheet.back;renderSheet();return}st.sheet=null;st.confirm=null;renderSheet();return}
- if(await sheetClick24(b))return;if(await sheetClick23(b))return;if(await sheetClick22(b))return;if(await sheetClick21(b))return;if(await sheetClick19(b))return;if(await sheetClick18(b))return;if(await sheetClick17(b))return;if(await sheetClick16(b))return;if(await sheetClick15(b))return;if(await sheetClick14(b))return;if(await crewSheetClick(b))return;if(await acctSheetClick(b))return;if(await sheetClick13(b))return;
+ if(await sheetClick25(b))return;if(await sheetClick24(b))return;if(await sheetClick23(b))return;if(await sheetClick22(b))return;if(await sheetClick21(b))return;if(await sheetClick19(b))return;if(await sheetClick18(b))return;if(await sheetClick17(b))return;if(await sheetClick16(b))return;if(await sheetClick15(b))return;if(await sheetClick14(b))return;if(await crewSheetClick(b))return;if(await acctSheetClick(b))return;if(await sheetClick13(b))return;
  if(b.id==='newsok'){markNews();st.sheet=null;renderSheet();setTimeout(()=>{if(!weekReport())checkUnlocks()},300);return}
  if(b.id==='shareprof2'){st.sheet={type:'share',title:'Share your rank'};renderSheet();const r=await profileCard();if(st.sheet&&st.sheet.type==='share'){st.sheet.url=r.url;st.sheet.file=r.file;renderSheet()}return}
  if(b.id==='missno'){missGuard=false;st.sheet=null;renderSheet();mirrorNow();return}
@@ -3398,7 +3432,7 @@ function privacyHTML(){return `<div class="ghd"><h2>Privacy</h2><button class="b
 <h3>What stays on your phone</h3><p>Your workouts, plan, notes and settings are saved on your device. If you never sign in or join a crew, nothing leaves your phone except the basic usage counts below.</p>
 <h3>What goes to the Overload server</h3><p>If you sign in, your log is backed up so you can restore it on another phone. If you join a crew, your name, profile, rank, workout summaries, posts, reactions and chat messages are shared with that crew. The server runs on Cloudflare.</p>
 <h3>Usage stats</h3><p>The app counts how it is used so it can get better: a random device ID, phone type, app version, whether it runs from the Home Screen, and counts like workouts and sets. If you are signed in or in a crew, your name can show next to your device in the owner’s private dashboard.</p>
-<h3>Overload AI</h3><p>AI is off until you allow it. When you use the plan builder, the photos or text you add, your lift names and recent best sets are sent through the Overload server to Anthropic’s Claude to build your plan. If coach notes are on, the sets, weights and reps from a finished workout or week are sent the same way to write a short note. Your name, crew, chats and account details are never sent. Anthropic processes this only to answer the request. Turn it off any time in Settings → Overload AI.</p><h3>What we never do</h3><p>No ads, no selling or renting your data, no tracking across other apps or sites.</p>
+<h3>Overload AI</h3><p>AI is off until you allow it. When you message Coach, your message, your plan and your last few workouts are sent. When you ask for form tips, only the exercise name is sent. Once a week your crew’s weekly totals (first names, days trained, sets, volume, PRs) are sent to write the crew recap. When you use the plan builder, the photos or text you add, your lift names and recent best sets are sent through the Overload server to Anthropic’s Claude to build your plan. If coach notes are on, the sets, weights and reps from a finished workout or week are sent the same way to write a short note. Your name, crew, chats and account details are never sent. Anthropic processes this only to answer the request. Turn it off any time in Settings → Overload AI.</p><h3>What we never do</h3><p>No ads, no selling or renting your data, no tracking across other apps or sites.</p>
 <h3>Your choices</h3><p>You can stay signed out, leave a crew, block people and export everything in Settings → Backup and restore. To have your account data removed from the server, contact Jake Scarpa, the app owner.</p>
 <p class="sub">© 2026 Jake Scarpa. All rights reserved.</p></div>`}
 
@@ -4017,7 +4051,7 @@ function move24(gi,ei,k){const G=day24().groups,ex=G[gi][ei];G[gi].splice(ei,1);
 function stp24(fld,lbl,v){return `<div class="st24"><span>${lbl}</span><div><button data-st24="${fld}:-1" aria-label="Less ${lbl}">−</button><input type="number" inputmode="numeric" data-f24="${fld}" value="${v}" aria-label="${lbl}"><button data-st24="${fld}:1" aria-label="More ${lbl}">+</button></div></div>`}
 function ed24(sh){const d=st.plan.days[sh.day],g=d&&d.groups[sh.gi],e=g&&g[sh.ei];if(!e)return `<div class="ghd"><h2>Exercise</h2><button class="btn sm" id="sheetx">Done</button></div><p class="sub">This exercise was moved or removed.</p>`;
  const next=d.groups[sh.gi+1],ss=g.length>1;
- return `<div class="ghd"><span class="sub" style="font-weight:700">${esc(d.name)}</span><button class="btn sm acc" id="pex24done">Done</button></div>
+ return `<div class="ghd"><span class="sub" style="font-weight:700">${esc(d.name)}</span><button class="btn sm acc" id="sheetx">Done</button></div>
  <input class="field nm24" data-f24="name" value="${esc(e.name)}" aria-label="Exercise name" maxlength="40">
  <div class="mu24"><span>Muscle</span><select data-f24="m" aria-label="Muscle">${MUSCLES.map(x=>`<option${x===e.m?' selected':''}>${x}</option>`).join('')}</select></div>
  <div class="sts24">${stp24('sets','Sets',e.sets)}${stp24('lo','Min reps',e.lo)}${stp24('hi','Max reps',e.hi)}</div>
@@ -4068,6 +4102,79 @@ function moveDrag24(c,e){c.row.style.transform=`translateY(${c.dy}px)`;const y=e
 function endDrag24(c,ok){document.body.classList.remove('drag24');if(c.line)c.line.remove();c.row.classList.remove('drag');c.row.style.transform='';if(!ok||c.k==null)return;
  const [gi,ei]=c.key.split('-').map(Number),G=day24().groups,single=G[gi].length===1;if(single&&(c.k===gi||c.k===gi+1))return;move24(gi,ei,c.k)}
 {let last24=null;const _rs=renderSheet;renderSheet=function(){const was=last24;last24=st.sheet&&st.sheet.type;const r=_rs.apply(this,arguments);if(was==='pex24'&&!st.sheet)try{render()}catch(e){}return r}}
+/* ---------- 0.25: Coach chat, form tips, crew AI recap, budget aware ---------- */
+AI23.chat=AI23.chat||[];AI23.cues=AI23.cues||{};
+{const _st=aiStatus;aiStatus=async function(){try{const r=await fetch(PUSH_URL+'/aistatus',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});const j=await r.json();const was=AI23.on+'|'+AI23.rest;AI23.on=!!j.on;AI23.rest=!!j.resting;aiSave(AI23);if(was!==AI23.on+'|'+AI23.rest)render()}catch(e){}}}
+const CHIPS25=[['🔄','Swap an exercise','Swap an exercise on today’s workout for something else'],['⏱','I only have 30 min','I only have 30 minutes today. Shorten today’s workout to fit.'],['😮‍💨','Deload week','I feel beat up. Make my plan a deload week.'],['📈','Why is my bench stuck?','Why is my bench press stuck and what should I change?'],['🗓','Change my split','I want to change my split. Ask me what I want.']];
+function planForAI25(){return (st.plan?st.plan.days:[]).map(d=>({name:d.name,type:d.type,focus:d.focus,rest:d.rest,groups:(d.groups||[]).map(g=>g.map(e=>({id:e.id,name:e.name,m:e.m,sets:e.sets,lo:e.lo,hi:e.hi})))}))}
+function recentForAI25(){return sorted().filter(([,s])=>s&&s.ex&&real(s)).slice(0,6).map(([,s])=>({date:s.date,day:(s.name||(st.plan&&st.plan.days[dayIdx(s.date)]||{}).name||''),ex:Object.entries(s.ex).map(([id,a])=>({n:exName(id),s:(a||[]).filter(full).map(x=>[+x.w,+x.r])})).filter(e=>e.s.length).slice(0,12)}))}
+function dayFromAI25(d,old){const seen={};const day={name:d.name,type:d.type,focus:d.focus||'',rest:d.rest||90,groups:(d.groups||[]).map(g=>g.map(e=>{let id=e.id||slug(e.name);if(seen[id]){let n=2;while(seen[id+'-'+n])n++;id=id+'-'+n}seen[id]=1;const x={id,name:e.name,m:e.m,lo:e.lo,hi:e.hi,sets:e.sets,cue:e.cue||''};const prev=old&&(old.groups||[]).flat().find(p=>p.id===id);if(prev&&prev.cue&&!x.cue)x.cue=prev.cue;if(prev&&prev.start)x.start=prev.start;if(e.w>0&&!last(id)&&!x.start)x.start={w:e.w,r:e.r||e.lo};return x}))};if(old&&old.color&&old.type!=='off'&&day.type!=='off')day.color=old.color;return day}
+function diff25(d){const old=st.plan&&st.plan.days[d.day],a=(old&&old.groups||[]).flat().map(e=>e.name),b=(d.groups||[]).flat().map(e=>e.name),add=b.filter(x=>!a.includes(x)),rem=a.filter(x=>!b.includes(x));
+ const bits=[];if(old&&old.name!==d.name)bits.push(`renamed to <b>${esc(d.name)}</b>`);add.forEach(x=>bits.push(`<i class="p">+ ${esc(x)}</i>`));rem.forEach(x=>bits.push(`<i class="m">− ${esc(x)}</i>`));if(!bits.length)bits.push('sets, reps or order changed');return bits.join(' ')}
+function coach25(sh){const left=AI23.chatLeft!=null?AI23.chatLeft:25;
+ let h=`<div class="ai23 co25">${stars23(80,31)}<div class="ai23h">${ORB23}<div><h1 class="gt23">Coach</h1><div class="sub">Ask anything, or tell me what to change</div></div><button class="x23" id="sheetx" aria-label="Close">✕</button></div>`;
+ if(!st.set.acct)return h+`<div class="cons23"><p>Sign in first so Coach knows it’s you and limits stay fair. It takes 10 seconds with Face ID.</p></div><button class="cta23" id="ai23signin">Sign in</button></div>`;
+ if(!st.set.aiOk)return h+`<div class="cons23"><p><b>Coach uses Anthropic’s Claude.</b> When you send a message it gets your message, your plan and your last few workouts (exercises, weights and reps).</p><p>Your name, crew, chats and account are never sent. Nothing in your plan changes unless you tap Apply.</p></div><button class="cta23" id="co25allow">Allow and start</button><button class="gh23 w" id="sheetx">Not now</button></div>`;
+ if(AI23.rest)h+=`<div class="warn23">Overload AI used up this month’s budget. Coach is back on the 1st.</div>`;
+ const msgs=AI23.chat.slice(-40);
+ h+=`<div class="msgs25" id="msgs25">`;
+ if(!msgs.length)h+=`<div class="hello25"><p>Hey${st.set.name?' '+esc(String(st.set.name).split(' ')[0]):''}. I can see your plan and your recent workouts. Try one of these:</p><div class="chips25">${CHIPS25.map(([i,l,q])=>`<button data-co25q="${esc(q)}">${i} ${l}</button>`).join('')}<button id="ai23build">✦ Build a whole new week</button></div></div>`;
+ msgs.forEach((m,i)=>{if(m.r==='u')h+=`<div class="mu25">${esc(m.t)}</div>`;else{h+=`<div class="ma25">${ORB23}<div><p>${esc(m.t)}</p>${m.ch?`<div class="ch25${m.st?' '+m.st:''}"><div class="ch25h">✦ ${esc(m.ch.summary||'Plan change')}</div>${m.ch.days.map(d=>`<div class="ch25d"><b>${DN[d.day]} · ${esc(d.name)}</b><span>${d._diff||diff25(d)}</span></div>`).join('')}${m.st==='applied'?'<div class="ch25s">✓ Applied. Your old plan is in Trash.</div>':m.st==='no'?'<div class="ch25s">Not applied</div>':`<div class="ch25b"><button class="cta23" data-co25apply="${i}">Apply</button><button class="gh23" data-co25no="${i}">No thanks</button></div>`}</div>`:''}</div></div>`}});
+ if(sh.busy)h+=`<div class="ma25 typing">${ORB23}<div><p><i></i><i></i><i></i></p></div></div>`;
+ if(sh.err)h+=`<div class="err23">${esc(sh.err)}</div>`;
+ h+=`</div><div class="in25"><textarea id="co25in" rows="1" maxlength="500" placeholder="${AI23.rest?'Coach is resting until the 1st':'Message Coach'}"${AI23.rest||!left?' disabled':''}>${esc(sh.draft||'')}</textarea><button id="co25send" aria-label="Send"${sh.busy||AI23.rest||!left?' disabled':''}>↑</button></div>
+ <div class="left23">${left} message${left===1?'':'s'} left today${msgs.length?` · <button class="lnk25" id="co25clear">Clear chat</button>`:''}</div></div>`;
+ return h}
+async function send25(sh,text){text=String(text||'').trim().slice(0,500);if(!text||sh.busy)return;AI23.chat.push({r:'u',t:text});sh.draft='';sh.busy=true;sh.err='';aiSave(AI23);renderSheet();scroll25();
+ const hist=AI23.chat.slice(-10).map(m=>({r:m.r,t:m.t+(m.ch&&m.st?` [plan change ${m.st==='applied'?'applied':'not applied'}]`:'')}));
+ try{const r=await vaultCall('/ai/chat',acctBody({msgs:hist,plan:planForAI25(),recent:recentForAI25(),today:dayIdx(today()),unit:U(),known:known23()}));AI23.chatLeft=r.left;if(r.changes)r.changes.days.forEach(d=>d._diff=diff25(d));AI23.chat.push({r:'a',t:r.text,ch:r.changes||null});try{haptic('tap')}catch(e){}}
+ catch(e){if(e.status===429)AI23.chatLeft=0;if(e.status===503&&/budget/i.test(e.message))AI23.rest=true;sh.err=e.message||'Coach could not answer. Try again.';AI23.chat.pop();sh.draft=text}
+ while(AI23.chat.length>60)AI23.chat.shift();sh.busy=false;aiSave(AI23);if(st.sheet===sh){renderSheet();scroll25()}}
+function scroll25(){setTimeout(()=>{const m=$('msgs25');if(m)m.scrollIntoView({block:'end'});const s=document.querySelector('#sheet .sheet');if(s)s.scrollTop=s.scrollHeight},30)}
+function apply25(i){const m=AI23.chat[i];if(!m||!m.ch||m.st)return;if(st.plan)trashPutSync('plan','Your plan before a Coach change',clone(st.plan));m.ch.days.forEach(d=>{st.plan.days[d.day]=dayFromAI25(d,st.plan.days[d.day])});store('overload-plan',st.plan);try{saveP()}catch(e){}m.st='applied';aiSave(AI23);renderSheet();render();toast('Plan updated. Old one is in Trash.')}
+function openCoach25(){if(!aiOnNow()){toast('Overload AI is off right now');return}st.sheet={type:'coach25',draft:''};renderSheet();scroll25()}
+/* form tips */
+function cueKey25(n){return String(n||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim()}
+function cueSheet25(sh){const t=AI23.cues[cueKey25(sh.name)];let h=`<div class="ai23">${stars23(50,41)}<div class="ai23h">${ORB23}<div><h1 class="gt23">${esc(sh.name)}</h1><div class="sub">Form tips</div></div><button class="x23" id="sheetx" aria-label="Close">✕</button></div>`;
+ if(!st.set.acct)return h+`<div class="cons23"><p>Sign in to get AI form tips. It takes 10 seconds with Face ID.</p></div><button class="cta23" id="ai23signin">Sign in</button></div>`;
+ if(!st.set.aiOk)return h+`<div class="cons23"><p>Form tips are written by Anthropic’s Claude. Only the exercise name is sent.</p></div><button class="cta23" id="cue25allow">Allow</button></div>`;
+ if(t)return h+`<div class="tips25"><ol>${t.cues.map(c=>`<li>${esc(c)}</li>`).join('')}</ol>${t.feel?`<div class="tp25"><b>Feel it in</b>${esc(t.feel)}</div>`:''}${t.mistake?`<div class="tp25 x"><b>Avoid</b>${esc(t.mistake)}</div>`:''}<p class="sub" style="margin-top:12px;font-size:11.5px">AI tips, not a substitute for a coach watching you. Stop if anything hurts.</p></div></div>`;
+ if(sh.err)return h+`<div class="err23">${esc(sh.err)}</div></div>`;
+ return h+`<div class="tips25 ld"><i class="sh23"></i><i class="sh23"></i><i class="sh23 s"></i></div></div>`}
+async function openCue25(name){st.sheet={type:'cue25',name,back:st.sheet&&st.sheet.type==='pex24'?st.sheet:null};renderSheet();fetchCue25(st.sheet)}
+async function fetchCue25(sh){const k=cueKey25(sh.name);if(AI23.cues[k]||!st.set.acct||!st.set.aiOk)return;try{const r=await vaultCall('/ai/cue',acctBody({name:sh.name}));AI23.cues[k]=r.tips;const ks=Object.keys(AI23.cues);while(ks.length>150)delete AI23.cues[ks.shift()];aiSave(AI23)}catch(e){sh.err=e.message||'Could not load tips'}if(st.sheet===sh)renderSheet()}
+{const _s=sheet15;sheet15=function(sh){if(sh.type==='coach25')return coach25(sh);if(sh.type==='cue25')return cueSheet25(sh);return _s(sh)}}
+async function sheetClick25(b){const sh=st.sheet,d=b.dataset;if(!sh)return false;
+ if(sh.type==='pex24'&&b.id==='ed24tips'){const dd=st.plan.days[sh.day],e=dd.groups[sh.gi][sh.ei];openCue25(e.name);return true}
+ if(sh.type==='tmore'&&b.id==='t25coach'){openCoach25();return true}
+ if(sh.type==='cue25'){if(b.id==='cue25allow'){st.set.aiOk=1;if(st.set.aiCoach===undefined)st.set.aiCoach=true;saveSet();renderSheet();fetchCue25(sh);return true}if(b.id==='ai23signin'){st.sheet=null;renderSheet();st.settings=true;st.set17='sync';render();return true}return false}
+ if(sh.type!=='coach25')return false;
+ if(b.id==='co25allow'){st.set.aiOk=1;if(st.set.aiCoach===undefined)st.set.aiCoach=true;saveSet();renderSheet();return true}
+ if(b.id==='ai23signin'){st.sheet=null;renderSheet();st.settings=true;st.set17='sync';st.profile=false;render();return true}
+ if(b.id==='ai23build'){openAi23();return true}
+ if(d.co25q){send25(sh,d.co25q);return true}
+ if(b.id==='co25send'){const i=$('co25in');send25(sh,i?i.value:sh.draft);return true}
+ if(d.co25apply!==undefined){apply25(+d.co25apply);return true}
+ if(d.co25no!==undefined){const m=AI23.chat[+d.co25no];if(m){m.st='no';aiSave(AI23);renderSheet()}return true}
+ if(b.id==='co25clear'){AI23.chat=[];aiSave(AI23);renderSheet();return true}
+ return false}
+async function click25(b){const d=b.dataset;
+ if(b.id==='co25open'){openCoach25();return true}
+ if(d.cue25){st.menu=null;render();openCue25(d.cue25);return true}
+ return false}
+/* entry points */
+{const _rp=renderPlan;renderPlan=function(){let h=_rp();if(!aiOnNow())return h;return h.replace('<button id="ai23open" class="ai23mi">✦ Build my plan with AI</button>','<button id="co25open" class="ai23mi">✦ Ask Coach</button><button id="ai23open" class="ai23mi">✦ Build a whole new week with AI</button>').replace('<button class="ai23chip" id="ai23open" aria-label="Build my plan with AI"><span>✦</span>AI</button>','<button class="ai23chip" id="co25open" aria-label="Ask Coach"><span>✦</span>Coach</button>')}}
+{const _s=sheet15;sheet15=function(sh){let h=_s(sh);if(sh.type==='tmore'&&aiOnNow())h=h.replace('<div class="card rows15">','<div class="card rows15">'+row16('t25coach','✦','Ask Coach','Swaps, short on time, questions'));if(sh.type==='pex24'&&aiOnNow())h=h.replace('<div class="act24">','<div class="act24"><button id="ed24tips" class="tip24">✦ <span>Form tips</span></button>');return h}}
+{const _eb=exBlock;exBlock=function(e){const h=_eb.apply(this,arguments);if(!aiOnNow())return h;return h.replace('<button data-act="nhist"',`<button data-cue25="${esc(e.name)}">✦ Form tips</button><button data-act="nhist"`)}}
+/* crew: weekly AI recap post */
+{const _p=postHTML;postHTML=function(p,preview){if(p&&p.type==='ai')return `<div class="post holo23 aip25">${ORB23}<div class="hb23"><div class="hh23"><b class="gt23">CREW RECAP</b><small>Overload AI · ${ago(p.ts)}</small></div><p>${esc(p.cap||'')}</p></div></div>`;return _p(p,preview)}}
+let hype25=0;
+function hypeCheck25(){try{if(!aiOnNow()||AI23.rest||!st.cs||!st.cs.crew||hype25)return;const tw=weekDates(today())[0],k='overload-hype';if(localStorage.getItem(k)===st.cs.crew.code+tw)return;hype25=1;crewCall('aihype',{today:today()}).then(r=>{if(r&&(r.ok||r.done))localStorage.setItem(k,st.cs.crew.code+tw)}).catch(()=>{}).finally(()=>{setTimeout(()=>hype25=0,60000)})}catch(e){}}
+/* settings page wording */
+{const _set=renderSettings;renderSettings=function(){let h=_set.apply(this,arguments);if(st.set17!=='ai')return h;return h.replace('Limits: 3 plan builds a day, 1 recap per workout, 1 note a week.','Daily limits per person: 25 Coach messages, 4 plan builds, 15 new form tips, 1 recap per workout, 1 note a week. There is also a hard monthly budget for the whole app.').replace('Builds plans from your notes and writes short coach notes.','Coach chat, plan builder, form tips, workout recaps and a weekly crew post.')+(AI23.rest?'<div class="warn23" style="margin-top:10px">This month’s AI budget is used up. Everything AI is back on the 1st.</div>':'')}}
+function boot25(){aiStatus();setInterval(hypeCheck25,60000);setTimeout(hypeCheck25,6000);
+ document.addEventListener('input',e=>{const t=e.target;if(t.id==='co25in'&&st.sheet&&st.sheet.type==='coach25'){st.sheet.draft=t.value;t.style.height='auto';t.style.height=Math.min(120,t.scrollHeight)+'px'}});
+ document.addEventListener('keydown',e=>{if(e.target.id==='co25in'&&e.key==='Enter'&&!e.shiftKey){e.preventDefault();if(st.sheet&&st.sheet.type==='coach25')send25(st.sheet,e.target.value)}})}
 /* ---------- background art ---------- */
 const ICONS={
  dumbbell:'<rect x="4" y="34" width="9" height="32" rx="3"/><rect x="13" y="24" width="12" height="52" rx="4"/><rect x="25" y="45" width="50" height="10" rx="3"/><path d="M33 45v10M38 45v10M62 45v10M67 45v10"/><rect x="75" y="24" width="12" height="52" rx="4"/><rect x="87" y="34" width="9" height="32" rx="3"/>',
@@ -4134,7 +4241,7 @@ async function sheetClick13(b){const d=b.dataset,sh=st.sheet;if(!sh)return false
  addEventListener('online',()=>{if(st.set.acct)syncNow(true);if(crewOn())wsConnect()});
  document.addEventListener('visibilitychange',()=>{if(document.hidden){if(ws){try{ws.close()}catch(e){}}return}if(st.set.acct)syncNow();if(crewOn()){wsConnect();setTimeout(sendLive,500)}})})();
 
-boot20();boot15();boot14();boot16();boot18();boot19();boot21();boot22();boot23();boot24();loadCounter();crewLoop();if(crewOn()){saveCrewId();setTimeout(()=>syncCrew(true),2500)}
+boot20();boot15();boot14();boot16();boot18();boot19();boot21();boot22();boot23();boot24();boot25();loadCounter();crewLoop();if(crewOn()){saveCrewId();setTimeout(()=>syncCrew(true),2500)}
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&crewOn())syncCrew()});
 if(st.plan&&!Array.isArray(st.set.seen))checkUnlocks();
 splash().then(()=>{if(st.plan&&st.set.seenVer!==VERSION){st.sheet={type:'news'};renderSheet()}else if(!weekReport()){checkUnlocks()}checkMissing().then(()=>mirrorNow())});
