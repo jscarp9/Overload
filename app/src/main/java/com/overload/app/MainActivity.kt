@@ -73,6 +73,7 @@ fun App(vm: OverloadViewModel) {
             snackbarHost = { SnackbarHost(snack, Modifier.statusBarsPadding()) },
             bottomBar = {
                 if (d.plan != null) Column(Modifier.navigationBarsPadding().padding(horizontal = 10.dp, vertical = 8.dp)) {
+                    UndoBarView(vm, u, Modifier.fillMaxWidth())
                     RestPill(vm, u, now)
                     NavBar(vm, u)
                 }
@@ -125,6 +126,14 @@ private fun TopBar(vm: OverloadViewModel, d: AppData, c: Ctx, u: UiState) {
             if (d.settings.name.isNotEmpty()) Sub("$greet, ${d.settings.name}", Modifier.padding(top = 2.dp))
         }
         if (d.plan != null) {
+            CoachOrb(vm)
+            // 0.22: the rank emblem opens Rank up. It pulses gold when you or your crew are one step away.
+            val near = c.meNear() || vm.crew.crewNear()
+            val pulse by rememberInfiniteTransition(label = "rk").animateFloat(1f, if (near) 1.12f else 1f, infiniteRepeatable(tween(1100), androidx.compose.animation.core.RepeatMode.Reverse), label = "rp")
+            Box(Modifier.padding(end = 8.dp).size(44.dp).graphicsLayer { scaleX = pulse; scaleY = pulse }.background(ov.card, RoundedCornerShape(14.dp))
+                .then(if (near) Modifier.border(1.5.dp, Color(0xFFE8B923), RoundedCornerShape(14.dp)) else Modifier)
+                .clickable { vm.haptic("tap"); vm.openSheet(Sheet.RankUp(if (c.meNear() || !vm.crew.crewNear()) "you" else "crew")) }, contentAlignment = Alignment.Center) {
+                Emblem(c.eng.rank, Modifier.size(32.dp)); if (near) Box(Modifier.align(Alignment.TopEnd).padding(5.dp).size(8.dp).background(Color(0xFFE8B923), RoundedCornerShape(4.dp))) }
             // 0.17: the backup reminder is a red dot on the gear
             val bk = backupDue(d) && d.settings.acct == null && !u.settings
             Box(Modifier.size(44.dp).background(ov.card, RoundedCornerShape(14.dp)).clickable { vm.toggleSettings() }, contentAlignment = Alignment.Center) {
@@ -234,7 +243,7 @@ private fun ColumnScope.SheetBody(vm: OverloadViewModel, c: Ctx, u: UiState, sh:
         Sheet.CrewSnaps -> CrewSnapsSheet(vm, u)
         is Sheet.PlatePick -> PlatePickSheet(vm, c, sh.day)
         is Sheet.ProfilePage -> ProfilePageSheet(vm, c, sh.id)
-        is Sheet.ProfEdit -> ProfEditSheet(vm, c, sh.sec)
+        is Sheet.ProfEdit -> ProfEditSheet(vm, c, sh.sec, sh.direct)
         Sheet.RaidInfo -> RaidSheet(vm)
         Sheet.GroupStart -> GroupSheet(vm)
         is Sheet.GroupCard -> { SheetHead("Lifted together") { vm.closeSheet() }; OvCard { GroupPostBody(vm, sh.post) }; Sub("Posted to your crew feed.") }
@@ -245,5 +254,13 @@ private fun ColumnScope.SheetBody(vm: OverloadViewModel, c: Ctx, u: UiState, sh:
         is Sheet.Psec -> PsecSheet(vm, c, sh.k)
         is Sheet.Tour -> TourSheet(vm, sh.i)
         Sheet.TodayMore -> TodayMoreSheet(vm)
+        Sheet.Privacy -> PrivacySheet(vm)
+        is Sheet.ReportMember -> ReportSheet18(vm, sh.id)
+        is Sheet.Holiday -> HolidaySheet(vm, sh.k, sh.y)
+        is Sheet.RankUp -> RankUpSheet(vm, c, sh.tab)
+        Sheet.AiBuild -> AiBuildSheet(vm, c)
+        Sheet.Coach -> CoachSheet(vm, c)
+        is Sheet.Cue -> CueSheet(vm, c, sh.name)
+        is Sheet.PlanEx -> PlanExSheet(vm, c, sh.day, sh.gi, sh.ei)
     }
 }

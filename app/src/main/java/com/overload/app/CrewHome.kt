@@ -1,6 +1,7 @@
 package com.overload.app
 
 import android.content.Intent
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -43,9 +44,27 @@ fun AvatarOf(id: String, name: String, av: Av?, size: Int) {
         else OvText(initials(name), (size * .38f).toInt(), FontWeight.ExtraBold, if (av?.c != null) Color.White else Color.hsl(h, .6f, .26f))
     }
 }
-/** A name with its name effect (gold, neon, fire, rainbow, founder). */
+/** Shimmering name effects (0.18 co-founder silver, 0.19 holiday effects). */
+val NAME_SHIMMER = mapOf(
+    "cofounder" to listOf("#5d636d", "#ffffff", "#9aa0aa", "#5d636d"), "hthanks" to listOf("#c2410c", "#ffd9a8", "#e8650c", "#c2410c"),
+    "hxmas" to listOf("#e8424e", "#ffffff", "#e8424e", "#ffffff", "#e8424e"), "hnewyear" to listOf("#b8860b", "#fffbe0", "#e3c25a", "#ffffff", "#b8860b"),
+    "hvalentine" to listOf("#ff4f8b", "#ffc2d8", "#ff4f8b"), "hstpat" to listOf("#178a3c", "#ffd24a", "#5ed47f", "#178a3c"),
+    "heaster" to listOf("#ff9fd0", "#9fe3ff", "#fff08a", "#b8ffb0", "#d9b3ff", "#ff9fd0"), "hjuly4" to listOf("#c8202b", "#ffffff", "#2b4fd1", "#c8202b"),
+    "hhalloween" to listOf("#ff7a1a", "#9b6bd6", "#ffb347", "#ff7a1a"))
+
+/** A name with its name effect (gold, neon, fire, rainbow, founder, co-founder, holiday). crown = false leaves the 👑 off (the profile header draws it). */
 @Composable
-fun NameText(name: String, fx: String, size: Int = 15, founder: Boolean = false, shame: Boolean = false, modifier: Modifier = Modifier) {
+fun NameText(name: String, fx: String, size: Int = 15, founder: Boolean = false, shame: Boolean = false, modifier: Modifier = Modifier, cofounder: Boolean = false, crown: Boolean = true) {
+    val shim = NAME_SHIMMER[fx] ?: if (cofounder && !founder && (fx.isEmpty() || fx == "none")) NAME_SHIMMER["cofounder"] else null
+    val txt = (if (founder && crown) "👑 " else "") + name + if (shame) " 🩷" else ""
+    if (shim != null) {
+        val tr = androidx.compose.animation.core.rememberInfiniteTransition(label = "nm")
+        val x by tr.animateFloat(0f, 1f, androidx.compose.animation.core.infiniteRepeatable(androidx.compose.animation.core.tween(3000, easing = androidx.compose.animation.core.LinearEasing)), label = "nx")
+        val w = size * 12f; val off = x * w
+        Text(txt, modifier, style = TextStyle(brush = Brush.linearGradient(shim.map { hex(it) }, androidx.compose.ui.geometry.Offset(-off, 0f), androidx.compose.ui.geometry.Offset(w - off, 0f), androidx.compose.ui.graphics.TileMode.Repeated),
+            fontSize = size.sp, fontWeight = FontWeight.ExtraBold))
+        return
+    }
     val brush = when {
         founder || fx == "gold" -> Brush.linearGradient(listOf(hex("#9c7424"), hex("#ffe58a"), hex("#c99a2e")))
         fx == "neon" -> Brush.linearGradient(listOf(hex("#00e5ff"), hex("#7af7ff")))
@@ -53,60 +72,75 @@ fun NameText(name: String, fx: String, size: Int = 15, founder: Boolean = false,
         fx == "rainbow" -> Brush.linearGradient(listOf(hex("#ff3d4a"), hex("#ffbe0b"), hex("#16b65b"), hex("#2563ff"), hex("#7c4dff")))
         else -> null
     }
-    val txt = (if (founder) "👑 " else "") + name + if (shame) " 🩷" else ""
     if (brush == null) OvText(txt, size, FontWeight.Bold, modifier = modifier)
     else Text(txt, modifier, style = TextStyle(brush = brush, fontSize = size.sp, fontWeight = FontWeight.ExtraBold))
 }
 
-// ============================ CREW HEAD (0.14) ============================
+// ============================ CREW HEAD (0.20: stats inside the banner, 0.22: next crew rank) ============================
 @Composable
 fun CrewHead17(vm: OverloadViewModel, s: CrewState) {
     val c = s.crew; val n = vm.crew.bellUnread(); val live by vm.live.collectAsState(); val R = vm.crew.crewRankInfo(); val S = vm.crew.crewSum(); val own = vm.crew.isOwner()
     val founded = Instant.ofEpochMilli(if (c.created > 0) c.created else System.currentTimeMillis()).atZone(ZoneId.systemDefault()).toLocalDate()
-    Box(Modifier.fillMaxWidth().padding(bottom = 10.dp).clip(RoundedCornerShape(24.dp))) {
+    val lv = c.level; val a = crewXpFor(lv); val z = crewXpFor(lv + 1)
+    Box(Modifier.fillMaxWidth().padding(bottom = 12.dp).clip(RoundedCornerShape(24.dp))) {
         Scene(c.banner, Modifier.matchParentSize(), c.level, "crew${c.code}")
-        Box(Modifier.matchParentSize().background(Brush.verticalGradient(listOf(Color.Black.copy(.05f), (s.style?.c1?.takeIf { it.isNotEmpty() }?.let { hex(it, .55f) } ?: Color.Black.copy(.55f))))))
+        Box(Modifier.matchParentSize().background(Brush.verticalGradient(listOf(Color.Black.copy(.05f), (s.style?.c1?.takeIf { it.isNotEmpty() }?.let { hex(it, .55f) } ?: Color.Black.copy(.6f))))))
+        Row(Modifier.align(Alignment.TopEnd).padding(10.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            HeadBtn("🔔", n) { vm.openSheet(Sheet.Bell); vm.setSettings { it.copy(bellSeen = System.currentTimeMillis()) } }
+            HeadBtn("⚙", 0) { vm.openSheet(Sheet.CrewSettings) }
+        }
         Column(Modifier.fillMaxWidth().padding(14.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(Modifier.size(58.dp).clickable { if (own) vm.openSheet(Sheet.CrestEdit(c.crest ?: Crest())) else vm.toast("The crew owner designs the crest") }) { CrestView(c.crest, R.r, Modifier.fillMaxSize()) }
+            Row(Modifier.padding(end = 84.dp), verticalAlignment = Alignment.CenterVertically) {
+                Box(Modifier.size(62.dp).clickable { if (own) vm.openSheet(Sheet.CrestEdit(c.crest ?: Crest())) else vm.openSheet(Sheet.RankUp("crew")) }) { CrestView(c.crest, R.r, Modifier.fillMaxSize(), holEmoji(s)) }
                 Spacer(Modifier.width(10.dp))
                 Column(Modifier.weight(1f)) {
                     Title(c.name, 24, Color.White)
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         if (c.founders) Chip("★ Founders", hex("#ffd76a"), Color(0xFF14161C))
-                        OvText("Founded ${MON[founded.monthValue - 1]} ${founded.year}", 12, FontWeight.SemiBold, Color.White.copy(.85f))
+                        OvText("Est. ${MON[founded.monthValue - 1]} ${founded.year}", 12, FontWeight.SemiBold, Color.White.copy(.85f))
                     }
                     s.style?.motto?.takeIf { it.isNotEmpty() }?.let { OvText("“$it”", 12, FontWeight.SemiBold, Color.White.copy(.9f)) }
                 }
-                HeadBtn("🔔", n) { vm.openSheet(Sheet.Bell); vm.setSettings { it.copy(bellSeen = System.currentTimeMillis()) } }
-                Spacer(Modifier.width(6.dp)); HeadBtn("⚙", 0) { vm.openSheet(Sheet.CrewSettings) }
+            }
+            Row(Modifier.padding(top = 10.dp).fillMaxWidth().background(Color.Black.copy(.3f), RoundedCornerShape(14.dp)).padding(horizontal = 10.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+                val dot = @Composable { OvText(" · ", 12, FontWeight.Bold, Color.White.copy(.5f)) }
+                OvText("${kfmt(S.vol)} ${vm.unit}", 12, FontWeight.Black, Color.White); dot()
+                OvText("${S.streak} wk streak", 12, FontWeight.Black, Color.White); dot()
+                Row(Modifier.clickable { vm.openSheet(Sheet.RankUp("crew")) }, verticalAlignment = Alignment.CenterVertically) { Emblem(R.r, Modifier.size(18.dp)); OvText(" ${RANKS[R.r].name}", 12, FontWeight.Black, Color.White) }; dot()
+                OvText("Lv $lv", 12, FontWeight.Black, Color.White)
+                Box(Modifier.padding(start = 6.dp).weight(1f).height(5.dp).clip(RoundedCornerShape(3.dp)).background(Color.White.copy(.25f))) {
+                    Box(Modifier.fillMaxWidth(((c.xp - a) / (z - a).coerceAtLeast(1)).toFloat().coerceIn(0f, 1f)).fillMaxHeight().background(Green)) }
             }
             val ln = live.keys.count { vm.crew.member(it) != null }
             if (ln > 0) Row(Modifier.padding(top = 8.dp).background(Color.Black.copy(.35f), RoundedCornerShape(12.dp)).padding(horizontal = 10.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
                 Box(Modifier.size(7.dp).background(Red, CircleShape)); Spacer(Modifier.width(6.dp)); OvText("$ln training now", 12, FontWeight.Bold, Color.White) }
+            if (R.nx != null) { val near = R.nx - R.pts <= 100
+                Row(Modifier.padding(top = 8.dp).fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(Color.Black.copy(.35f))
+                    .then(if (near) Modifier.border(1.dp, hex("#e8b923", .7f), RoundedCornerShape(12.dp)) else Modifier)
+                    .clickable { vm.openSheet(Sheet.RankUp("crew")) }.padding(horizontal = 10.dp, vertical = 7.dp), verticalAlignment = Alignment.CenterVertically) {
+                    OvText("Next: ", 12, FontWeight.SemiBold, Color.White.copy(.85f)); OvText(RANKS[R.r + 1].name, 12, FontWeight.Black, Color.White)
+                    Box(Modifier.padding(horizontal = 8.dp).weight(1f).height(5.dp).clip(RoundedCornerShape(3.dp)).background(Color.White.copy(.2f))) {
+                        Box(Modifier.fillMaxWidth(R.frac.toFloat().coerceIn(0f, 1f)).fillMaxHeight().background(hex("#e8b923"))) }
+                    OvText("${loc(R.nx - R.pts)} pts · How?", 12, FontWeight.Bold, Color.White.copy(.9f)) }
+            }
         }
-    }
-    val lv = c.level; val a = crewXpFor(lv); val z = crewXpFor(lv + 1)
-    Row(Modifier.fillMaxWidth().padding(bottom = 10.dp, start = 4.dp, end = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-        StripCell("${kfmt(S.vol)}", "${vm.unit} lifted", Modifier.weight(1f)); StripCell("${S.streak}", "wk crew streak", Modifier.weight(1f))
-        Column(Modifier.weight(1f).clickable { vm.openSheet(Sheet.CrewRankInfo) }, horizontalAlignment = Alignment.CenterHorizontally) { Emblem(R.r, Modifier.size(30.dp), spin = R.r >= 6); Sub(RANKS[R.r].name) }
-        Column(Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) { Title("Lv $lv", 18); Bar(((c.xp - a) / (z - a).coerceAtLeast(1)), Green, Modifier.padding(horizontal = 8.dp, vertical = 4.dp), 5) }
     }
 }
 @Composable private fun HeadBtn(icon: String, n: Int, onClick: () -> Unit) =
-    Box(Modifier.size(40.dp).background(Color.White.copy(.22f), RoundedCornerShape(13.dp)).clickable(onClick = onClick), contentAlignment = Alignment.Center) {
+    Box(Modifier.size(38.dp).background(Color.Black.copy(.35f), CircleShape).clickable(onClick = onClick), contentAlignment = Alignment.Center) {
         OvText(icon, 17, color = Color.White); if (n > 0) OvText(if (n > 9) "9+" else "$n", 10, FontWeight.Black, Color.White, Modifier.align(Alignment.TopEnd).background(Red, RoundedCornerShape(8.dp)).padding(horizontal = 4.dp))
     }
-@Composable private fun StripCell(v: String, l: String, m: Modifier) = Column(m, horizontalAlignment = Alignment.CenterHorizontally) { Title(v, 18); Sub(l) }
 
 // ============================ ARENA (0.17: one row of tabs) ============================
 @Composable
 fun ArenaTabs(vm: OverloadViewModel, c: Ctx, s: CrewState, u: UiState, ranks: @Composable () -> Unit) {
-    val k = u.sub["arena2"] ?: "rank"; val mode = u.sub["arena"] ?: "all"; val cur = if (k == "rank") "r_$mode" else k
-    Chips(listOf("r_all" to "Rankings", "r_week" to "This week", "r_lifts" to "Lifts", "tro" to "Trophies", "rec" to "Records", "fun" to "Awards"), cur) { a ->
-        if (a.startsWith("r_")) { vm.setSub("arena2", "rank"); vm.setSub("arena", a.drop(2)) } else vm.setSub("arena2", a) }
+    val k = u.sub["arena2"] ?: "rank"; val mode = (u.sub["arena"] ?: "all").let { if (it == "lifts") "all" else it }
+    Chips(listOf("rank" to "Rankings", "tro" to "Trophies", "rec" to "Records", "fun" to "Awards"), k) { vm.setSub("arena2", it) }
     when (k) {
-        "rank" -> ranks()
+        "rank" -> { Row(Modifier.padding(bottom = 10.dp).background(ov.card, RoundedCornerShape(12.dp)).padding(3.dp)) {
+                listOf("all" to "All-time", "week" to "This week").forEach { (m, l) -> OvText(l, 13, FontWeight.Bold, if (mode == m) ov.bg else ov.mute,
+                    Modifier.clip(RoundedCornerShape(10.dp)).background(if (mode == m) ov.ink else Color.Transparent).clickable { vm.setSub("arena", m) }.padding(horizontal = 14.dp, vertical = 6.dp)) } }
+            ranks() }
         "tro" -> { TrophyCase(vm, s); RaidWins(s); HallOfFame(vm, s); CrewCardButton(vm, s) }
         "rec" -> { CrewRecords(vm, c); SeasonWall(vm, s, c) }
         else -> JokeAwards(vm, s)
@@ -297,19 +331,6 @@ fun GroupPostBody(vm: OverloadViewModel, p: Post) {
 }
 
 // ============================ CREW SHEETS (0.14-0.15) ============================
-@Composable
-fun CrestSheet(vm: OverloadViewModel, start: Crest) {
-    var c by remember { mutableStateOf(start) }; val R = vm.crew.crewRankInfo()
-    SheetHead("Crew crest", "Cancel") { vm.closeSheet() }
-    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { CrestView(c, R.r, Modifier.size(120.dp)) }
-    Lbl("SHAPE"); FlowRowC { listOf("shield", "plate", "circle", "hex").forEach { k -> Seg(k.replaceFirstChar { it.uppercase() }, c.shape == k, { c = c.copy(shape = k) }) } }
-    Lbl("ICON"); FlowRowC { CREST_ICON.keys.forEach { k -> Seg(k.replaceFirstChar { it.uppercase() }, c.icon == k, { c = c.copy(icon = k) }) } }
-    Lbl("COLORS"); FlowRowC { CREST_COLORS.forEach { (a, b) -> Box(Modifier.size(38.dp).clip(CircleShape).background(Brush.verticalGradient(listOf(hex(a), hex(b))))
-        .then(if (c.c1 == a) Modifier.border(3.dp, ov.ink, CircleShape) else Modifier).clickable { c = c.copy(c1 = a, c2 = b) }) } }
-    Lbl("INITIALS"); TextBox(c.txt, { c = c.copy(txt = it.uppercase().take(3)) }, "TF")
-    Sub("The crest gets fancier as your crew ranks up: borders at Silver, gold trim at Platinum, a glow at Titan and laurels at Olympian.", Modifier.padding(top = 6.dp))
-    OvButton("Save crest", { vm.crew.saveCrest(c) }, Modifier.padding(top = 10.dp), bg = Red, fg = Color.White, wide = true)
-}
 @Composable fun Lbl(t: String) = OvText(t, 13, FontWeight.ExtraBold, ov.mute, Modifier.padding(top = 12.dp, bottom = 6.dp))
 
 @Composable

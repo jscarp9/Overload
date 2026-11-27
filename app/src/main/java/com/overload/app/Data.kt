@@ -1,13 +1,22 @@
+@file:OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
 package com.overload.app
 
+import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+/**
+ * start = a starting weight the AI plan builder read from your notes (0.23), used as "Try" until there is history.
+ * ai = "new" when the AI added the lift. Both are left out of the JSON when empty, same as the web app.
+ */
 @Serializable
 data class Exercise(
     val id: String, val name: String, val m: String,
-    val lo: Int = 0, val hi: Int = 0, val sets: Int = 2, val cue: String = ""
+    val lo: Int = 0, val hi: Int = 0, val sets: Int = 2, val cue: String = "",
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val start: StartW? = null,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val ai: String? = null
 )
+@Serializable data class StartW(val w: Double = 0.0, val r: Int = 0)
 
 @Serializable
 data class DayPlan(
@@ -98,6 +107,13 @@ data class Settings(
     val rim: String = "", val founder: Boolean = false, val og: Int = 0, val fban16: Int = 0,
     // ---- 0.16 ----
     val tour16: Int = 0,
+    // ---- 0.18-0.25 (same keys as the web app) ----
+    val blocked: List<String> = emptyList(),              // crew members you blocked
+    val cofounder: Boolean = false,
+    val holSent: Map<String, Int> = emptyMap(), val holSeen: Map<String, Int> = emptyMap(), // holiday drops told to the crew / revealed
+    val tap21: Map<String, Int> = emptyMap(),             // "tap to change" hints already used (ban, av)
+    val ptip21: Int = 0, val hint24: Int = 0,             // Plan page tips dismissed
+    val aiOk: Int = 0, val aiCoach: Boolean? = null, val aiSeen23: Int = 0, // Overload AI permission, coach notes switch
     // ---- cloud sync ----
     val acct: Acct? = null, val schema: Int = 0
 )

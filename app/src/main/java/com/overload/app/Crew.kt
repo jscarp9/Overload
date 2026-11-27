@@ -269,7 +269,8 @@ class CrewService(private val vm: OverloadViewModel) {
             put("bcount", e.bcount); put("active", e.active); put("workouts", e.workouts); put("lifeVol", jsRound(e.lifeVol)); put("unit", c.unit)
             e.since?.let { put("since", it) } ?: put("since", JsonNull); put("frac", (e.frac * 100).roundToInt() / 100.0)
             putJsonArray("keys") { e.B.filter { it.earned }.forEach { add(it.k) } }
-            putJsonArray("show") { st.showcase.mapNotNull { e.badge(it) }.forEach { b -> addJsonArray { add(b.icon); add(b.name) } } }
+            // 0.21: the badge key and count go with each pin so others see the right medal
+            putJsonArray("show") { st.showcase.mapNotNull { e.badge(it) }.forEach { b -> addJsonArray { add(b.icon); add(b.name); add(b.k); add(b.count ?: 0) } } }
             putJsonObject("week") { weekStat(c, wd) }
             putJsonObject("last") { weekStat(c, weekDates(wd[0].minusDays(7))) }
             putJsonObject("prev") { weekStat(c, weekDates(wd[0].minusDays(14))) }
@@ -288,7 +289,7 @@ class CrewService(private val vm: OverloadViewModel) {
             put("flex", vm.jsonCodec.encodeToJsonElement(c.myFlex())); put("prtl", vm.jsonCodec.encodeToJsonElement(c.prTimeline().takeLast(20)))
             c.bestLift()?.let { put("best", vm.jsonCodec.encodeToJsonElement(it)) } ?: put("best", JsonNull)
             putJsonArray("plates") { FIN.keys.filter { FIN[it]!!.cat != "finish" && c.finOwned(it) }.take(40).forEach { add(it) } }
-            put("fav", P.fav); if (st.founder) put("founder", true)
+            put("fav", P.fav); if (st.founder) put("founder", true); if (st.cofounder) put("cofounder", true)
         }
     }
 

@@ -6,18 +6,19 @@ Overload is a simple workout log built around progressive overload. Pick a plan,
 
 ## Install
 
-1. Open the [Releases](../../releases) page and download the newest `overload-0.17.x.apk`.
+1. Open the [Releases](../../releases) page and download the newest `overload-0.25.x.apk`.
 2. Open it on your Android phone. If asked, allow installs from your browser or file manager.
 3. Later updates install over the top and keep your data.
 
-Every push to the `kotlin` branch builds a new release automatically. The app is at version **0.17**, the same as the web app. Releases are numbered 0.17.1, 0.17.2, … When the web app moves to a new version, change `overloadVersion` in `gradle.properties` to match.
+Every push to the `kotlin` branch builds a new release automatically. The app is at version **0.25**, matching the web app (0.25.1). Releases are numbered 0.25.1, 0.25.2, … When the web app moves to a new version, change `overloadVersion` in `gradle.properties` to match.
 
 ## Features
 
 **Plans**
 - Four tabs plus your profile: **Today, Crew, Profile, Stats, Plan**. New lifters get a quick 5-step app tour (replay it in Settings → Help).
 - Start from a template: **Jake's split**, **Push pull legs**, **Upper lower**, **Full body**, or **Build my own**.
-- Edit any day: rename it, add exercises from a library of 60+ or type your own, group them into supersets, set rest time.
+- A clean Plan page: one row per exercise. Tap a row for an edit card with − / + steppers, drag ≡ to reorder, swipe left to delete (with Undo), and tap the 🔗 between two exercises to make a superset (up to 3).
+- Add exercises from a library of 60+ or type your own, set the day's name, focus and rest, copy a day to other days, or start from a template.
 - **Themed plates:** each day gets a plate from Plan → Plate, picked by category: colours, 14 special finishes (Mirror Chrome, Lava, Galaxy…), rank plates, a Legend plate for every lift, crew trophy plates, funny plates, holiday plates, plus Founder and OG plates.
 
 **Logging**
@@ -29,6 +30,7 @@ Every push to the `kotlin` branch builds a new release automatically. The app is
 - A compact Today card: the big plate fills up as you go (tap it, it talks back), one Start button, and a ⋯ menu with Lift together, the excuse generator and session notes. Your name or motto can be engraved on the plate rim.
 - A slim week strip you can swipe between weeks, and today's challenges in one row.
 - Plate calculator and warm-up sets.
+- **Faster logging:** "Same as last time" fills empty sets from your last session (Today ⋯ or an exercise's ⋯), hold a set's number to copy it to the next set, and swipe a set left to remove it with a 6-second Undo.
 
 **Rest timer and workout clock**
 - Rest starts on its own after the last exercise in a round, with +15/−15, restart and stop buttons.
@@ -45,11 +47,19 @@ Every push to the `kotlin` branch builds a new release automatically. The app is
 - A weekly view: sessions done, hard sets, volume, PRs, and sets per muscle against your plan.
 - Volume for the last 8 weeks and your week streak.
 
+**Overload AI** (uses Anthropic's Claude through the Overload server; off until you allow it, needs a signed-in account)
+- **Coach:** the gold ✦ Coach button in the top bar opens a chat that sees your plan and recent workouts. Quick chips for swaps, short workouts, deloads and split changes. Plan changes show as a change card with Apply / No thanks, and the old plan goes to Trash first.
+- **Plan builder:** turn a photo of your notes (up to 3), a typed list or your last 10 weeks of history into a whole week. Pick days, goal and time per workout, preview the week, then Use this plan.
+- **Coach notes:** a short recap after each workout and a coach note in the Monday report. **Form tips** for any exercise, from the Plan edit card or the exercise ⋯ menu.
+- A weekly AI crew recap post in the feed. Settings → Overload AI explains what is sent and has the coach notes switch.
+
 **Profile, ranks, badges and seasons**
 - A Profile tab with your banner, avatar, rank, motto and pinned badges. **Edit profile** and **Customize** are short lists: banner, avatar, motto, gym, walkout song, lifter type, flex stats, pinned trophies, favourite plate, profile colour and jersey number.
 - **Customize:** app theme colours, backgrounds, set-complete effects, PR celebrations, rest timer skins, sound packs, name effects, post card styles and reactions. Some come only from **mystery boxes** you earn from the season pass, rank-ups and boss raids.
 - A **trophy room** with spinning trophies, and badges behind one Badges row with category tabs.
-- Ranks from Iron to Olympian with divisions, promotion trials and prestige stars. Tap the emblem at the top for your profile.
+- Ranks from Iron to Olympian with divisions, promotion trials and prestige stars. The rank emblem in the top bar opens **Rank up**: what your next rank needs, a checklist for your crew's next rank, and every plate ranks unlock. It pulses gold when you're one step away.
+- Pinned badges are **medals** (minted coins in bronze to legend) on a shelf on your profile. Tap your banner or your plate to change them.
+- **Holiday Drops:** lift on Thanksgiving, Christmas, New Year's, Valentine's, St. Patrick's, Easter, the Fourth of July or Halloween to unlock an animated plate with the year, a profile banner, a name effect, a crew reaction, a set burst and a dated medal.
 - 70+ badges (including hidden funny ones like Leg Day Dodger and Ghost), milestones, weekly badges, daily challenges, weekly quests and a Monday report card.
 - A 30-level season pass with plate colours, frames, auras and nameplates.
 - Lift ranks for your bodyweight, muscle mastery, goals with a projected finish date, and quest chains.
@@ -58,10 +68,11 @@ Every push to the `kotlin` branch builds a new release automatically. The app is
 **Crew**
 - Join or start a crew (shared with friends on the web app). Post workouts, react, comment and see who's lifting live. Roast lines under workout posts (can be turned off).
 - **Crew chat:** replies, reactions, @mentions, share your workout card, pinned messages. The owner can delete and mute.
-- **Crew home:** animated scene banners, a crest the owner designs, crew rank from Iron to Olympian, a trophy case, crew records, a season wall, joke weekly awards, a Hall of Fame and a shareable crew card.
+- **Crew home:** animated scene banners with the crew's stats and next rank inside, a layered crest (shape, pattern, emblem, metal, border, ribbon) that gains stars, wings, a crown and laurels with crew rank, a trophy case, crew records, a season wall, joke weekly awards, a Hall of Fame and a shareable crew card. 3 crew lifts on a holiday unlock a holiday crew banner and a seasonal crest.
+- **Invite friends** from crew settings. **Block and report** on every crew profile: blocking hides their posts and chat for you, reports go only to the crew owner.
 - **Boss raids:** a weekly boss every pound the crew lifts damages. **Lift together:** start a group at the gym, see each other's sets and rest timers live and finish with one shared card.
 - **Crew profiles:** tap anyone for their full profile. Give respect once a day, vote on nicknames, owners hand out roles, and the shame plate goes to whoever skips leg day.
-- The Arena (one row of tabs: Rankings, This week, Lifts, Trophies, Records, Awards): podium, Rank Power, titles, rivals, lift boards, crew challenges, crew levels and monthly awards.
+- The Arena (Rankings with an All-time / This week switch, Trophies, Records, Awards): podium, Rank Power, titles, rivals, crew challenges, crew levels and monthly awards.
 
 **Notes, settings and backup**
 - Coloured notes you can pin.
@@ -70,7 +81,7 @@ Every push to the `kotlin` branch builds a new release automatically. The app is
 - **Nothing gets lost:** deleted exercises, notes, goals, sets and plans wait in a **Trash** for 30 days. A full copy is saved before every update, and anything missing afterwards is put back. **Export everything** writes one file with all of it.
 - Glass cards with the background art always showing through (Dim art option), and Settings as a short list of pages.
 - Optional cloud backup and sync (recovery code), shared with the web app.
-- A **What's new** screen after each update.
+- A **What's new** screen after each update, and a plain-English **Privacy** page in Settings → Help.
 
 All data stays on your phone.
 
@@ -101,7 +112,7 @@ All source is in `app/src/main/java/com/overload/app/`.
 | `MainActivity.kt` | Main layout, bottom nav, floating rest timer |
 | `TodayScreen.kt` | Week strip, day card, exercise blocks, plate/warm-up/swap, exercise picker |
 | `OtherScreens.kt` | Progress, Stats and Notes tabs |
-| `PlanSettings.kt` | Plan editor, Settings, onboarding |
+| `PlanSettings.kt` | Settings, onboarding |
 | `RestAlerts.kt` | Lock-screen rest alerts (exact alarm and notification while the app is in the background) |
 | `Health.kt` | Heart rate through Health Connect: reading, the post-workout card and graph, the permission explanation screen |
 | `News.kt` | What's new screen |
@@ -120,6 +131,11 @@ All source is in `app/src/main/java/com/overload/app/`.
 | `CrewHome.kt`, `CrewExtras.kt` | Crew header, Arena tabs, trophy case, records, boss raids, lift together, Hall of Fame, crest, owner tools |
 | `Trash.kt` | Trash, update safety net, Export everything |
 | `Fx.kt` | Sound packs, set and PR effects |
+| `V18.kt`, `Crest18.kt` | 0.18: same as last time, copy and swipe-remove sets, the Undo bar, invites, block and report, privacy, the crest builder |
+| `Holiday.kt`, `Space20.kt` | 0.19 Holiday Drops (plates, banners, reveal, crew bonus) and the 0.20 founder space banners |
+| `Medal21.kt`, `RankUp22.kt` | 0.21 medals and the profile shelf, the 0.22 Rank up sheet |
+| `Ai.kt`, `AiUi.kt` | 0.23-0.25 Overload AI: plan builder, coach notes, Coach chat, form tips, crew recap, Settings page |
+| `Plan24.kt` | The 0.24 Plan page and its edit card |
 
 Data is saved as JSON in the app's private storage.
 
@@ -127,7 +143,7 @@ Data is saved as JSON in the app's private storage.
 
 ### Differences from the web version
 
-Not ported yet: workout share cards (image export; the crew card is there), passkey sign-in (use the recovery code), crew pings (lock-screen alerts for crew posts), copy-a-day, notes history, on-phone daily snapshots and the welcome splash. The Customize options for welcome screen, app icon and share card theme only change the web app for now. Sharing your profile shares text instead of an image. Fonts are the system font. Add Archivo and Inter in `res/font` to match the web look.
+Not ported yet: the `?join=CODE` invite link (Android invites share the crew code instead), workout share cards (image export; the crew card is there), passkey sign-in (use the recovery code), crew pings (lock-screen alerts for crew posts), notes history, on-phone daily snapshots and the welcome splash. The Customize options for welcome screen, app icon and share card theme only change the web app for now. Sharing your profile shares text instead of an image. Fonts are the system font. Add Archivo and Inter in `res/font` to match the web look.
 
 ## License
 

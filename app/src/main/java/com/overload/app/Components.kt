@@ -135,13 +135,15 @@ fun Toggle(on: Boolean, onChange: (Boolean) -> Unit) {
  * Special plates (Locker.kt FIN) draw their artwork over the face when solid.
  */
 @Composable
-fun Plate(color: String, state: String, modifier: Modifier = Modifier, ring: Float? = null, label: String? = null, og: Int = 0) {
+fun Plate(color: String, state: String, modifier: Modifier = Modifier, ring: Float? = null, label: String? = null, og: Int = 0, year: String? = null) {
     val p = pc(color)
+    val hol = if (state == "done") PLATE2HOL[color] else null
+    val ht = if (hol != null) holT() else 0f
     val base = when (state) { "rest" -> Color(0xFFC9CDD4); "idle" -> Color(0xFF25272D); else -> p.base }
     val light = when (state) { "rest" -> Color.White; "idle" -> Color(0xFF4A4D55); else -> p.light }
     val dark = when (state) { "rest" -> Color(0xFF7D828C); "idle" -> Color(0xFF0D0E11); else -> p.dark }
     Canvas(modifier.aspectRatio(1f)) {
-        if (color == "founder" && state != "idle" && state != "rest") { viewBox(100f, 100f) { founderPlate(label ?: "", ring) }; return@Canvas }
+        if ((color == "founder" || color == "cofounder") && state != "idle" && state != "rest") { viewBox(100f, 100f) { founderPlate(label ?: "", ring, silver = color == "cofounder") }; return@Canvas }
         val r = size.minDimension / 2; val c = center
         if (state == "rest") {
             val rr = r * .7f
@@ -160,6 +162,8 @@ fun Plate(color: String, state: String, modifier: Modifier = Modifier, ring: Flo
         drawCircle(Brush.linearGradient(listOf(Color.White, Color(0xFF9AA0AA), Color(0xFFF4F6F9), Color(0xFF6F7580)), c - Offset(hub, hub), c + Offset(hub, hub)), hub, c)
         drawCircle(Color(0xFF0A0A0C), hub * .42f, c)
         drawCircle(Color(0xFFC9CDD4), hub * .42f, c, style = Stroke(r * .03f))
+        // 0.19: holiday plates move, and big ones get the year you earned them
+        if (hol != null) viewBox(100f, 100f) { holPlateFx(hol, color, ht, size.width / density > 90f); if (year != null) svgText(year, 50f, 80f, 6f, Color.White.copy(.85f), spacing = 1.5f) }
         if (ring != null) {
             drawCircle(Color.White.copy(.25f), r * .98f, c, style = Stroke(r * .04f))
             drawArc(Color.White, -90f, 360f * ring.coerceIn(0f, 1f), false,

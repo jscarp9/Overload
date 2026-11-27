@@ -17,21 +17,19 @@ val VERSION: String = BuildConfig.VERSION_NAME
  * seenNews doesn't match. It's separate from VERSION because every push makes a new release, and
  * the sheet shouldn't pop up for releases with nothing new to say.
  */
-const val NEWS_ID = 3
+const val NEWS_ID = 4
 val NEWS = listOf(
-    "Profile tab" to "Your profile has its own tab now, between Crew and Stats. Edit profile and Customize are short lists: tap a row to change just that one thing.",
-    "Crew chat" to "A Chat tab in Crew. Reply, react, @mention and share your last workout. The crew owner can delete, pin or mute.",
-    "Crew home" to "Animated scene banners, a crest you design, crew rank from Iron to Olympian, a trophy case, crew records, a season wall and a shareable crew card.",
-    "Boss raids" to "Every week a boss shows up in your crew feed. Every pound the crew lifts does damage. Beat it for crew XP, mystery boxes and the Boss Slayer plate.",
-    "Lift together" to "At the gym with crewmates? Start a group from the ⋯ menu on Today. Everyone sees each other’s sets and rest timers, and you finish with one shared workout card.",
-    "Crew profiles" to "Tap anyone in your crew for their full profile: banner, avatar, motto, flex stats, best lift, pinned trophies, plate collection and PR timeline. Give respect once a day and vote on nicknames.",
-    "Themed plates" to "Rank plates, Legend plates for each lift, crew trophy plates, funny plates, holiday plates and 14 special finishes like Mirror Chrome, Lava and Galaxy. Plan → Plate. Engrave your name on the big plate in Edit profile.",
-    "Customize" to "App themes, backgrounds, rest timer skins, sound packs, set and PR effects, name effects, post card styles, banners and new reactions. Plus mystery boxes you can only earn.",
-    "Trophy room" to "Trophies on glass shelves in your profile. Tap one to spin it. Your crew can see yours.",
-    "Funny stuff" to "Hidden funny badges, roast lines on crew posts, the shame plate, an excuse generator, rest timer one-liners and a plate that talks back when you tap it.",
-    "Nothing gets lost" to "Deleted things go to a Trash for 30 days (Settings → Backup and restore). A full copy is saved before every update and anything missing is put back.",
-    "Calmer screens" to "Glass cards with the background art showing through, a compact Today card with one Start button, challenges in one row, a slimmer crew feed and Settings as a short list.",
-    "App tour" to "New to Overload? Take the quick tour in Settings → Help."
+    "Meet Coach ✦" to "Tap the gold ✦ Coach button at the top and just ask: swap an exercise, short on time, deload week, change your split. Coach shows the change and you tap Apply. Your old plan goes to Trash first.",
+    "Build your plan with AI" to "Snap a photo of your workout notes, type a list, or use your history, and AI builds your whole week. Plan → ⋯ → Build a whole new week with AI.",
+    "Coach notes and form tips" to "A short recap after each workout, a coach note in your Monday report, and ✦ Form tips in each exercise’s ⋯ menu. AI is off until you allow it (Settings → Overload AI).",
+    "Clean Plan page" to "One row per exercise. Tap it to edit, drag ≡ to reorder, swipe left to delete (with Undo), and tap the 🔗 between two exercises to make a superset.",
+    "Rank up, explained" to "Tap the rank emblem at the top to see exactly what your next rank and your crew’s next rank need, plus every plate ranks unlock.",
+    "Medals on your shelf" to "Pinned badges are minted coins in bronze, silver, gold and up. Tap your banner or plate on your profile to change them.",
+    "Holiday Drops" to "Lift on a holiday and unlock a whole matching set: an animated plate with the year, a banner, a name effect, a crew reaction, a set burst and a dated medal. 3 crew lifts unlock a crew banner.",
+    "New crew crests" to "Build your crest from a shape, pattern, emblem, metal, border and ribbon. It earns stars, wings, a crown and laurels as your crew ranks up.",
+    "Faster logging" to "Hold a set’s number to copy it to the next set. Swipe a set left to remove it, with Undo. “Same as last time” fills your sets from your last session (⋯ menu).",
+    "Crew" to "Stats sit inside the crew banner, the Arena has 4 tabs, Invite friends in crew settings, and Block or Report on any crew profile.",
+    "Privacy" to "See what’s saved and shared in Settings → Help → Privacy."
 )
 
 @Composable

@@ -108,7 +108,7 @@ private fun dayOf(ts: Long) = Instant.ofEpochMilli(ts).atZone(ZoneId.systemDefau
 
 @Composable
 fun ChatTab(vm: OverloadViewModel, c: Ctx, s: CrewState) {
-    val list by vm.chat.msgs.collectAsState(); val loaded by vm.chat.loaded.collectAsState(); val more by vm.chat.more.collectAsState(); val rep by vm.chat.reply.collectAsState()
+    val list0 by vm.chat.msgs.collectAsState(); val list = list0.filter { !vm.blocked(it.by) }; val loaded by vm.chat.loaded.collectAsState(); val more by vm.chat.more.collectAsState(); val rep by vm.chat.reply.collectAsState()
     LaunchedEffect(Unit) { if (!loaded) vm.chat.load(); vm.chat.seen() }
     LaunchedEffect(list.size) { vm.chat.seen() }
     val me = vm.myId()

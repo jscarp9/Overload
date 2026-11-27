@@ -3,6 +3,7 @@ package com.overload.app
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -40,6 +41,7 @@ fun TodayScreen(vm: OverloadViewModel, d: AppData, u: UiState, now: Long) {
         Hero17(vm, c, d, u, day, s, groups, now)
         GroupBar(vm, now)
         if (s.end != null) Summary(vm, d, s, now)
+        if (s.end != null) AiRecapCard(vm, vm.curKey(u), s)
         if (s.end != null && s.start != null && d.settings.heartRate) HeartRateCard(vm, vm.curKey(u), s)
         if (s.end != null) Analysis(vm, c, s, u)
         // 0.17: challenges collapse to one slim row
@@ -244,6 +246,8 @@ private fun ExerciseBlock(vm: OverloadViewModel, d: AppData, u: UiState, s: Sess
                 Box(Modifier.padding(start = 8.dp).height(34.dp).widthIn(min = 34.dp).background(ov.soft, RoundedCornerShape(10.dp)).clickable { menu = true }, contentAlignment = Alignment.Center) { OvText("⋯", 18, FontWeight.Black, ov.mute) }
                 DropdownMenu(menu, { menu = false; confirmDel = false }) {
                     DropdownMenuItem({ Text("🏋️ Plate calculator") }, { menu = false; plates = true })
+                    DropdownMenuItem({ Text("↺ Same as last time") }, { menu = false; vm.fillFromLast(listOf(e.id)) })
+                    if (vm.ai.on) DropdownMenuItem({ Text("✦ Form tips") }, { menu = false; vm.ai.openCue(e.name) })
                     DropdownMenuItem({ Text("🔥 Warm-ups") }, { menu = false; vm.toggleWarm(e.id) })
                     if (isSw) DropdownMenuItem({ Text("↩︎ Undo swap (back to ${orig!!.name})") }, { menu = false; vm.unswap(orig!!) })
                     else DropdownMenuItem({ Text("🔄 Swap for today") }, { menu = false; vm.openPicker(Picker("swap", key = key)) })
@@ -274,8 +278,14 @@ private fun ExerciseBlock(vm: OverloadViewModel, d: AppData, u: UiState, s: Sess
             val phW = sg?.w ?: lx?.w?.takeIf { it > 0 }
             val phR = sg?.r ?: lx?.r?.takeIf { it > 0 }
             val done = x.d
-            Row(Modifier.fillMaxWidth().padding(bottom = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                Row(Modifier.width(34.dp), verticalAlignment = Alignment.CenterVertically) {
+            // 0.18: hold the set number to copy it to the next set, swipe the row left to remove it (with Undo)
+            var sx by remember(e.id, i, sets.size) { mutableStateOf(0f) }
+            Box(Modifier.fillMaxWidth().padding(bottom = 8.dp).clip(RoundedCornerShape(14.dp)).background(if (sx < 0f) Red.copy(if (sx < -70 * androidx.compose.ui.platform.LocalDensity.current.density) .35f else .18f) else Color.Transparent)) {
+            if (sx < 0f) OvText("Remove", 13, FontWeight.Black, Red, Modifier.align(Alignment.CenterEnd).padding(end = 14.dp))
+            Row(Modifier.fillMaxWidth().graphicsLayer { translationX = sx }.pointerInput(e.id, i, sets.size) {
+                    if (i < sets.size) detectHorizontalDragGestures(onDragEnd = { if (sx < -70 * density) vm.delSet(e, i); sx = 0f }, onDragCancel = { sx = 0f }) { _, a -> sx = (sx + a).coerceIn(-110 * density, 0f) } },
+                horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                Row(Modifier.width(34.dp).height(50.dp).combinedClickable(onClick = {}, onLongClick = { vm.copySet(e, i) }), verticalAlignment = Alignment.CenterVertically) {
                     OvText("${i + 1}", 18, FontWeight.Black, if (done) Green else Color(0xFFB3B6C2))
                     if (better(x, la.getOrNull(i))) OvText("↑", 13, color = Green)
                 }
@@ -287,6 +297,7 @@ private fun ExerciseBlock(vm: OverloadViewModel, d: AppData, u: UiState, s: Sess
                 Box(Modifier.size(52.dp, 50.dp).background(if (done) Green else ov.soft, RoundedCornerShape(14.dp)).clickable { vm.toggleSet(e, gi, ei, i, phW, phR) }, contentAlignment = Alignment.Center) {
                     OvText("✓", 22, FontWeight.Black, if (done) Color.White else Color(0xFFB4B7C2))
                 }
+            }
             }
         }
         TextBox(s.exNotes[e.id] ?: "", { vm.setExNote(e.id, it) }, "Add a note (seat, grip, how it felt)", singleLine = false, minH = 40.dp, size = 14)

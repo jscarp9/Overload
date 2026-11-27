@@ -64,6 +64,7 @@ fun SetFxBurst(trigger: Int, kind: String) {
     val cols = listOf(Color(0xFFFFBE0B), Color(0xFFEF2B36), Color(0xFF2563FF), Color(0xFF16B65B), Color(0xFFD14DFF))
     Canvas(Modifier.fillMaxSize()) {
         val c = Offset(size.width / 2, size.height * .72f); val f = t.value
+        if (kind.startsWith("h") && HOL19[kind.drop(1)] != null) { holBurst(kind.drop(1), c, f); return@Canvas }
         when (kind) {
             "sparks", "pop" -> { val n = if (kind == "pop") 14 else 10
                 repeat(n) { i -> val a = i * 2 * PI / n; val r = f * 90.dp.toPx(); drawCircle(cols[i % 5], (if (kind == "pop") 6f else 4f) * density * (1 - f * .6f), c + Offset((cos(a) * r).toFloat(), (sin(a) * r).toFloat()), alpha = 1 - f) } }

@@ -18,8 +18,6 @@ class Fin(val k: String, val name: String, val base: Long, val light: Long, val 
 private fun liftTierMax(c: Ctx) = runCatching { c.liftRanks().maxOfOrNull { it.t } ?: 0 }.getOrDefault(0)
 fun crewLv(c: Ctx) = c.cs?.crew?.level ?: 0
 fun crewRk(c: Ctx) = c.cs?.crew?.rank ?: 0
-private fun sessOnHoliday(c: Ctx, test: (LocalDate) -> Boolean) = c.rs.any { test(toD(it.date)) }
-private fun isThanks(t: LocalDate) = t.monthValue == 11 && t.dayOfWeek == DayOfWeek.THURSDAY && t.dayOfMonth in 22..28
 fun liftLegend(c: Ctx, k: String) = runCatching { c.liftRanks().firstOrNull { it.k == k }?.let { it.t >= 6 } == true }.getOrDefault(false)
 fun crewTro(c: Ctx, k: String) = c.cs?.crew?.trophies?.containsKey(k) == true
 fun raidWon(c: Ctx) = c.cs?.raid?.won?.any { c.myId != null && c.myId in it.by } == true
@@ -58,14 +56,16 @@ val FIN: LinkedHashMap<String, Fin> = linkedMapOf<String, Fin>().apply {
     f("f_moon", "Night Shift", 0xFF141B3D, 0xFF2F3B7A, 0xFF05081A, "Funny badge: Night Shift", cat = "funny") { hasB(it.eng, "f_night") }
     f("f_couch", "Couch Potato", 0xFFB07A3F, 0xFFE0B072, 0xFF5A3A17, "Funny badge: Rest Day Champion", cat = "funny") { hasB(it.eng, "f_rest") }
     f("f_peacock", "Peacock", 0xFF0F6B6B, 0xFF3CC9B5, 0xFF06302F, "Funny badge: Ego Lifter", cat = "funny") { hasB(it.eng, "f_ego") }
-    f("h_xmas", "Christmas", 0xFFB3121F, 0xFFE8424E, 0xFF4D060B, "Lift on Christmas (Dec 25)", cat = "holiday") { c -> sessOnHoliday(c) { it.monthValue == 12 && it.dayOfMonth == 25 } }
-    f("h_newyear", "New Year", 0xFF16130B, 0xFF4A3F1C, 0xFF000000, "Lift on New Year’s Day", cat = "holiday") { c -> sessOnHoliday(c) { it.monthValue == 1 && it.dayOfMonth == 1 } }
-    f("h_valentine", "Valentine", 0xFFE04A82, 0xFFFF9FC4, 0xFF7A1236, "Lift on Valentine’s Day (Feb 14)", cat = "holiday") { c -> sessOnHoliday(c) { it.monthValue == 2 && it.dayOfMonth == 14 } }
-    f("h_stpat", "Lucky Clover", 0xFF178A3C, 0xFF5ED47F, 0xFF063A17, "Lift on St. Patrick’s Day (Mar 17)", cat = "holiday") { c -> sessOnHoliday(c) { it.monthValue == 3 && it.dayOfMonth == 17 } }
-    f("h_july4", "Fourth of July", 0xFF1D3A8A, 0xFF4A6FD6, 0xFF0A1640, "Lift on the Fourth of July", cat = "holiday") { c -> sessOnHoliday(c) { it.monthValue == 7 && it.dayOfMonth == 4 } }
-    f("h_halloween", "Halloween", 0xFFE8650C, 0xFFFFA44A, 0xFF5A2302, "Lift on Halloween (Oct 31)", cat = "holiday") { c -> sessOnHoliday(c) { it.monthValue == 10 && it.dayOfMonth == 31 } }
-    f("h_thanks", "Turkey Day", 0xFF9A4A17, 0xFFE0903F, 0xFF3D1A05, "Lift on Thanksgiving", cat = "holiday") { c -> sessOnHoliday(c, ::isThanks) }
+    f("h_xmas", "Christmas", 0xFFB3121F, 0xFFE8424E, 0xFF4D060B, "Lift on Christmas (Dec 25)", cat = "holiday") { it.holHas("xmas") }
+    f("h_newyear", "New Year", 0xFF16130B, 0xFF4A3F1C, 0xFF000000, "Lift on New Year’s Day", cat = "holiday") { it.holHas("newyear") }
+    f("h_valentine", "Valentine", 0xFFE04A82, 0xFFFF9FC4, 0xFF7A1236, "Lift on Valentine’s Day (Feb 14)", cat = "holiday") { it.holHas("valentine") }
+    f("h_stpat", "Lucky Clover", 0xFF178A3C, 0xFF5ED47F, 0xFF063A17, "Lift on St. Patrick’s Day (Mar 17)", cat = "holiday") { it.holHas("stpat") }
+    f("h_easter", "Easter", 0xFFE98CBF, 0xFFFDE4F1, 0xFF8F4A74, "Lift on Easter", cat = "holiday") { it.holHas("easter") }
+    f("h_july4", "Fourth of July", 0xFF1D3A8A, 0xFF4A6FD6, 0xFF0A1640, "Lift on the Fourth of July", cat = "holiday") { it.holHas("july4") }
+    f("h_halloween", "Halloween", 0xFFE8650C, 0xFFFFA44A, 0xFF5A2302, "Lift on Halloween (Oct 31)", cat = "holiday") { it.holHas("halloween") }
+    f("h_thanks", "Turkey Day", 0xFF9A4A17, 0xFFE0903F, 0xFF3D1A05, "Lift on Thanksgiving", cat = "holiday") { it.holHas("thanks") }
     f("founder", "Founder 001", 0xFF0B0B0D, 0xFF2A2A2E, 0xFF000000, "Only the founder of Overload", cat = "special") { it.st.founder }
+    f("cofounder", "Co-Founder 002", 0xFF0B0B0D, 0xFF2A2A2E, 0xFF000000, "Only the co-founder of Overload", cat = "special") { it.st.cofounder }
     f("og", "OG", 0xFFEFE6CF, 0xFFFFFAF0, 0xFFA8946A, "Join Overload before the App Store launch", cat = "special") { myOG(it) > 0 }
     LIFTS.forEach { l -> f("l_${l.k}", "${l.name} Legend", 0xFF2B2E35, 0xFF5A606B, 0xFF0D0E12, "Legend rank on ${l.name}", cat = "lift") { liftLegend(it, l.k) } }
 }
@@ -102,7 +102,8 @@ val LOCK: LinkedHashMap<String, LockCat> = linkedMapOf(
         FIN.values.filter { it.cat == "finish" }.forEach { f -> put(f.k, li(f.k, f.name, f.k, f.how) { it.finOwned(f.k) }) }
     }),
     "setfx" to cat("Set complete effect", li("pulse", "Pulse", "", "", yes), li("sparks", "Sparks", "", "Bronze rank") { it.eng.rank >= 1 },
-        li("shock", "Shockwave", "", "Silver rank") { it.eng.rank >= 2 }, li("pop", "Confetti pop", "", "Season pass level 7") { it.eng.lvl >= 7 }, box("lightning", "Lightning")),
+        li("shock", "Shockwave", "", "Silver rank") { it.eng.rank >= 2 }, li("pop", "Confetti pop", "", "Season pass level 7") { it.eng.lvl >= 7 }, box("lightning", "Lightning"),
+        *HOL19.values.map { h -> li("h${h.k}", "${h.n} burst", "", "Lift on ${h.n}") { it.holHas(h.k) } }.toTypedArray()),
     "prfx" to cat("PR celebration", li("confetti", "Confetti", "", "", yes), li("fireworks", "Fireworks", "", "Gold rank") { it.eng.rank >= 3 },
         li("goldrain", "Gold rain", "", "Platinum rank") { it.eng.rank >= 4 }, box("storm", "Lightning storm")),
     "rest" to cat("Rest timer", li("classic", "Classic ring", "", "", yes), li("bar", "Minimal bar", "", "", yes),
@@ -110,7 +111,8 @@ val LOCK: LinkedHashMap<String, LockCat> = linkedMapOf(
     "sound" to cat("Sound pack", li("classic", "Classic beep", "", "", yes), li("soft", "Soft chime", "", "", yes),
         li("gong", "Gong", "", "Silver rank") { it.eng.rank >= 2 }, li("airhorn", "Air horn", "", "Gold rank") { it.eng.rank >= 3 }, box("arcade", "Arcade")),
     "nameFx" to cat("Name effect", li("none", "Plain", "", "", yes), li("gold", "Gold shine", "", "Gold rank") { it.eng.rank >= 3 },
-        li("neon", "Neon", "", "Crew level 4") { crewLv(it) >= 4 }, li("fire", "Fire", "", "Season pass level 17") { it.eng.lvl >= 17 }, box("rainbow", "Rainbow")),
+        li("neon", "Neon", "", "Crew level 4") { crewLv(it) >= 4 }, li("fire", "Fire", "", "Season pass level 17") { it.eng.lvl >= 17 }, box("rainbow", "Rainbow"),
+        *HOL19.values.map { h -> li("h${h.k}", h.n, "", "Lift on ${h.n}") { it.holHas(h.k) } }.toTypedArray()),
     "card" to cat("Post card style", li("plain", "Plain", "", "", yes), li("carbon", "Carbon", "", "Silver rank") { it.eng.rank >= 2 },
         li("gold", "Gold", "", "Gold rank") { it.eng.rank >= 3 }, li("ice", "Ice", "", "Season pass level 21") { it.eng.lvl >= 21 }, box("neon", "Neon")),
     "pbanner" to cat("Profile banner", li("none", "None", "", "", yes), li("forge", "Forge", "", "", yes),
@@ -122,14 +124,19 @@ val LOCK: LinkedHashMap<String, LockCat> = linkedMapOf(
         // 0.16 banners
         li("sunrise", "Sunrise", "", "", yes), li("neon", "Neon Gym", "", "4 week streak") { it.eng.streak >= 4 },
         li("summit", "Summit", "", "50 workouts") { it.eng.workouts >= 50 }, li("chalk", "Chalk Cloud", "", "10 PRs") { it.eng.lifePR >= 10 },
-        li("founder", "Founder", "", "Founder only") { it.st.founder }),
+        li("founder", "Founder", "", "Founder only") { it.st.founder },
+        // 0.18-0.20: founder-only space scenes, the co-founder banner, holiday banners
+        li("feclipse", "Gold Eclipse", "", "Founder only") { it.st.founder }, li("fconst", "The Constellation", "", "Founder only") { it.st.founder },
+        li("fgalaxy", "Golden Galaxy", "", "Founder only") { it.st.founder }, li("cofounder", "Co-Founder", "", "Co-founder only") { it.st.cofounder },
+        *HOL19.values.map { h -> li("hb_${h.k}", h.n, "", "Lift on ${h.n}") { it.holHas(h.k) } }.toTypedArray()),
     "share" to cat("Share card theme", li("plate", "Plate color", "", "", yes), li("midnight", "Midnight", "", "", yes),
         li("gold", "Gold", "", "Gold rank") { it.eng.rank >= 3 }, box("neon", "Neon")),
     "react" to cat("Reactions", li("fire", "🔥", "", "", yes), li("muscle", "💪", "", "", yes), li("trophy", "🏆", "", "", yes),
         li("clap", "👏", "", "Bronze rank") { it.eng.rank >= 1 }, li("heart", "❤️", "", "Silver rank") { it.eng.rank >= 2 },
         li("crown", "👑", "", "Gold rank") { it.eng.rank >= 3 }, li("rocket", "🚀", "", "Season pass level 9") { it.eng.lvl >= 9 },
         li("skull", "💀", "", "Earn a funny badge") { c -> c.eng.B.any { it.cat == "Funny" && it.earned } }, box("goat", "🐐"), box("lol", "😂"),
-        li("crest", "🛡", "", "Be in a crew") { it.cs != null })
+        li("crest", "🛡", "", "Be in a crew") { it.cs != null },
+        *HOL19.values.map { h -> li("h${h.k}", h.e, "", "Lift on ${h.n}") { it.holHas(h.k) } }.toTypedArray())
 )
 val LOOK_DEF = mapOf("accent" to "red", "bg" to "classic", "welcome" to "classic", "icon" to "red", "setfx" to "pulse", "prfx" to "confetti",
     "rest" to "classic", "sound" to "classic", "nameFx" to "none", "card" to "plain", "pbanner" to "none", "share" to "plate")
@@ -140,7 +147,7 @@ val WEB_ONLY_LOOKS = setOf("welcome", "icon", "share")
 
 /** All reactions, in order. The crest one is drawn as the crew crest. */
 val RE14 = linkedMapOf("fire" to "🔥", "muscle" to "💪", "trophy" to "🏆", "clap" to "👏", "heart" to "❤️", "crown" to "👑", "rocket" to "🚀",
-    "skull" to "💀", "goat" to "🐐", "lol" to "😂", "crest" to "🛡")
+    "skull" to "💀", "goat" to "🐐", "lol" to "😂", "crest" to "🛡").apply { HOL19.values.forEach { put("h${it.k}", it.e) } }
 
 fun Ctx.owns(t: String, k: String): Boolean {
     val it = LOCK[t]?.items?.get(k) ?: return false
@@ -149,7 +156,11 @@ fun Ctx.owns(t: String, k: String): Boolean {
 }
 fun Ctx.look(t: String): String { val k = st.look[t] ?: LOOK_DEF[t] ?: ""; return if (LOCK[t]?.items?.get(k) != null && owns(t, k)) k else LOOK_DEF[t] ?: "" }
 fun Ctx.reactKeys() = LOCK.getValue("react").items.keys.filter { owns("react", it) }
-fun Ctx.myBanner(): String { val k = look("pbanner"); if (k != "none") return k; return if (st.founder) "founder" else "" }
+/** 0.20: the old founder banners became space scenes. */
+val OLDF20 = mapOf("vault" to "feclipse", "fblue" to "fconst", "throne" to "fgalaxy")
+/** Banners only founders see in the picker, listed first. */
+val FONLY18 = listOf("feclipse", "fconst", "fgalaxy", "cofounder", "founder")
+fun Ctx.myBanner(): String { val k = look("pbanner"); if (k != "none") return k; return if (st.founder) "feclipse" else if (st.cofounder) "cofounder" else "" }
 fun accentOf(k: String): Color = hex(LOCK.getValue("accent").items[k]?.extra ?: "#ef2b36")
 
 // ---------- mystery boxes (earned only, never bought) ----------
@@ -192,6 +203,8 @@ fun Ctx.trophies(): List<Trophy> {
     if (out.none { it.type == "plaque" }) T("award_any", "plaque", "Crew award plaque", "Win a monthly crew award", false, 0xFF9B7BFF)
     val legend = runCatching { liftRanks().count { it.t >= 6 } }.getOrDefault(0)
     T("barbell", "barbell", "Golden barbell", "Reach Legend on a lift rank", legend > 0, 0xFFE3C25A)
+    // 0.19: a dated medal for every holiday you lifted on
+    HOL19.values.forEach { h -> holYears(h.k).forEach { y -> T("hol_${h.k}_$y", "medal", "${h.b} $y", "Lifted on ${h.n} $y", true, hexL(h.c)) } }
     return out
 }
 val AWARDS = listOf(Triple("grinder", "Biggest Grinder", "⚙️"), Triple("hype", "Best Hype Man", "📣"), Triple("comeback", "Comeback of the Month", "🔁"),

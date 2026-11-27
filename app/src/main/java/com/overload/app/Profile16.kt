@@ -2,6 +2,7 @@ package com.overload.app
 
 import android.content.Intent
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -31,30 +32,30 @@ import kotlin.math.roundToInt
 fun ProfileTab(vm: OverloadViewModel, c: Ctx) {
     val e = c.eng; val st = c.st; val nx = RANKS.getOrNull(e.rank + 1); val ban = c.myBanner(); val ctx = LocalContext.current
     val show = st.showcase.mapNotNull { e.badge(it) }
+    val F = st.founder; val CF = !F && st.cofounder; val T = st.tap21
     OvCard {
-        Box(Modifier.fillMaxWidth().height(96.dp).clip(RoundedCornerShape(18.dp)).background(ov.soft)) {
-            if (ban == "blueprint") Scene("blueprint", Modifier.matchParentSize(), 8, "me") else if (ban.isNotEmpty()) Scene(ban, Modifier.matchParentSize(), 8, "me$ban")
+        // 0.20: Edit and Share are icon buttons on the banner. 0.21: tap the banner or your plate to change them.
+        Box(Modifier.fillMaxWidth().height(96.dp).clip(RoundedCornerShape(18.dp)).background(ov.soft).clickable { vm.tap21("ban") }) {
+            if (ban.isNotEmpty()) Scene(ban, Modifier.matchParentSize(), 8, "me$ban")
+            if (T["ban"] == null) EditDot(Modifier.align(Alignment.BottomStart).padding(8.dp))
+            Row(Modifier.align(Alignment.TopEnd).padding(8.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                IconChip("✎") { vm.openSheet(Sheet.ProfEdit(null)) }; IconChip("⇪") { shareProfile(ctx, c) } }
         }
         Row(Modifier.fillMaxWidth().offset(y = (-30).dp).padding(horizontal = 6.dp), verticalAlignment = Alignment.Bottom) {
-            Box(Modifier.border(3.dp, ov.bg, CircleShape)) { AvatarOf(c.myId ?: "me", st.name.ifBlank { "Lifter" }, st.av, 76) }
-            Spacer(Modifier.weight(1f)); FramedEmblem(e.rank, st.frame, st.aura, Modifier.size(64.dp))
+            Box(Modifier.border(3.dp, ov.bg, CircleShape).clip(CircleShape).clickable { vm.tap21("av") }) {
+                AvatarOf(c.myId ?: "me", st.name.ifBlank { "Lifter" }, st.av, 76); if (T["av"] == null) EditDot(Modifier.align(Alignment.BottomEnd)) }
+            Spacer(Modifier.weight(1f)); Box(Modifier.clickable { vm.openSheet(Sheet.RankUp("you")) }) { FramedEmblem(e.rank, st.frame, st.aura, Modifier.size(64.dp)) }
         }
         Column(Modifier.fillMaxWidth().offset(y = (-22).dp), horizontalAlignment = Alignment.CenterHorizontally) {
-            NameText(st.name.ifBlank { "Lifter" }, c.look("nameFx"), 26, founder = st.founder)
-            FlowRowC(Modifier.padding(top = 6.dp)) {
-                if (st.founder) Chip("Founder #001", hex("#e3c25a"), Color(0xFF14161C)); Chip(e.rname); Chip("🔥 ${e.streak} wk")
-                e.since?.let { val d = toD(it); Chip("Since ${MON[d.monthValue - 1]} ${d.year}") }
-                if (st.tag.isNotEmpty()) Chip(st.tag, Color(0xFF14161C), Color.White)
-            }
+            // the crown sits outside the name, balanced by an invisible one so the name stays centred
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                if (F) OvText("👑", 20); NameText(st.name.ifBlank { "Lifter" }, c.look("nameFx"), 26, founder = F, cofounder = CF, crown = false, modifier = Modifier.padding(horizontal = 4.dp))
+                if (F) OvText("👑", 20, modifier = Modifier.alpha(0f)) }
+            Row(Modifier.padding(top = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                if (F) OvText("Founder #001 · ", 13, FontWeight.Black, hex("#c99a2e")) else if (CF) OvText("Co-Founder #002 · ", 13, FontWeight.Black, hex("#9aa0aa"))
+                OvText("${e.rname} · 🔥 ${e.streak} wk", 13, FontWeight.SemiBold, ov.mute) }
             if (st.prof.motto.isNotEmpty()) OvText("“${st.prof.motto}”", 15, FontWeight.SemiBold, ov.mute, Modifier.padding(top = 6.dp), align = TextAlign.Center)
-            FlowRowC(Modifier.padding(top = 10.dp)) {
-                show.forEach { b -> OvButton("${b.icon} ${b.name}", { vm.openSheet(Sheet.BadgeInfo(b.k)) }, small = true) }
-                if (show.size < 3) OvButton("＋ Pin a badge", { vm.openSheet(Sheet.PinPick) }, small = true)
-            }
-            Row(Modifier.padding(top = 10.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                OvButton("Edit profile", { vm.openSheet(Sheet.ProfEdit(null)) }, bg = ov.ink, fg = ov.bg)
-                OvButton("📸 Share", { shareProfile(ctx, c) })
-            }
+            Shelf(c.shelfItems(), { vm.openSheet(Sheet.BadgeInfo(it)) }, { vm.openSheet(Sheet.PinPick) })
         }
     }
     Row(Modifier.fillMaxWidth().padding(bottom = 12.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -80,6 +81,19 @@ fun ProfileTab(vm: OverloadViewModel, c: Ctx) {
         Row16("📈", "Lifetime stats", "${loc(e.lifeSets)} sets") { vm.openSheet(Sheet.Psec("life")) }
         Row16("🎬", "${LocalDate.now().year} Year in review", if (LocalDate.now().monthValue == 12) "Ready" else "Preview") { vm.openYear(true) }
     }
+}
+
+@Composable private fun IconChip(t: String, onClick: () -> Unit) =
+    Box(Modifier.size(34.dp).background(Color.Black.copy(.4f), CircleShape).clickable(onClick = onClick), contentAlignment = Alignment.Center) { OvText(t, 15, FontWeight.Black, Color.White) }
+/** The pulsing pencil hint shown until you've used tap-to-change once (0.21). */
+@Composable fun EditDot(modifier: Modifier = Modifier) {
+    val tr = androidx.compose.animation.core.rememberInfiniteTransition(label = "ed")
+    val a by tr.animateFloat(.55f, 1f, androidx.compose.animation.core.infiniteRepeatable(tween(900), androidx.compose.animation.core.RepeatMode.Reverse), label = "ea")
+    Box(modifier.size(24.dp).alpha(a).background(Red, CircleShape), contentAlignment = Alignment.Center) { OvText("✎", 12, FontWeight.Black, Color.White) }
+}
+fun OverloadViewModel.tap21(k: String) {
+    if (data.value.settings.tap21[k] == null) setSettings { it.copy(tap21 = it.tap21 + (k to 1)) }
+    profDraft.value = null; openSheet(Sheet.ProfEdit(if (k == "ban") "banner" else "plate21", direct = true))
 }
 
 /** A row in a clean list (Profile, Settings, Customize, Edit profile). */
@@ -134,11 +148,20 @@ fun Badges16Sheet(vm: OverloadViewModel, c: Ctx, cat: String) {
 @Composable
 fun PinPickSheet(vm: OverloadViewModel, c: Ctx) {
     val e = c.eng; val pins = c.st.showcase; val list = e.B.filter { it.earned } + e.R.filter { (it.count ?: 0) > 0 }
-    SheetHead("Pin badges") { vm.closeSheet() }
-    Sub("Pick up to 3 to show on your profile and to your crew. ${pins.size}/3 pinned.")
+    SheetHead("Your shelf") { vm.closeSheet() }
+    Sub("Pick up to 3 medals to show on your profile and to your crew. ${pins.size}/3 pinned.")
     if (list.isEmpty()) Sub("Earn your first badge and you can pin it here.", Modifier.padding(top = 8.dp))
-    list.forEach { b -> Row(Modifier.fillMaxWidth().padding(top = 6.dp).clip(RoundedCornerShape(14.dp)).background(if (b.k in pins) Red.copy(.1f) else ov.soft).clickable { vm.togglePin(b.k) }.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
-        OvText(b.icon, 24); Spacer(Modifier.width(10.dp)); Column(Modifier.weight(1f)) { OvText(b.name, 15, FontWeight.Bold); Sub(b.desc) }; OvText(if (b.k in pins) "Pinned" else "Pin", 13, FontWeight.Bold, if (b.k in pins) Red else ov.mute) } }
+    list.forEach { b -> Row(Modifier.fillMaxWidth().padding(top = 6.dp).clip(RoundedCornerShape(14.dp)).background(if (b.k in pins) Red.copy(.1f) else ov.soft).clickable { vm.togglePin(b.k) }.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
+        BadgeMedal(b, 40.dp); Spacer(Modifier.width(10.dp)); Column(Modifier.weight(1f)) { OvText(b.name, 15, FontWeight.Bold); Sub("${tierName(b.k, b.name, b.count ?: 0)} · ${b.desc}") }
+        OvText(if (b.k in pins) "Pinned" else "Pin", 13, FontWeight.Bold, if (b.k in pins) Red else ov.mute) } }
+    // 0.21: pinned trophies live here too
+    val earned = c.trophies().filter { it.earned }; val tp = c.st.prof.tpins
+    H3("Trophies", Modifier.padding(top = 18.dp)); Sub("Up to 3 show on your crew card. ${tp.size}/3 pinned.")
+    if (earned.isEmpty()) Sub("Win trophies with your crew and pin them here.")
+    FlowRowC(Modifier.padding(top = 6.dp)) { earned.forEach { t -> val on = t.k in tp
+        Column(Modifier.width(96.dp).clip(RoundedCornerShape(14.dp)).background(if (on) Red.copy(.12f) else ov.soft).clickable {
+            vm.setSettings { s0 -> val a = s0.prof.tpins.toMutableList(); if (t.k in a) a.remove(t.k) else { if (a.size >= 3) a.removeAt(0); a.add(t.k) }; s0.copy(prof = s0.prof.copy(tpins = a)) }; vm.crew.sync(true) }.padding(6.dp),
+            horizontalAlignment = Alignment.CenterHorizontally) { TrophyView(t, Modifier.size(40.dp)); OvText(t.name.take(18), 11, FontWeight.Bold, align = TextAlign.Center) } } }
 }
 
 // ============================ CREW PROFILE PAGE (0.15) ============================
@@ -148,25 +171,28 @@ fun ProfilePageSheet(vm: OverloadViewModel, c: Ctx, id: String) {
     val m0 = cs?.members?.firstOrNull { it.id == (if (self) me else id) }
     val name = if (self) c.st.name.ifBlank { "You" } else m0?.name ?: run { Sub("They left the crew."); return }
     val p: MemberProfile = if (self) (m0?.profile ?: MemberProfile()).copy(motto = c.st.prof.motto, gym = c.st.prof.gym, phase = c.st.prof.phase, ltype = c.st.prof.ltype, song = c.st.prof.song,
-        av = c.st.av, pacc = c.st.prof.acc, tpins = c.st.prof.tpins, flex = c.myFlex(), prtl = c.prTimeline().takeLast(20), best = c.bestLift(), fav = c.st.prof.fav, founder = c.st.founder,
+        av = c.st.av, pacc = c.st.prof.acc, tpins = c.st.prof.tpins, flex = c.myFlex(), prtl = c.prTimeline().takeLast(20), best = c.bestLift(), fav = c.st.prof.fav, founder = c.st.founder, cofounder = c.st.cofounder,
         pbanner = c.look("pbanner"), nameFx = c.look("nameFx"), plates = FIN.keys.filter { FIN[it]!!.cat != "finish" && c.finOwned(it) }.take(40)) else m0?.profile ?: MemberProfile()
     val acc = if (p.pacc.isNotEmpty()) hex(p.pacc) else Red
-    val pb = p.pbanner.takeIf { it.isNotEmpty() && it != "none" } ?: if (p.founder) "founder" else "forge"
+    val pb = p.pbanner.takeIf { it.isNotEmpty() && it != "none" }?.let { OLDF20[it] ?: it } ?: if (p.founder) "feclipse" else if (p.cofounder) "cofounder" else "forge"
     Box(Modifier.fillMaxWidth().height(110.dp).clip(RoundedCornerShape(18.dp))) { Scene(pb, Modifier.matchParentSize(), 8, "pp$id")
         OvButton("Done", { vm.closeSheet() }, Modifier.align(Alignment.TopEnd).padding(8.dp), small = true, bg = Color.White.copy(.85f), fg = Color(0xFF14161C)) }
     Row(Modifier.fillMaxWidth().offset(y = (-26).dp).padding(horizontal = 8.dp), verticalAlignment = Alignment.Bottom) {
         Box(Modifier.border(3.dp, acc, CircleShape)) { AvatarOf(if (self) me ?: "me" else id, name, p.av, 84) }
         Spacer(Modifier.width(10.dp))
         Column(Modifier.padding(bottom = 4.dp)) {
-            NameText(name, p.nameFx, 22, founder = p.founder, shame = vm.crew.shamed(id))
+            NameText(name, p.nameFx, 22, founder = p.founder, shame = vm.crew.shamed(id), cofounder = p.cofounder)
             if (m0?.nick?.isNotEmpty() == true) OvText("“${m0.nick}”", 13, FontWeight.SemiBold, ov.mute)
-            FlowRowC { if (p.founder) Chip("Founder #001", hex("#e3c25a"), Color(0xFF14161C)); if (p.og > 0 && !p.founder) Chip("OG #${p.og.toString().padStart(3, '0')}")
+            FlowRowC { if (p.founder) Chip("Founder #001", hex("#e3c25a"), Color(0xFF14161C)) else if (p.cofounder) Chip("Co-Founder #002", hex("#4a4f57"), Color(0xFFEEF1F5))
+                if (p.og > 0 && !p.founder) Chip("OG #${p.og.toString().padStart(3, '0')}")
                 if (m0?.role?.isNotEmpty() == true) Chip(m0.role); m0?.jersey?.let { Chip("#$it") }; if (p.rname.isNotEmpty()) Chip(p.rname) }
         }
     }
     Column(Modifier.offset(y = (-18).dp)) {
         if (p.motto.isNotEmpty()) OvText("“${p.motto}”", 15, FontWeight.SemiBold, modifier = Modifier.padding(bottom = 6.dp))
         FlowRowC { if (p.ltype.isNotEmpty()) Chip("🏋️ ${p.ltype}"); if (p.phase.isNotEmpty()) Chip("📈 ${p.phase}"); if (p.gym.isNotEmpty()) Chip("📍 ${p.gym}"); if (p.song.isNotEmpty()) Chip("🎵 ${p.song}") }
+        val shelf = if (self) c.shelfItems() else memberShelf(p)
+        if (shelf.isNotEmpty()) Shelf(shelf, if (self) ({ k: String -> vm.openSheet(Sheet.BadgeInfo(k)) }) else null, null, 72.dp)
         Row(Modifier.fillMaxWidth().padding(vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
             if (self) { Sub("💪 ${m0?.respect ?: 0} respect from your crew", Modifier.weight(1f)); OvButton("Edit profile", { vm.openSheet(Sheet.ProfEdit(null)) }, small = true) }
             else { val given = id in (cs?.respectGiven ?: emptyList())
@@ -196,6 +222,7 @@ fun ProfilePageSheet(vm: OverloadViewModel, c: Ctx, id: String) {
                 OvButton("🏛 Induct into Hall of Fame", { vm.crew.hofMember(id) }, Modifier.padding(top = 8.dp), small = true) }
             ShameButton(vm, id)
             if (p.troph != null) OvButton("🏆 View $name’s trophy room", { vm.openSheet(Sheet.TrophyRoom(id)) }, Modifier.padding(top = 10.dp), wide = true)
+            BlockReportRow(vm, id)
         }
     }
 }
@@ -205,17 +232,22 @@ class ProfDraft(val p: Prof, val av: Av?, val flex: List<String>, val rim: Strin
 val profDraft = mutableStateOf<ProfDraft?>(null)
 
 @Composable
-fun ProfEditSheet(vm: OverloadViewModel, c: Ctx, sec: String?) {
+fun ProfEditSheet(vm: OverloadViewModel, c: Ctx, sec: String?, direct: Boolean = false) {
     if (profDraft.value == null) profDraft.value = ProfDraft(c.st.prof, c.st.av, c.st.flex, c.st.rim)
     val dr = profDraft.value!!; fun set(f: (ProfDraft) -> ProfDraft) { profDraft.value = f(profDraft.value!!) }
     val rows = listOf("banner" to ("🖼" to "Banner"), "avatar" to ("🙂" to "Avatar"), "motto" to ("💬" to "Motto"), "gym" to ("📍" to "Gym"), "song" to ("🎵" to "Walkout song"),
         "ltype" to ("🏋️" to "Lifter type"), "phase" to ("📈" to "Right now I’m"), "flex" to ("📊" to "Flex stats"), "tpins" to ("🏆" to "Pinned trophies"), "fav" to ("💿" to "Favorite plate"),
-        "rim" to ("✍️" to "Name on plate"), "acc" to ("🎨" to "Profile color"), "jersey" to ("🔢" to "Jersey number")).filter { it.first != "jersey" || c.cs != null }
+        "rim" to ("✍️" to "Name on plate"), "acc" to ("🎨" to "Profile color"), "jersey" to ("🔢" to "Jersey number"), "plate21" to ("💿" to "Plate and avatar")).filter { it.first != "jersey" || c.cs != null }
+    // 0.21: banner, plate and avatar are changed by tapping them on the profile, so Edit profile is the personal stuff only
+    val hide = setOf("banner", "avatar", "tpins", "fav", "rim", "plate21")
+    /** Opened by tapping the banner or plate: Done saves and closes. */
+    fun commit() { vm.setSettings { it.copy(prof = dr.p, av = dr.av?.takeIf { a -> a.t != null || a.c != null }, flex = dr.flex, rim = dr.rim.take(24)) }; profDraft.value = null; vm.closeSheet(); vm.crew.sync(true); vm.toast("Saved") }
     if (sec == null) {
         SheetHead("Edit profile", "Cancel") { profDraft.value = null; vm.closeSheet() }
-        Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { AvatarOf(c.myId ?: "me", c.st.name, dr.av, 64) }
+        Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).clickable { vm.openSheet(Sheet.ProfEdit("plate21")) }.padding(6.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            AvatarOf(c.myId ?: "me", c.st.name, dr.av, 64); OvText("Change plate", 13, FontWeight.Bold, Red, Modifier.padding(top = 4.dp)) }
         OvCard(Modifier.padding(top = 10.dp)) {
-            rows.forEach { (k, v) ->
+            rows.filter { it.first !in hide }.forEach { (k, v) ->
                 val value = when (k) { "banner" -> c.myBanner().let { b -> if (b.isEmpty()) "None" else LOCK.getValue("pbanner").items[b]?.label ?: b }
                     "avatar" -> when (dr.av?.t) { "icon" -> dr.av.v ?: ""; "plate" -> "Plate"; else -> "Initials" }
                     "motto" -> dr.p.motto.ifEmpty { "Not set" }; "gym" -> dr.p.gym.ifEmpty { "Not set" }; "song" -> dr.p.song.ifEmpty { "Not set" }
@@ -227,15 +259,17 @@ fun ProfEditSheet(vm: OverloadViewModel, c: Ctx, sec: String?) {
             }
         }
         OvButton("Save profile", { vm.saveProfile(dr.p, dr.av, dr.flex, dr.rim); profDraft.value = null }, bg = Red, fg = Color.White, wide = true)
+        Sub("Tip: tap your banner or plate on your profile to change them.", Modifier.fillMaxWidth().padding(top = 10.dp))
         return
     }
     val lbl = rows.firstOrNull { it.first == sec }?.second?.second ?: ""
     Row(Modifier.fillMaxWidth().padding(bottom = 10.dp), verticalAlignment = Alignment.CenterVertically) {
-        OvButton("‹ Back", { vm.openSheet(Sheet.ProfEdit(null)) }, small = true); Title(lbl, 20, modifier = Modifier.weight(1f).padding(horizontal = 10.dp)); OvButton("Done", { vm.openSheet(Sheet.ProfEdit(null)) }, small = true, bg = Red, fg = Color.White)
+        if (!direct) OvButton("‹ Back", { vm.openSheet(Sheet.ProfEdit(null)) }, small = true); Title(lbl, 20, modifier = Modifier.weight(1f).padding(horizontal = 10.dp))
+        OvButton("Done", { if (direct) commit() else vm.openSheet(Sheet.ProfEdit(null)) }, small = true, bg = Red, fg = Color.White)
     }
     val own = PC.keys.filter { c.plateOwn(it) }
     when (sec) {
-        "banner" -> { LOCK.getValue("pbanner").items.values.filter { it.k != "founder" || c.st.founder }.chunked(2).forEach { row -> Row(Modifier.padding(top = 6.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        "banner" -> { LOCK.getValue("pbanner").items.values.filter { it.k !in FONLY18 || c.owns("pbanner", it.k) }.sortedBy { FONLY18.indexOf(it.k).let { i -> if (i < 0) 99 else i } }.chunked(2).forEach { row -> Row(Modifier.padding(top = 6.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 row.forEach { it2 -> val ok = c.owns("pbanner", it2.k); val on = c.myBanner() == it2.k || (it2.k == "none" && c.myBanner().isEmpty())
                     Column(Modifier.weight(1f).clip(RoundedCornerShape(14.dp)).then(if (on) Modifier.border(3.dp, ov.ink, RoundedCornerShape(14.dp)) else Modifier).clickable { vm.equipLook("pbanner", it2.k) }) {
                         if (it2.k == "none") Box(Modifier.fillMaxWidth().aspectRatio(380f / 130f).background(ov.soft), contentAlignment = Alignment.Center) { Sub("None") } else Box(Modifier.alpha(if (ok) 1f else .5f)) { Scene(it2.k, Modifier.fillMaxWidth(), 8, "pk${it2.k}") }
@@ -249,6 +283,19 @@ fun ProfEditSheet(vm: OverloadViewModel, c: Ctx, sec: String?) {
                 .clickable { set { it2 -> ProfDraft(it2.p, (it2.av ?: Av()).copy(c = col), it2.flex, it2.rim) } }) } }
             if (own.isNotEmpty()) { Lbl("OR USE A PLATE"); FlowRowC { own.forEach { k -> Box(Modifier.size(40.dp).then(if (dr.av?.t == "plate" && dr.av.v == k) Modifier.border(3.dp, ov.ink, CircleShape) else Modifier)
                 .clickable { set { it2 -> ProfDraft(it2.p, Av("plate", k, it2.av?.c), it2.flex, it2.rim) } }) { Plate(k, "done", Modifier.fillMaxSize()) } } } } }
+        "plate21" -> { Box(Modifier.fillMaxWidth().padding(bottom = 6.dp), contentAlignment = Alignment.Center) { AvatarOf(c.myId ?: "me", c.st.name, dr.av, 84) }
+            if (own.isNotEmpty()) { Lbl("USE A PLATE"); FlowRowC { own.forEach { k -> Box(Modifier.size(42.dp).then(if (dr.av?.t == "plate" && dr.av.v == k) Modifier.border(3.dp, ov.ink, CircleShape) else Modifier)
+                .clickable { set { it2 -> ProfDraft(it2.p, Av("plate", k, it2.av?.c), it2.flex, it2.rim) } }) { Plate(k, "done", Modifier.fillMaxSize()) } } } }
+            Lbl("OR AN ICON"); FlowRowC { Seg("Initials", dr.av?.t == null, { set { it2 -> ProfDraft(it2.p, Av(c = it2.av?.c), it2.flex, it2.rim) } })
+                AV_ICONS.forEach { i -> Seg(i, dr.av?.t == "icon" && dr.av.v == i, { set { it2 -> ProfDraft(it2.p, Av("icon", i, it2.av?.c), it2.flex, it2.rim) } }) } }
+            Lbl("ICON COLOR"); FlowRowC { AV_COLS.forEach { col -> Box(Modifier.size(34.dp).clip(CircleShape).background(hex(col)).then(if (dr.av?.c == col) Modifier.border(3.dp, ov.ink, CircleShape) else Modifier)
+                .clickable { set { it2 -> ProfDraft(it2.p, (it2.av ?: Av()).copy(c = col), it2.flex, it2.rim) } }) } }
+            val fav = own.filter { FIN[it] != null }; Lbl("FAVORITE PLATE")
+            if (fav.isEmpty()) Sub("Unlock special plates to show one off.")
+            else FlowRowC { Seg("None", dr.p.fav.isEmpty(), { set { ProfDraft(it.p.copy(fav = ""), it.av, it.flex, it.rim) } })
+                fav.forEach { k -> Box(Modifier.size(42.dp).then(if (dr.p.fav == k) Modifier.border(3.dp, ov.ink, CircleShape) else Modifier).clickable { set { ProfDraft(it.p.copy(fav = k), it.av, it.flex, it.rim) } }) { Plate(k, "done", Modifier.fillMaxSize()) } } }
+            Lbl("NAME ON YOUR PLATE"); TextBox(dr.rim, { v -> set { ProfDraft(it.p, it.av, it.flex, v.take(24)) } }, c.st.name.ifBlank { "Your name" }.uppercase())
+            Sub("Engraved around the big plate on Today.", Modifier.padding(top = 6.dp)) }
         "motto" -> TextBox(dr.p.motto, { v -> set { ProfDraft(it.p.copy(motto = v.take(60)), it.av, it.flex, it.rim) } }, "Leg day is a lifestyle")
         "gym" -> TextBox(dr.p.gym, { v -> set { ProfDraft(it.p.copy(gym = v.take(30)), it.av, it.flex, it.rim) } }, "Home gym")
         "song" -> TextBox(dr.p.song, { v -> set { ProfDraft(it.p.copy(song = v.take(30)), it.av, it.flex, it.rim) } }, "Lose Yourself")
@@ -426,6 +473,8 @@ fun TourSheet(vm: OverloadViewModel, i: Int) {
 fun TodayMoreSheet(vm: OverloadViewModel) {
     SheetHead("Today") { vm.closeSheet() }
     OvCard {
+        Row16("↺", "Same as last time", "Fill every set from your last session") { vm.closeSheet(); vm.fillFromLast() }
+        if (vm.ai.on) Row16("✦", "Ask Coach", "Swaps, short on time, questions") { vm.ai.openCoach() }
         if (vm.crew.on) Row16("👥", "Lift together", "Train with your crew live") { vm.openSheet(Sheet.GroupStart) }
         Row16("🎲", "Need an excuse?", "The generator, for emergencies") { vm.openSheet(Sheet.Excuse((Math.random() * EX_A.size).toInt())) }
         Row16("📝", "Session notes", "Jump to today’s notes") { vm.closeSheet(); vm.ui.value = vm.ui.value.copy(jumpNotes = vm.ui.value.jumpNotes + 1) }
@@ -436,7 +485,7 @@ fun TodayMoreSheet(vm: OverloadViewModel) {
 fun FounderSheet(vm: OverloadViewModel) {
     var code by remember { mutableStateOf("") }
     SheetHead("Founder code", "Cancel") { vm.closeSheet() }
-    Sub("For the person who built Overload. Unlocks the Founder plate, title and banner on your account.")
+    Sub("For the people who built Overload. A Founder or Co-Founder code unlocks its own plate, title and banners on your account.")
     TextBox(code, { code = it.uppercase() }, "FNDR-XXXXXX-…", Modifier.padding(top = 10.dp))
     OvButton("Unlock", { vm.founderUnlock(code.trim()) }, Modifier.padding(top = 12.dp), bg = Red, fg = Color.White, wide = true)
 }

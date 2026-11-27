@@ -57,8 +57,10 @@ fun inc(w: Double, unit: String) = if (unit == "kg") (if (w >= 40) 2.5 else 1.0)
 
 /** Double progression: hit the top of the rep range on every top-weight set -> add weight, else add a rep. */
 fun suggest(e: Exercise, last: Session?, unit: String): Sug? {
-    val a = (last?.ex?.get(e.id) ?: return null).filter(::full)
-    if (a.isEmpty()) return null
+    // 0.23: a starting weight from the AI plan builder stands in until there is real history
+    val start = e.start?.takeIf { it.w > 0 }?.let { Sug(it.w, if (e.lo > 0) e.lo else it.r) }
+    val a = (last?.ex?.get(e.id) ?: return start).filter(::full)
+    if (a.isEmpty()) return start
     val top = a.reduce { m, x -> if (x.w!! > m.w!! || (x.w == m.w && x.r!! > m.r!!)) x else m }
     val atTop = a.filter { it.w == top.w }
     if (e.hi > 0 && atTop.all { it.r!! >= e.hi }) return Sug(top.w!! + inc(top.w!!, unit), if (e.lo > 0) e.lo else top.r!!)

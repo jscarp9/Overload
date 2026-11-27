@@ -37,13 +37,15 @@ val SCENES = linkedMapOf(
     "gym" to Triple("Iron Gym", "Crew level 4", 4), "aurora" to Triple("Northern Lights", "Crew level 6", 6), "volcano" to Triple("Volcano", "Crew level 8", 8),
     "colosseum" to Triple("Colosseum", "Crew rank Gold", -3), "space" to Triple("Deep Space", "Crew rank Diamond", -5), "thunder" to Triple("Thunder", "Million Pound Club trophy", 0),
     "olympus" to Triple("Olympus", "Crew rank Olympian", -7), "founder" to Triple("Founder", "Founder only", 0)
-)
-val LEGACY_SCENE = mapOf("steel" to "gym", "ember" to "forge", "ocean" to "ocean2", "toxic" to "volcano", "royal" to "aurora", "gold" to "olympus")
+).apply { HOL19.values.forEach { h -> put("hb_${h.k}", Triple(h.n, "3 crew lifts on ${h.n}", 0)) } }
+val LEGACY_SCENE = mapOf("steel" to "gym", "ember" to "forge", "ocean" to "ocean2", "toxic" to "volcano", "royal" to "aurora", "gold" to "olympus",
+    "vault" to "feclipse", "fblue" to "fconst", "throne" to "fgalaxy")
 /** Can the crew use this banner? (level, crew rank, trophy, or the founder's crew) */
 fun sceneOK(cs: CrewState?, k: String): Boolean {
     val c = cs?.crew ?: return false; val r = SCENES[k]?.third ?: return false
     return when {
         k == "founder" -> c.fcrew
+        k.startsWith("hb_") -> crewHol(cs, k.drop(3))
         k == "thunder" -> c.trophies.containsKey("mpc")
         r > 0 -> c.level >= r
         r < 0 -> c.rank >= -r
@@ -55,7 +57,10 @@ fun sceneOK(cs: CrewState?, k: String): Boolean {
 fun Scene(k0: String, modifier: Modifier = Modifier, level: Int = 8, uid: String = k0) {
     val k = LEGACY_SCENE[k0] ?: k0
     val tr = rememberInfiniteTransition(label = "scene")
-    val t by tr.animateFloat(0f, 1f, infiniteRepeatable(tween(6000, easing = LinearEasing), RepeatMode.Restart), label = "t")
+    // the founder space scenes move slowly, so they run on a 60 second loop (t still counts 0..10 "6 second" beats)
+    val slow = k in SPACE20
+    val t0 by tr.animateFloat(0f, 1f, infiniteRepeatable(tween(if (slow) 60000 else 6000, easing = LinearEasing), RepeatMode.Restart), label = "t")
+    val t = if (slow) t0 * 10f else t0
     Canvas(modifier.aspectRatio(380f / 130f)) { viewBox(380f, 130f, slice = true) { drawScene(k, level, uid, t) } }
 }
 
@@ -114,16 +119,17 @@ private fun DrawScope.drawScene(k: String, lvl: Int, u: String, t: Float) {
             repeat(6) { i -> drawRect(hex("#efe6d0"), Offset(218f + i * 28, 46f), Size(10f, 56f)); drawRect(hex("#cdb98c"), Offset(216f + i * 28, 44f), Size(14f, 3f)) }
             drawRect(hex("#d8c79f"), Offset(206f, 102f), Size(188f, 8f)) }
         // 0.16 banners
-        "founder" -> { drawRect(Brush.radialGradient(listOf(hex("#4a3510"), hex("#16110a"), hex("#050505")), Offset(304f, 13f), 380f), size = Size(380f, 130f))
-            repeat(6) { i -> fillP("M360 -20 L${120 + i * 46} 140 L${142 + i * 46} 140 Z", hex("#f3d77a"), .02f + .07f * tw(i, 0f)) }
-            val gold = Brush.horizontalGradient(listOf(hex("#9c7424"), hex("#fff2bd"), hex("#9c7424")))
-            translate(312f, 66f) { rotate(t * 60f, Offset.Zero) { drawCircle(gold, 70f, Offset.Zero, alpha = .55f, style = Stroke(1.4f)); drawCircle(hex("#e8c55c"), 58f, Offset.Zero, alpha = .55f, style = Stroke(.8f))
-                repeat(12) { i -> val a = i * PI.toFloat() / 6; drawLine(hex("#e8c55c", .33f), Offset(cos(a) * 30, sin(a) * 30), Offset(cos(a) * 56, sin(a) * 56), .6f) } }
+        "founder", "cofounder" -> { val sv = k == "cofounder"; fun g(a: String, b: String) = hex(if (sv) b else a)
+            drawRect(Brush.radialGradient(listOf(g("#4a3510", "#2c3038"), g("#16110a", "#101216"), hex("#050505")), Offset(304f, 13f), 380f), size = Size(380f, 130f))
+            repeat(6) { i -> fillP("M360 -20 L${120 + i * 46} 140 L${142 + i * 46} 140 Z", g("#f3d77a", "#eef1f5"), .02f + .07f * tw(i, 0f)) }
+            val gold = Brush.horizontalGradient(listOf(g("#9c7424", "#7d838e"), g("#fff2bd", "#ffffff"), g("#9c7424", "#7d838e")))
+            translate(312f, 66f) { rotate(t * 60f, Offset.Zero) { drawCircle(gold, 70f, Offset.Zero, alpha = .55f, style = Stroke(1.4f)); drawCircle(g("#e8c55c", "#d5dae2"), 58f, Offset.Zero, alpha = .55f, style = Stroke(.8f))
+                repeat(12) { i -> val a = i * PI.toFloat() / 6; drawLine(g("#e8c55c", "#d5dae2").copy(.33f), Offset(cos(a) * 30, sin(a) * 30), Offset(cos(a) * 56, sin(a) * 56), .6f) } }
                 drawCircle(hex("#0b0906"), 26f, Offset.Zero, alpha = .55f); fillP("M-12 8 L-14 -6 L-6 0 L0 -11 L6 0 L14 -6 L12 8 Z", gold, .55f) }
             repeat(26) { i -> val d = R("d$i", 5f, 11f); val ph = ((t * 6f / d) + R("b$i", 0f, 1f)) % 1f
-                drawCircle(hex("#f3d77a"), R("r$i", .6f, 1.9f), Offset(R("x$i", 8f, 372f), 140f - ph * 150f), alpha = if (ph < .15f) ph / .15f else if (ph > .7f) (1 - ph) / .3f else 1f) }
-            drawRect(gold, Offset(0f, 0f), Size(380f, 2f)); drawRect(gold, Offset(0f, 128f), Size(380f, 2f))
-            svgText("FOUNDER · 001 · THE ORIGINAL · OVERLOAD · FOUNDER · 001", 190f, 123f, 5.5f, hex("#e8c55c", .35f), spacing = 4f) }
+                drawCircle(g("#f3d77a", "#eef1f5"), R("r$i", .6f, 1.9f), Offset(R("x$i", 8f, 372f), 140f - ph * 150f), alpha = if (ph < .15f) ph / .15f else if (ph > .7f) (1 - ph) / .3f else 1f) }
+            drawRect(gold, Offset(0f, 0f), Size(380f, 2f)); drawRect(gold, Offset(0f, 128f), Size(380f, 2f)) }
+        "feclipse", "fconst", "fgalaxy" -> drawSpace(k, u, t)
         "sunrise" -> { drawRect(Brush.verticalGradient(listOf(hex("#2b1d4f"), hex("#e2557a"), hex("#ffb35c")), 0f, 130f), size = Size(380f, 130f))
             drawCircle(hex("#ffe08a"), 30f, Offset(280f, 98f - 6f * sin(t * 2 * PI.toFloat())))
             fillP("M0 130 L0 96 Q60 70 120 92 T250 88 T380 84 V130Z", hex("#5a2846")); fillP("M0 130 L0 108 Q80 90 170 110 T380 104 V130Z", hex("#2c1530"))
@@ -142,46 +148,8 @@ private fun DrawScope.drawScene(k: String, lvl: Int, u: String, t: Float) {
             rotate(t * 30f, Offset(300f, 64f)) { drawCircle(hex("#cfe3ff", .9f), 40f, Offset(300f, 64f), style = Stroke(1.2f, pathEffect = androidx.compose.ui.graphics.PathEffect.dashPathEffect(floatArrayOf(4f, 3f)))) }
             drawCircle(hex("#cfe3ff", .9f), 12f, Offset(300f, 64f), style = Stroke(1.2f)); strokeP("M260 64h-60M200 54v20M120 30h60v68h-60z", hex("#cfe3ff"), 1.2f, .9f)
             strokeP("M130 44h40M130 56h30M130 68h36", hex("#cfe3ff"), 1.2f, .55f); svgText("OVERLOAD · BLUEPRINT · 001", 22f, 24f, 10f, hex("#cfe3ff", .8f), align = 0, spacing = 3f) }
-        else -> drawScene("forge", lvl, u, t)
+        else -> if (k.startsWith("hb_")) drawHolScene(k.drop(3), u, t) else drawScene("forge", lvl, u, t)
     }
-}
-
-// ============================ CREST ============================
-val CREST_ICON = linkedMapOf(
-    "barbell" to listOf("M-14 0h28M-14-7v14M14-7v14M-18-4v8M18-4v8" to 3.2f),
-    "skull" to listOf("M-9 3a10 10 0 1 1 18 0v5h-18z" to 2.6f, "M-4 8v3M0 8v3M4 8v3" to 2f),
-    "crown" to listOf("M-13 8l-3-14 9 6 7-10 7 10 9-6-3 14z" to 2.6f),
-    "bolt" to listOf("M3-14l-12 16h9l-3 12 12-16h-9z" to 2.6f),
-    "wolf" to listOf("M-12-12l5 8h14l5-8 1 14-7 10-6 2-6-2-7-10z" to 2.4f),
-    "flame" to listOf("M0 14c-7 0-10-5-10-9 0-6 5-8 6-13 2 4 4 5 5 7 1-4 3-7 6-9 0 6 3 9 3 14 0 6-4 10-10 10z" to 2.4f),
-    "star" to listOf("M0-13l4 8 9 1-7 6 2 9-8-5-8 5 2-9-7-6 9-1z" to 2.4f),
-    "none" to emptyList()
-)
-private val CREST_SHAPE = mapOf("shield" to "M0-26 L22-17 V2 C22 16 12 24 0 28 C-12 24 -22 16 -22 2 V-17Z", "plate" to "M0-26a26 26 0 1 1 0 52a26 26 0 1 1 0-52z",
-    "circle" to "M0-25a25 25 0 1 1 0 50a25 25 0 1 1 0-50z", "hex" to "M0-27 L23-14 V14 L0 27 L-23 14 V-14Z")
-val CREST_COLORS = listOf("#ef2b36" to "#14161c", "#2563ff" to "#0b1a3e", "#16b65b" to "#0a2e18", "#7c4dff" to "#1b0f4a", "#c99a2e" to "#2a1e05", "#00c2b2" to "#06302c", "#ff3d8b" to "#2e0617", "#e8e8ec" to "#3a3d46")
-
-/** The crew crest. It gets fancier with crew rank: border at Silver, gold trim at Platinum, glow at Titan, laurels at Olympian. */
-@Composable
-fun CrestView(cr0: Crest?, rank: Int, modifier: Modifier = Modifier) = Canvas(modifier.aspectRatio(1f)) {
-    val cr = cr0 ?: Crest()
-    viewBox(68f, 68f) { translate(34f, 34f) {
-        val shape = CREST_SHAPE[cr.shape] ?: CREST_SHAPE.getValue("shield")
-        if (rank >= 6) drawCircle(Brush.radialGradient(listOf(hex("#ffd76a", .45f), Color.Transparent), Offset.Zero, 34f), 34f, Offset.Zero)
-        if (rank >= 7) repeat(7) { i -> listOf(-1f, 1f).forEach { sd -> val x = sd * (28f - i * 1.2f); val y = -12f + i * 5f
-            rotate(sd * (30f - i * 8f) * -1f, Offset(x, y)) { drawOval(hex("#e3c25a"), Offset(x - 2f, y - 4.4f), Size(4f, 8.8f)) } } }
-        fillP(shape, Brush.verticalGradient(listOf(hex(cr.c1), hex(cr.c2)), -27f, 28f))
-        val trim = if (rank >= 4) hex("#ffd76a") else if (rank >= 2) hex("#cfd4dc") else Color.White.copy(.35f)
-        drawPath(svgPath(shape), trim, style = Stroke(if (rank >= 4) 2.6f else 1.6f))
-        if (rank >= 2) scale(.82f, .82f, Offset.Zero) { drawPath(svgPath(shape), Color.Black.copy(.35f), style = Stroke(1f)) }
-        if (cr.shape == "plate") drawCircle(Color.Black.copy(.35f), 7f, Offset.Zero)
-        translate(0f, if (cr.txt.isNotEmpty()) -4f else 0f) {
-            CREST_ICON[cr.icon]?.forEach { (d, w) -> strokeP(d, Color.White, w) }
-            if (cr.icon == "skull") { drawCircle(Color.White, 2.4f, Offset(-4f, -1f)); drawCircle(Color.White, 2.4f, Offset(4f, -1f)) }
-            if (cr.icon == "wolf") { drawCircle(Color.White, 1.8f, Offset(-4f, 0f)); drawCircle(Color.White, 1.8f, Offset(4f, 0f)) }
-        }
-        if (cr.txt.isNotEmpty()) svgText(cr.txt, 0f, 20f, 9f, Color.White, spacing = 1f)
-    } }
 }
 
 // ============================ BOSSES ============================

@@ -111,25 +111,27 @@ fun DrawScope.plateOverlay(k: String, seed: String = k, og: Int = 0) {
 }
 
 /** The Founder 001 plate (0.16): black and gold, crown, laurels, gold hub, one rim engraving. */
-fun DrawScope.founderPlate(label: String = "", ring: Float? = null) {
-    val gold = Brush.linearGradient(listOf(hex("#fff6cf"), hex("#e8c55c"), hex("#9c7424"), hex("#f3d77a")), Offset(0f, 0f), Offset(100f, 100f))
+fun DrawScope.founderPlate(label: String = "", ring: Float? = null, silver: Boolean = false) {
+    // 0.18: the co-founder plate is the same plate in silver, engraved 002
+    fun g(gold: String, sil: String) = hex(if (silver) sil else gold)
+    val gold = Brush.linearGradient(listOf(g("#fff6cf", "#ffffff"), g("#e8c55c", "#d5dae2"), g("#9c7424", "#7d838e"), g("#f3d77a", "#eef1f5")), Offset(0f, 0f), Offset(100f, 100f))
     drawCircle(Brush.radialGradient(listOf(hex("#2c2a2f"), hex("#0f0f13"), hex("#030304")), Offset(40f, 35f), 75f), 48f, C50)
     drawCircle(gold, 47.4f, C50, style = Stroke(1.8f)); drawCircle(gold, 40.4f, C50, style = Stroke(.9f))
     val lbl = label.uppercase().replace(Regex("[^A-Z0-9 ]"), "").trim().take(12)
-    rimText("FOUNDER · 001 · OVERLOAD${if (lbl.isNotEmpty()) " · $lbl" else ""} · EST 2026 ·", 50f, 50f, 42.6f, 4.5f, hex("#e8c55c"), 1.15f)
-    drawCircle(hex("#e8c55c"), 37.6f, C50, alpha = .7f, style = Stroke(.7f, pathEffect = androidx.compose.ui.graphics.PathEffect.dashPathEffect(floatArrayOf(.5f, 2.4f))))
+    rimText("${if (silver) "CO-FOUNDER · 002" else "FOUNDER · 001"} · OVERLOAD${if (lbl.isNotEmpty()) " · $lbl" else ""} · EST 2026 ·", 50f, 50f, 42.6f, 4.5f, g("#e8c55c", "#d5dae2"), 1.15f)
+    drawCircle(g("#e8c55c", "#d5dae2"), 37.6f, C50, alpha = .7f, style = Stroke(.7f, pathEffect = androidx.compose.ui.graphics.PathEffect.dashPathEffect(floatArrayOf(.5f, 2.4f))))
     for (i in 0 until 7) { val a = 124f + i * 13.5f; val r = if (i % 2 == 1) 34.6f else 31.6f
         listOf(a to -1, 180f - a to 1).forEach { (aa, side) -> val p = pol(r, aa); val rot = aa + (if (side < 0) 90f else -90f) + (if (side < 0) -28f else 28f)
             rotate(rot, p) { drawOval(gold, Offset(p.x - 1.35f, p.y - 3.1f), Size(2.7f, 6.2f)) } } }
-    fillP("M41.5 25 L40 16.5 L44.8 20.2 L50 13.6 L55.2 20.2 L60 16.5 L58.5 25 Z", gold); strokeP("M41.5 25 L40 16.5 L44.8 20.2 L50 13.6 L55.2 20.2 L60 16.5 L58.5 25 Z", hex("#6e5014"), .4f)
-    drawCircle(hex("#fff6cf"), 1.1f, Offset(50f, 13.4f)); drawRoundRect(gold, Offset(41.6f, 25.2f), Size(16.8f, 1.6f), androidx.compose.ui.geometry.CornerRadius(.8f))
-    svgText("001", 50f, 87.4f, 8.2f, hex("#e8c55c"), spacing = 1.4f)
-    drawCircle(Color.Black.copy(.45f), 23.2f, C50); drawCircle(Brush.radialGradient(listOf(hex("#fff3c0"), hex("#d9b04a"), hex("#6e5014")), Offset(38f, 32f), 30f), 22f, C50)
-    drawCircle(hex("#5a410f"), 22f, C50, style = Stroke(.7f)); drawCircle(hex("#7a5a18"), 15.6f, C50, style = Stroke(.7f))
-    repeat(6) { i -> val p = pol(18.8f, i * 60f + 30f); drawCircle(hex("#5a410f"), 1.3f, p); drawCircle(hex("#fff6cf"), .55f, p - Offset(.35f, .35f)) }
+    fillP("M41.5 25 L40 16.5 L44.8 20.2 L50 13.6 L55.2 20.2 L60 16.5 L58.5 25 Z", gold); strokeP("M41.5 25 L40 16.5 L44.8 20.2 L50 13.6 L55.2 20.2 L60 16.5 L58.5 25 Z", g("#6e5014", "#5d636d"), .4f)
+    drawCircle(g("#fff6cf", "#ffffff"), 1.1f, Offset(50f, 13.4f)); drawRoundRect(gold, Offset(41.6f, 25.2f), Size(16.8f, 1.6f), androidx.compose.ui.geometry.CornerRadius(.8f))
+    svgText(if (silver) "002" else "001", 50f, 87.4f, 8.2f, g("#e8c55c", "#d5dae2"), spacing = 1.4f)
+    drawCircle(Color.Black.copy(.45f), 23.2f, C50); drawCircle(Brush.radialGradient(listOf(g("#fff3c0", "#ffffff"), g("#d9b04a", "#b9c0cb"), g("#6e5014", "#5d636d")), Offset(38f, 32f), 30f), 22f, C50)
+    drawCircle(g("#5a410f", "#4a4f57"), 22f, C50, style = Stroke(.7f)); drawCircle(g("#7a5a18", "#6b717b"), 15.6f, C50, style = Stroke(.7f))
+    repeat(6) { i -> val p = pol(18.8f, i * 60f + 30f); drawCircle(g("#5a410f", "#4a4f57"), 1.3f, p); drawCircle(g("#fff6cf", "#ffffff"), .55f, p - Offset(.35f, .35f)) }
     drawCircle(hex("#050506"), 9.5f, C50); drawCircle(gold, 9.5f, C50, style = Stroke(1.5f))
     if (ring != null) {
-        drawCircle(hex("#e8c55c", .3f), 49f, C50, style = Stroke(2f))
-        drawArc(hex("#f3d77a"), -90f, 360f * ring.coerceIn(0f, 1f), false, Offset(1f, 1f), Size(98f, 98f), style = Stroke(2.4f, cap = StrokeCap.Round))
+        drawCircle(g("#e8c55c", "#d5dae2").copy(.3f), 49f, C50, style = Stroke(2f))
+        drawArc(g("#f3d77a", "#eef1f5"), -90f, 360f * ring.coerceIn(0f, 1f), false, Offset(1f, 1f), Size(98f, 98f), style = Stroke(2.4f, cap = StrokeCap.Round))
     }
 }

@@ -35,7 +35,7 @@ sealed class Sheet {
     // ---- 0.15 ----
     data class PlatePick(val day: Int) : Sheet()
     data class ProfilePage(val id: String) : Sheet()            // crew profile ("" or your id = you)
-    data class ProfEdit(val sec: String?) : Sheet()
+    data class ProfEdit(val sec: String?, val direct: Boolean = false) : Sheet() // direct = opened by tapping the banner or plate (0.21)
     object RaidInfo : Sheet()
     object GroupStart : Sheet()
     data class GroupCard(val post: Post) : Sheet()
@@ -47,6 +47,15 @@ sealed class Sheet {
     data class Psec(val k: String) : Sheet()
     data class Tour(val i: Int) : Sheet()
     object TodayMore : Sheet()
+    // ---- 0.18-0.25 ----
+    object Privacy : Sheet()
+    data class ReportMember(val id: String) : Sheet()               // report a crew member
+    data class Holiday(val k: String, val y: Int) : Sheet()     // holiday drop unlocked
+    data class RankUp(val tab: String) : Sheet()                // you | crew | plates (0.22)
+    object AiBuild : Sheet()                                     // Overload AI plan builder (0.23)
+    object Coach : Sheet()                                       // Coach chat (0.25)
+    data class Cue(val name: String) : Sheet()                  // AI form tips (0.25)
+    data class PlanEx(val day: Int, val gi: Int, val ei: Int) : Sheet() // Plan page edit card (0.24)
 }
 
 /** Full-screen rank-up moment. */

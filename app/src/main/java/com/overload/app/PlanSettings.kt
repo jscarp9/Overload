@@ -25,97 +25,8 @@ import androidx.compose.ui.unit.dp
 import java.time.LocalDate
 import kotlinx.coroutines.launch
 
-// ============================ PLAN ============================
 @Composable
-fun PlanScreen(vm: OverloadViewModel, d: AppData, u: UiState) {
-    val plan = d.plan ?: return
-    val di = u.pday; val day = plan[di]
-    var confirm by remember(di) { mutableStateOf<String?>(null) }
-    Title("Plan"); Sub("Set up each day once. It repeats every week.")
-    Row(Modifier.fillMaxWidth().padding(vertical = 12.dp), horizontalArrangement = Arrangement.spacedBy(5.dp)) {
-        DN.forEachIndexed { i, n ->
-            val dd = plan[i]
-            Column(Modifier.weight(1f).height(46.dp).clip(RoundedCornerShape(13.dp))
-                .background(if (i == di) ov.ink else ov.card).clickable { vm.setPDay(i) }, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-                OvText(n, 13, FontWeight.ExtraBold, if (i == di) ov.bg else ov.ink)
-                Box(Modifier.padding(top = 3.dp).size(6.dp).background(if (dd.type == "off") Color(0xFFC9CDD4) else pc(colorOf(dd)).base, androidx.compose.foundation.shape.CircleShape))
-            }
-        }
-    }
-    OvCard {
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            TextBox(day.name, { vm.editDay(di) { x -> x.copy(name = it) } }, "Day name", Modifier.weight(1f))
-            Dropdown(TYPES[day.type]?.first ?: "Other", TYPES.values.map { it.first }, Modifier.weight(1f)) { sel ->
-                val key = TYPES.entries.first { it.value.first == sel }.key
-                vm.editDay(di) { x -> x.copy(type = key, color = null) }
-            }
-        }
-        Spacer(Modifier.height(8.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            TextBox(day.focus, { vm.editDay(di) { x -> x.copy(focus = it) } }, "Focus, e.g. Chest and back", Modifier.weight(1f))
-            val opts = listOf(30, 45, 60, 75, 90, 105, 120, 150, 180, 240)
-            Dropdown("Rest ${day.rest / 60}:${(day.rest % 60).toString().padStart(2, '0')}", opts.map { "Rest ${it / 60}:${(it % 60).toString().padStart(2, '0')}" }, Modifier.weight(1f)) { sel ->
-                vm.editDay(di) { x -> x.copy(rest = opts[opts.indexOfFirst { "Rest ${it / 60}:${(it % 60).toString().padStart(2, '0')}" == sel }]) }
-            }
-        }
-        // 0.15: plate is one compact row; tapping it opens the picker with category tabs
-        Row(Modifier.fillMaxWidth().padding(top = 10.dp).clip(RoundedCornerShape(14.dp)).background(ov.soft).clickable { vm.openSheet(Sheet.PlatePick(di)) }.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
-            Plate(colorOf(day), "done", Modifier.size(40.dp)); Spacer(Modifier.width(10.dp))
-            Column(Modifier.weight(1f)) { OvText(plateName(colorOf(day)), 15, FontWeight.Bold); Sub("${PCAT[plateCat(colorOf(day))] ?: "Color"} · Tap to change") }
-            OvText("›", 20, FontWeight.Bold, ov.mute)
-        }
-    }
-    if (day.type != "off") {
-        day.groups.forEachIndexed { gi, gr ->
-            OvCard {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    OvText("${if (gr.size > 1) "SUPERSET" else "EXERCISE"} ${'A' + gi}", 13, FontWeight.ExtraBold, ov.mute, Modifier.weight(1f))
-                    OvButton("↑", { vm.moveGroupUp(di, gi) }, small = true); Spacer(Modifier.width(6.dp))
-                    OvButton(if (confirm == "g$gi") "Tap to confirm" else "Delete", { if (confirm == "g$gi") { vm.removeGroup(di, gi); confirm = null } else confirm = "g$gi" }, small = true)
-                }
-                gr.forEachIndexed { ei, e ->
-                    Spacer(Modifier.height(12.dp))
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        TextBox(e.name, { vm.editEx(di, gi, ei) { x -> x.copy(name = it) } }, "Exercise name", Modifier.weight(1f), bold = true)
-                        OvButton("✕", { vm.removeEx(di, gi, ei) })
-                    }
-                    Spacer(Modifier.height(6.dp))
-                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.Bottom) {
-                        Dropdown(e.m, MUSCLES, Modifier.weight(1.4f)) { m -> vm.editEx(di, gi, ei) { x -> x.copy(m = m) } }
-                        LabeledNum("Sets", e.sets, Modifier.weight(1f)) { n -> vm.editEx(di, gi, ei) { x -> x.copy(sets = n) } }
-                        LabeledNum("Min reps", e.lo, Modifier.weight(1f)) { n -> vm.editEx(di, gi, ei) { x -> x.copy(lo = n) } }
-                        LabeledNum("Max reps", e.hi, Modifier.weight(1f)) { n -> vm.editEx(di, gi, ei) { x -> x.copy(hi = n) } }
-                    }
-                    Spacer(Modifier.height(6.dp))
-                    TextBox(e.cue, { vm.editEx(di, gi, ei) { x -> x.copy(cue = it) } }, "Cue, e.g. Elbows tucked", size = 14)
-                }
-                Spacer(Modifier.height(8.dp))
-                OvButton("+ Superset another exercise", { vm.openPicker(Picker("plan", gi = gi)) }, small = true)
-            }
-        }
-        OvButton("+ Add exercise", { vm.openPicker(Picker("plan", gi = -1)) }, bg = ov.ink, fg = ov.bg, wide = true)
-    }
-    Spacer(Modifier.height(22.dp))
-    Title("Templates", 20); Sub("Replaces the whole week. Your logged history stays.")
-    TemplateList(Modifier.padding(top = 10.dp), confirm) { t -> if (confirm == "t${t.key}") { vm.replacePlan(t.key); confirm = null } else confirm = "t${t.key}" }
-    u.picker?.let { ExercisePicker(vm, it) }
-}
-
-@Composable
-private fun TemplateList(modifier: Modifier, confirm: String?, onPick: (Template) -> Unit) = Column(modifier, verticalArrangement = Arrangement.spacedBy(10.dp)) {
-    TEMPLATES.forEach { t ->
-        Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(22.dp)).background(ov.card).clickable { onPick(t) }.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
-            Plate(t.color, "done", Modifier.size(52.dp)); Spacer(Modifier.width(14.dp))
-            Column {
-                Title(if (confirm == "t${t.key}") "Tap again to replace your plan" else t.label, 20)
-                Sub(t.desc)
-            }
-        }
-    }
-}
-
-@Composable
-private fun Dropdown(current: String, options: List<String>, modifier: Modifier, onPick: (String) -> Unit) {
+fun Dropdown(current: String, options: List<String>, modifier: Modifier, onPick: (String) -> Unit) {
     var open by remember { mutableStateOf(false) }
     Box(modifier) {
         Box(Modifier.fillMaxWidth().heightIn(min = 48.dp).background(ov.soft, RoundedCornerShape(14.dp)).clickable { open = true }.padding(horizontal = 12.dp), contentAlignment = Alignment.CenterStart) {
@@ -124,13 +35,6 @@ private fun Dropdown(current: String, options: List<String>, modifier: Modifier,
         DropdownMenu(open, { open = false }) { options.forEach { o -> DropdownMenuItem({ Text(o) }, { onPick(o); open = false }) } }
     }
 }
-
-@Composable
-private fun LabeledNum(label: String, v: Int, modifier: Modifier, onChange: (Int) -> Unit) =
-    Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
-        Sub(label)
-        NumBox(if (v > 0) "$v" else "", "0", { onChange(it.toIntOrNull()?.coerceAtLeast(0) ?: 0) }, decimal = false, size = 16, h = 44.dp)
-    }
 
 // ============================ SETTINGS (0.17: a short list, one page per section) ============================
 @Composable
@@ -150,7 +54,7 @@ fun SettingsScreen(vm: OverloadViewModel, d: AppData) {
         if (uri != null) ctx.contentResolver.openInputStream(uri)?.use { vm.importJson(it.readBytes().decodeToString()) }
     }
     val pages = listOf("you" to ("🙂" to "Name, theme and units"), "workout" to ("🏋️" to "Workout"), "health" to ("❤️" to "Heart rate"), "sync" to ("☁️" to "Account and sync"),
-        "data" to ("🛟" to "Backup and restore"), "founder" to ("👑" to "Founder"), "help" to ("👋" to "Help"), "danger" to ("⚠️" to "Start over")).filter { it.first != "founder" || st.founder }
+        "ai" to ("✦" to "Overload AI"), "data" to ("🛟" to "Backup and restore"), "founder" to ("👑" to "Founder"), "help" to ("👋" to "Help"), "danger" to ("⚠️" to "Start over")).filter { it.first != "founder" || st.founder }
     val page = u.set17
     if (page == null) {
         Row(verticalAlignment = Alignment.CenterVertically) { Title("Settings", modifier = Modifier.weight(1f)); OvButton("Done", { vm.toggleSettings() }, small = true, bg = ov.ink, fg = ov.bg) }
@@ -208,6 +112,7 @@ fun SettingsScreen(vm: OverloadViewModel, d: AppData) {
             if (st.heartRate) Sub("In Samsung Health: Settings → Health Connect, and allow heart rate. Starting a Weights workout on your watch gives a much more detailed graph.", Modifier.padding(bottom = 6.dp))
         }
         "sync" -> AccountCard(vm, d, u.confirm)
+        "ai" -> AiSettingsPage(vm, c)
         "data" -> {
             OvCard {
                 Title("Backup", 20)
@@ -232,7 +137,8 @@ fun SettingsScreen(vm: OverloadViewModel, d: AppData) {
         "help" -> OvCard {
             Row16("👋", "Take the app tour", "How Overload works") { vm.openSheet(Sheet.Tour(0)) }
             Row16("✨", "What's new", "Overload $APP_VER") { vm.showNews() }
-            if (!st.founder) Row16("🔑", "Founder code", "For the person who built Overload") { vm.openSheet(Sheet.Founder) }
+            Row16("🔒", "Privacy", "What’s saved and shared") { vm.openSheet(Sheet.Privacy) }
+            if (!st.founder && !st.cofounder) Row16("🔑", "Founder code", "For the people who built Overload") { vm.openSheet(Sheet.Founder) }
         }
         "danger" -> OvCard {
             Title("Start over", 20); Sub("Erases every workout, note and your plan from this phone.", Modifier.padding(vertical = 6.dp))

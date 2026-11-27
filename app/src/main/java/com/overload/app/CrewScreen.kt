@@ -40,9 +40,11 @@ fun CrewScreen(vm: OverloadViewModel, c: Ctx, u: UiState) {
             vm.crew.lastFinished()?.let { lf -> if (!lf.posted) CardButton("📣", "Post your ${c.plan.getOrNull(DAYS.indexOf(lf.day))?.name ?: "workout"}", "Share your breakdown with the crew") { vm.openSheet(Sheet.PostWorkout(sid(lf.date, lf.day))) } }
             if (s.posts.isEmpty()) OvCard { Sub("No posts yet. Finish a workout and tap Post to crew, or share the code ${s.crew.code} so friends can join.") }
             // 0.17: all "joined the crew" posts collapse into one line
-            val joins = s.posts.filter { it.type == "join" }; var joinShown = false
-            s.posts.forEach { p ->
-                if (p.type != "join") PostCard(vm, c, p, u)
+            val posts = s.posts.filter { !vm.blocked(it.by) }
+            val joins = posts.filter { it.type == "join" }; var joinShown = false
+            posts.forEach { p ->
+                if (p.type == "ai") AiRecapPost(p)
+                else if (p.type != "join") PostCard(vm, c, p, u)
                 else if (!joinShown) { joinShown = true
                     val names = joins.map { vm.crew.member2(it.by)?.name ?: "Someone" }.distinct()
                     val nm = if (names.size > 3) names.take(3).joinToString(", ") + " and ${names.size - 3} more" else if (names.size > 1) names.dropLast(1).joinToString(", ") + " and " + names.last() else names.first()
@@ -217,7 +219,6 @@ private fun GroupPostBodyFor(c: Ctx, p: Post) { val vm: OverloadViewModel = andr
 @Composable
 private fun Arena(vm: OverloadViewModel, c: Ctx, s: CrewState, u: UiState) {
     val mode = u.sub["arena"] ?: "all"; val me = vm.myId()
-    if (mode == "lifts") { LiftBoard(vm, c, s, u); return }
     val order = vm.crew.arenaOrder(mode).filter { it.profile != null }; val t = vm.crew.titleHolders(); val snap = c.st.arenaSnap?.pos ?: emptyMap()
     if (order.isEmpty()) { OvCard { Sub("Rankings show up once crew members open the app.") }; return }
     fun value(m: Member) = if (mode == "week") "${vm.crew.weekPts(m.profile)} pts" else "${m.profile!!.power.roundToInt()}"
@@ -235,7 +236,8 @@ private fun Arena(vm: OverloadViewModel, c: Ctx, s: CrewState, u: UiState) {
         }
     }
     OvCard {
-        order.forEachIndexed { i, m -> val p = m.profile!!; val prev = snap[m.id]; val mv = if (mode == "all" && prev != null) prev - i else 0
+        if (order.size <= 3) Sub("Everyone in your crew is on the podium.")
+        order.forEachIndexed { i, m -> if (i < 3) return@forEachIndexed; val p = m.profile!!; val prev = snap[m.id]; val mv = if (mode == "all" && prev != null) prev - i else 0
             val tk = t.filter { it.value == m.id }.keys.mapNotNull { k -> vm.crew.titles.firstOrNull { it.k == k } }
             Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(if (m.id == me) Red.copy(.08f) else Color.Transparent).clickable { vm.openSheet(Sheet.ProfilePage(m.id)) }.padding(vertical = 8.dp, horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically) {
                 OvText("${i + 1}", 15, FontWeight.Black, ov.mute, Modifier.width(24.dp)); MemberAvatar(vm, m.id, m.name, 34); Spacer(Modifier.width(8.dp))
@@ -282,35 +284,6 @@ private fun Arena(vm: OverloadViewModel, c: Ctx, s: CrewState, u: UiState) {
 }
 
 @Composable
-private fun LiftBoard(vm: OverloadViewModel, c: Ctx, s: CrewState, u: UiState) {
-    val mem = s.members.filter { it.profile?.lifts?.isNotEmpty() == true }; val cnt = HashMap<String, Int>()
-    mem.forEach { m -> m.profile!!.lifts.keys.forEach { cnt[it] = (cnt[it] ?: 0) + 1 } }
-    val names = cnt.keys.sortedWith(compareByDescending<String> { cnt[it] }.thenBy { it })
-    if (names.isEmpty()) { OvCard { Sub("No lifts shared yet.") }; return }
-    val sel = u.liftSel?.takeIf { it in names } ?: names[0]; val rel = u.liftRel; var open by remember { mutableStateOf(false) }
-    OvCard {
-        OvText("LIFT", 13, FontWeight.ExtraBold, ov.mute)
-        Box { OvButton("$sel ▾", { open = true }, Modifier.padding(vertical = 6.dp), wide = true)
-            androidx.compose.material3.DropdownMenu(open, { open = false }) { names.forEach { n -> androidx.compose.material3.DropdownMenuItem({ androidx.compose.material3.Text(n) }, { vm.ui.value = vm.ui.value.copy(liftSel = n); open = false }) } } }
-        Row(verticalAlignment = Alignment.CenterVertically) { OvText("Relative to bodyweight", 15, FontWeight.SemiBold, modifier = Modifier.weight(1f)); Toggle(rel) { vm.ui.value = vm.ui.value.copy(liftRel = it) } }
-        if (rel && c.st.bw <= 0) Sub("Add your bodyweight in Crew ⚙ to show up here.")
-    }
-    val rows = mem.mapNotNull { m -> val p = m.profile!!; val l = p.lifts[sel] ?: return@mapNotNull null; val e = vm.crew.mine(l.e, p.unit); val bw = if (p.bw > 0) vm.crew.mine(p.bw, p.unit) else 0.0
-        Triple(m, l, e) to (if (bw > 0) e / bw else 0.0) }.filter { !rel || it.second > 0 }.sortedByDescending { if (rel) it.second else it.first.third }
-    OvCard {
-        if (rows.isEmpty()) Sub("Nobody here yet.")
-        rows.forEachIndexed { i, (x, r) -> val (m, l, e) = x
-            Row(Modifier.fillMaxWidth().clickable { vm.openSheet(Sheet.ProfilePage(m.id)) }.padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                OvText(listOf("🥇", "🥈", "🥉").getOrElse(i) { "${i + 1}" }, 16, modifier = Modifier.width(28.dp)); MemberAvatar(vm, m.id, m.name, 34); Spacer(Modifier.width(8.dp))
-                Column(Modifier.weight(1f)) { OvText(m.name, 15, FontWeight.Bold); Sub("Best ${vm.crew.mine(l.w, m.profile!!.unit).roundToInt()} × ${l.r}") }
-                OvText(if (rel) String.format("%.2f×", r) else "${e.roundToInt()} ${c.unit}", 15, FontWeight.Black)
-            }
-        }
-        Sub("Ranked by estimated 1-rep max" + if (rel) " divided by bodyweight." else ".", Modifier.padding(top = 6.dp))
-    }
-}
-
-@Composable
 fun AwardsCardPublic(vm: OverloadViewModel, s: CrewState) {
     if (s.members.size < 2) return
     val d = LocalDate.now().dayOfMonth; val mo = vm.crew.monthKey(); val pm = vm.crew.prevMonthKey()
@@ -348,27 +321,19 @@ fun CommentsSheet(vm: OverloadViewModel, postId: String) {
 @Composable
 fun CrewSettingsSheet(vm: OverloadViewModel, c: Ctx, u: UiState) {
     val cs by vm.crewState.collectAsState(); val s = cs ?: return; val me = vm.myId(); val own = s.crew.owner == me; val ctx = LocalContext.current
-    var bw by remember { mutableStateOf(if (c.st.bw > 0) fmtN(c.st.bw) else "") }
     SheetHead(s.crew.name) { vm.closeSheet() }
     Column(Modifier.fillMaxWidth().background(ov.soft, RoundedCornerShape(18.dp)).padding(14.dp), horizontalAlignment = Alignment.CenterHorizontally) {
         Sub("Crew code"); Title(s.crew.code, 28)
-        OvButton("Share invite", {
-            val txt = "Join my crew \"${s.crew.name}\" on Overload 💪\nCrew tab → Join → ${s.crew.code}"
-            ctx.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, txt), null))
-        }, Modifier.padding(top = 6.dp), small = true)
     }
+    OvButton("📨 Invite friends", { shareInvite(ctx, s) }, Modifier.padding(top = 10.dp), bg = Red, fg = Color.White, wide = true)
     H3("Members", Modifier.padding(top = 14.dp))
     s.members.forEach { m -> Row(Modifier.fillMaxWidth().padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
         MemberAvatar(vm, m.id, m.name, 34); Spacer(Modifier.width(10.dp))
         Column(Modifier.weight(1f)) { OvText(m.name + (if (m.id == s.crew.owner) " · owner" else "") + (if (m.id == me) " · you" else ""), 15, FontWeight.Bold); Sub(m.profile?.rname ?: "Hasn’t synced yet") }
         if (own && m.id != me) OvButton(if (u.confirm == "k${m.id}") "Tap to confirm" else "Remove", { if (u.confirm != "k${m.id}") vm.setConfirm("k${m.id}") else { vm.setConfirm(null); vm.crew.kick(m.id) } }, small = true)
     } }
-    if (own) CrewOwnerExtras(vm, s)
+    if (own) { ReportsCard(vm, s); CrewOwnerExtras(vm, s) }
     Sub("Crew pings (lock-screen alerts for posts) aren’t available on Android yet. You still see everything in 🔔 Activity.", Modifier.padding(top = 14.dp))
-    Row(Modifier.padding(top = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-        Column(Modifier.weight(1f)) { OvText("Bodyweight (${c.unit})", 15, FontWeight.SemiBold); Sub("Optional. Only used for the relative lift boards") }
-        NumBox(bw, "180", { bw = it; it.toDoubleOrNull()?.let { v -> if (v > 40 && v < 1000) vm.setSettings { s2 -> s2.copy(bw = v) } } }, Modifier.width(96.dp), size = 16, h = 44.dp)
-    }
     OvButton(if (u.confirm == "leave") "Tap again to leave" else "Leave crew", { if (u.confirm != "leave") vm.setConfirm("leave") else { vm.setConfirm(null); vm.crew.leave() } }, Modifier.padding(top = 14.dp), fg = Red, wide = true)
 }
 
@@ -380,9 +345,6 @@ fun MemberExtras(vm: OverloadViewModel, c: Ctx, id: String) {
         FramedEmblem(p.rank.coerceIn(0, 7), p.frame, p.aura, Modifier.size(64.dp)); Spacer(Modifier.width(10.dp))
         Column { Title(p.rname.ifEmpty { "Unranked" }, 20); if (p.tag.isNotEmpty()) Chip(p.tag, Color(0xFF14161C), Color.White)
             Sub("Rank Power ${p.power.roundToInt()} · 🔥 ${p.streak} week${if (p.streak == 1) "" else "s"} · ${p.bcount} badges") }
-    }
-    if (p.show.isNotEmpty()) Row(Modifier.padding(top = 10.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        p.show.forEach { b -> Column(Modifier.weight(1f).background(ov.soft, RoundedCornerShape(14.dp)).padding(8.dp), horizontalAlignment = Alignment.CenterHorizontally) { OvText(b.getOrElse(0) { "" }, 22); OvText(b.getOrElse(1) { "" }, 11, FontWeight.Bold, ov.mute, align = TextAlign.Center) } }
     }
     val lifts = p.lifts.entries.take(6).toList(); val common = if (mine != null) lifts.filter { mine.lifts[it.key] != null } else emptyList()
     if (!isMe && common.isNotEmpty()) {

@@ -65,8 +65,14 @@ data class UiState(
     val restLine: String = "",
     val chal17: Boolean = false,       // Today: challenges row opened
     val set17: String? = null,         // Settings page open (you, workout, sync, data, founder, help, danger)
-    val jumpNotes: Int = 0             // Today ⋯ → Session notes
+    val jumpNotes: Int = 0,            // Today ⋯ → Session notes
+    // 0.18+
+    val undo: UndoBar? = null,         // the "Undo" bar at the bottom (removed set, removed exercise)
+    val pd21: Boolean = false,         // Plan: day name/focus/rest editor open
+    val pd21m: Boolean = false,        // Plan: ⋯ menu open
+    val tpl21: Boolean = false         // Plan: templates shown
 )
+data class UndoBar(val msg: String, val n: Int)
 
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 class OverloadViewModel(app: Application) : AndroidViewModel(app) {
@@ -83,6 +89,7 @@ class OverloadViewModel(app: Application) : AndroidViewModel(app) {
     val sync by lazy { SyncService(this) }
     val trash by lazy { TrashStore(this) }
     val chat by lazy { ChatService(this) }
+    val ai by lazy { AiService(this) }
     val dash = MutableStateFlow<JsonObject?>(null)
 
     init {
@@ -99,7 +106,9 @@ class OverloadViewModel(app: Application) : AndroidViewModel(app) {
             val d = data.value
             if (d.plan != null && d.settings.seen == null) checkUnlocks()
             if (d.plan != null && !ui.value.news && !weekReport()) checkUnlocks()
-            crew.start(); sync.start()
+            crew.start(); sync.start(); ai.start()
+            // 0.20: the old founder banners became space scenes
+            data.value.settings.look["pbanner"]?.let { b -> OLDF20[b]?.let { nb -> setSettings { it.copy(look = it.look + ("pbanner" to nb)) } } }
         }
         viewModelScope.launch {
             while (true) {
@@ -239,7 +248,7 @@ class OverloadViewModel(app: Application) : AndroidViewModel(app) {
     /** Debounced unlock check (e.g. while typing a note). */
     fun checkUnlocksSoon(ms: Long = 1500) { unlockJob?.cancel(); unlockJob = viewModelScope.launch { delay(ms); checkUnlocks() } }
 
-    fun checkUnlocks() { viewModelScope.launch(engDispatcher) { checkUnlocksNow(); grant14() } }
+    fun checkUnlocks() { viewModelScope.launch(engDispatcher) { checkUnlocksNow(); grant14(); holCheck(); holReveal() } }
 
     /** Season pass plate finishes are granted and kept forever (0.14). */
     private fun grant14() {
@@ -290,7 +299,8 @@ class OverloadViewModel(app: Application) : AndroidViewModel(app) {
         val a = data.value.settings.acct ?: run { say("Sign in first, then try again"); return }
         viewModelScope.launch {
             val (st, j) = postJson("$SERVER/vault/founder", buildJsonObject { put("acct", a.id); put("token", a.token); put("code", code) })
-            if (st in 200..299) { setSettings { it.copy(founder = true) }; closeSheet(); confetti(140); say("👑 Welcome, Founder"); crew.sync(true) }
+            if (st in 200..299 && j["cofounder"]?.jsonPrimitive?.booleanOrNull == true) { setSettings { it.copy(cofounder = true) }; closeSheet(); confetti(120); say("🥈 Welcome, Co-Founder"); crew.sync(true) }
+            else if (st in 200..299) { setSettings { it.copy(founder = true) }; closeSheet(); confetti(140); say("👑 Welcome, Founder"); crew.sync(true) }
             else say(if (j.err == "wrong code") "That code isn’t right" else "Sign in first, then try again")
         }
     }
@@ -365,7 +375,7 @@ class OverloadViewModel(app: Application) : AndroidViewModel(app) {
         crew.sync(true)
         if (mid) { items.forEachIndexed { i, b -> later(i * 2100L) { say("${b.icon} Badge unlocked: ${b.name}"); confetti(40) } }; return }
         if (items.isEmpty()) return
-        openSheet(Sheet.Badges(items.distinctBy { it.k })); confetti(70)
+        autoSheet(Sheet.Badges(items.distinctBy { it.k })); confetti(70)
     }
 
     /** On Mondays: last week's report card. Returns true if it was shown. */
@@ -374,15 +384,26 @@ class OverloadViewModel(app: Application) : AndroidViewModel(app) {
         if (st.lastReport == tw || data.value.plan == null) return false
         setSettings { it.copy(lastReport = tw) }
         val r = ctx().weekReport() ?: return false
-        openSheet(Sheet.ReportCard(r)); return true
+        autoSheet(Sheet.ReportCard(r)); return true
     }
 
     // ---------- screens and sheets ----------
     fun openSheet(s: Sheet?) = ui.update { it.copy(sheet = s, confirm = null) }
-    fun closeSheet() = openSheet(null)
+    fun closeSheet() { openSheet(null); pumpAuto() }
+    /** 0.18: automatic popups (badges, report card, holiday drop...) wait their turn instead of replacing what's open. */
+    private val autoQ = ArrayDeque<Sheet>()
+    fun autoSheet(s: Sheet) { val u = ui.value; if (u.sheet != null || u.news || u.cine != null) { if (autoQ.size < 5) autoQ.addLast(s) } else openSheet(s) }
+    fun pumpAuto() { if (autoQ.isEmpty()) return; later(380) { val u = ui.value; if (u.sheet == null && !u.news && u.cine == null && autoQ.isNotEmpty()) openSheet(autoQ.removeFirst()) } }
+    // ---------- 0.18 undo bar ----------
+    private var undoFn: (() -> Unit)? = null
+    fun showUndo(msg: String, fn: () -> Unit) {
+        undoFn = fn; val n = (ui.value.undo?.n ?: 0) + 1; ui.update { it.copy(undo = UndoBar(msg, n)) }
+        later(6000) { if (ui.value.undo?.n == n) { ui.update { it.copy(undo = null) }; undoFn = null } }
+    }
+    fun doUndo() { val f = undoFn; undoFn = null; ui.update { it.copy(undo = null) }; f?.invoke() }
     fun setConfirm(k: String?) = ui.update { it.copy(confirm = k) }
     fun openProfile(on: Boolean = true) { if (on) setTab("me") else setTab("log") }
-    fun closeCine() = ui.update { it.copy(cine = null) }
+    fun closeCine() { ui.update { it.copy(cine = null) }; pumpAuto() }
     fun setSub(t: String, k: String) {
         ui.update { it.copy(sub = it.sub + (t to k), editNote = if (t == "plan" && k == "notes") null else it.editNote) }
         if (t == "stats" && k == "lifts") setFlag("prog")
@@ -444,7 +465,7 @@ class OverloadViewModel(app: Application) : AndroidViewModel(app) {
     fun allIds(d: AppData = data.value): List<String> =
         (exMap(d).keys + d.sessions.values.flatMap { it.ex.keys }).distinct()
 
-    private fun editSession(f: (Session) -> Session) {
+    internal fun editSession(f: (Session) -> Session) {
         val u = ui.value; val k = curKey(u)
         update { d -> d.copy(sessions = d.sessions + (k to f(d.sessions[k] ?: Session(u.date.toString(), dayKey(u.date))))) }
     }
@@ -717,7 +738,7 @@ class OverloadViewModel(app: Application) : AndroidViewModel(app) {
     fun showNews() = ui.update { it.copy(news = true) }
     fun closeNews() {
         ui.update { it.copy(news = false) }; if (data.value.settings.seenNews != NEWS_ID) setSettings { it.copy(seenNews = NEWS_ID) }
-        later(300) { if (!weekReport()) checkUnlocks() }
+        later(300) { if (!weekReport()) checkUnlocks() }; pumpAuto()
     }
     fun setSettings(f: (Settings) -> Settings) = update { it.copy(settings = f(it.settings)) }
     fun wipe() { RestAlerts.cancel(appCtx); crew.stop(); chat.reset(); update { AppData(settings = Settings(theme = it.settings.theme, seenNews = NEWS_ID)) }; crewState.value = null; ui.update { UiState() } }

@@ -29,7 +29,7 @@ private fun LadderTile(vm: OverloadViewModel, e: Eng, cat: String, modifier: Mod
     val list = e.B.filter { it.cat == cat }; val n = list.count { it.earned }; val (nm, ic) = LADDER[cat]!!
     val tier = if (n > 0) TIERS[minOf(n, 6) - 1] else null; val next = list.getOrNull(n)
     Column(modifier.clip(RoundedCornerShape(16.dp)).background(ov.soft).clickable { vm.openSheet(Sheet.Ladder(cat)) }.padding(8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-        OvText(ic, 26, modifier = Modifier.alpha(if (n > 0) 1f else .4f))
+        (if (n > 0) list[n - 1] else list.firstOrNull())?.let { BadgeMedal(it, 54.dp, dim = n == 0, text = false) } ?: OvText(ic, 26)
         OvText("$nm ${ROMAN.getOrElse(n) { "" }}", 12, FontWeight.Bold, align = TextAlign.Center)
         OvText(tier?.first ?: "Locked", 11, FontWeight.Bold, tier?.let { Color(it.second) } ?: ov.mute)
         if (next != null) Bar(next.cur / next.tgt, tier?.let { Color(it.second) } ?: Color(0xFF8C939E), Modifier.padding(top = 4.dp), 4) else Sub("Maxed")
@@ -102,11 +102,13 @@ fun BadgeInfoSheet(vm: OverloadViewModel, c: Ctx, k: String) {
     val pinned = k in c.st.showcase
     SheetHead(if (hidden) "Hidden badge" else b.name) { vm.closeSheet() }
     Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-        OvText(if (hidden) "❔" else b.icon, 64, modifier = Modifier.alpha(if (got) 1f else .45f))
+        BadgeMedal(b, 130.dp, dim = !got)
+        if (got) OvText("${tierName(b.k, b.name, b.count ?: 0)} medal", 14, FontWeight.ExtraBold, ov.mute, Modifier.padding(vertical = 4.dp))
         Chip(rr, Color(rc), Color.White); if (rn.isNotEmpty()) Sub(rn)
         OvText(if (hidden) "Keep training to discover it." else b.desc, 16, align = TextAlign.Center, modifier = Modifier.padding(vertical = 8.dp))
         Sub(if (b.count != null) "Earned ${b.count} time${if (b.count == 1) "" else "s"}" else if (got) "Earned ✓" else if (b.tgt > 1) "${loc(b.cur)} / ${loc(b.tgt)}" else "")
     }
+    if (got && !pinned && c.st.showcase.size >= 3) Sub("Your shelf holds 3. Pinning this replaces the oldest one.", Modifier.fillMaxWidth().padding(top = 10.dp))
     if (got) OvButton(if (pinned) "Unpin from showcase" else "📌 Pin to showcase", { vm.togglePin(k) }, Modifier.padding(top = 12.dp), bg = if (pinned) ov.soft else Red, fg = if (pinned) ov.ink else Color.White, wide = true)
 }
 
@@ -192,6 +194,7 @@ fun ReportSheet(vm: OverloadViewModel, r: Report, unit: String) {
     val dv = r.a.vol - r.b.vol
     Sub(if (r.b.vol > 0) (if (dv >= 0) "+${kfmt(dv)} $unit vs the week before 📈" else "${kfmt(-dv)} $unit less than the week before") else "", Modifier.padding(top = 10.dp))
     if (r.earned.isNotEmpty()) { H3("Weekly badges", Modifier.padding(top = 10.dp)); r.earned.forEach { OvText(it, 15) } }
+    AiWeeklyCard(vm, r)
     OvButton("Let's go 💪", { vm.closeSheet(); vm.later(300) { vm.checkUnlocks() } }, Modifier.padding(top = 14.dp), bg = Red, fg = Color.White, wide = true)
 }
 

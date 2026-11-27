@@ -77,7 +77,7 @@ fun BadgeTile(b: Bdg, shine: Boolean, modifier: Modifier = Modifier, onClick: ((
     Column(modifier.clip(RoundedCornerShape(16.dp)).background(if (got) ov.soft else ov.soft.copy(alpha = .5f))
         .then(if (shine) Modifier.border(1.5.dp, Color(0xFFFFD75E).copy(.7f), RoundedCornerShape(16.dp)) else Modifier)
         .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier).padding(8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-        OvText(if (hidden) "❔" else b.icon, 26, modifier = Modifier.alpha(if (got) 1f else .4f))
+        BadgeMedal(b, 54.dp, dim = !got, text = false)
         OvText(if (hidden) "???" else b.name, 12, FontWeight.Bold, align = TextAlign.Center, modifier = Modifier.padding(top = 2.dp))
         OvText(when { b.count != null -> if (b.count > 0) "×${b.count}" else "Not yet"; got -> "Earned"; b.hid -> "Hidden"; else -> "${loc(b.cur)}/${loc(b.tgt)}" }, 11, color = ov.mute)
         if (!got && b.tgt > 1 && !b.hid && b.count == null) Bar(b.cur / b.tgt, modifier = Modifier.padding(top = 4.dp), h = 4)

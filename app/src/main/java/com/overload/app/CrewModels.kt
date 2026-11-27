@@ -34,7 +34,13 @@ data class CrewState(
 )
 
 @Serializable data class CrewStyle(val motto: String = "", val c1: String = "", val c2: String = "")
-@Serializable data class Crest(val shape: String = "shield", val icon: String = "barbell", val c1: String = "#ef2b36", val c2: String = "#14161c", val txt: String = "")
+/** Crew crest. 0.18 adds a pattern, emblem, metal, border and ribbon; shape/icon/txt from older crests are converted by crNorm. */
+@Serializable data class Crest(
+    val shape: String = "shield", val icon: String = "barbell", val c1: String = "#ef2b36", val c2: String = "#14161c", val txt: String = "",
+    val pat: String? = null, val emb: String? = null, val metal: String? = null, val border: String? = null, val rib: String? = null
+)
+/** A report on a crew member (0.18). Only the crew owner gets these from the server. */
+@Serializable data class CrewReport(val target: String = "", val why: String = "", val by: String = "", val ts: Long = 0)
 @Serializable data class CTrophy(val tier: Int = 1, val ts: Long = 0)
 @Serializable data class Shame(val target: String = "", val until: Long = 0)
 @Serializable data class ShameVotes(val tally: Map<String, Int> = emptyMap(), val mine: String? = null)
@@ -61,7 +67,10 @@ data class CrewInfo(
     val created: Long = 0, val founders: Boolean = false, val fcrew: Boolean = false, val rank: Int = 0,
     val crest: Crest? = null, val trophies: Map<String, CTrophy> = emptyMap(),
     val chatRecent: List<ChatRecent> = emptyList(), val chatLast: Long = 0, val muted: Map<String, Long> = emptyMap(),
-    val shame: Shame? = null, val shameVotes: ShameVotes? = null
+    val shame: Shame? = null, val shameVotes: ShameVotes? = null,
+    // 0.18-0.19
+    val reports: List<CrewReport> = emptyList(),
+    val holU: Map<String, kotlinx.serialization.json.JsonElement> = emptyMap()   // holidays the crew unlocked (3 lifters)
 )
 
 @Serializable data class CrewChallenge(val type: String = "sets", val target: Double = 0.0, val wk: String = "", val title: String = "")
@@ -87,7 +96,8 @@ data class MemberProfile(
     val motto: String = "", val gym: String = "", val phase: String = "", val ltype: String = "", val song: String = "",
     val av: Av? = null, val pacc: String = "", val rim: String = "", val tpins: List<String> = emptyList(),
     val flex: List<FlexStat> = emptyList(), val prtl: List<PrPt> = emptyList(), val best: PrPt? = null,
-    val plates: List<String> = emptyList(), val fav: String = "", val founder: Boolean = false, val og: Int = 0
+    val plates: List<String> = emptyList(), val fav: String = "", val founder: Boolean = false, val og: Int = 0,
+    val cofounder: Boolean = false
 )
 @Serializable data class FlexStat(val k: String = "", val l: String = "", val v: String = "")
 @Serializable data class PrPt(val n: String = "", val w: Double = 0.0, val r: Int = 0, val d: String = "", val v: Double = 0.0)
