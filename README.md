@@ -49,9 +49,28 @@ Use the home-screen icon from then on. Workouts logged in a normal browser tab a
 
 | File | What it is |
 |---|---|
-| `index.html` | The whole app: layout, styles and code in one file |
+| `index.html` | Page markup, and the list of scripts to load |
+| `styles.css` | All styles |
+| `js/01-core.js` | Constants, workout templates, app state, storage, helpers |
+| `js/02-rendering.js` | Tab panes, `render()`, sheets, haptics, popups |
+| `js/03-plates.js` | Plate drawing, share card, plate finishes, background art |
+| `js/04-today.js` | Today screen, exercise picker, rest timer, logging |
+| `js/05-plan.js` | Plan page and editor |
+| `js/06-stats.js` | Progress, stats, notes, muscle map, lift ranks, goals |
+| `js/07-rewards.js` | Badges, ranks, challenges, unlocks, locker, trophies, medals, holidays |
+| `js/08-profile.js` | Profile, avatars, banners, crests, looks and effects |
+| `js/09-crew.js` | Crew feed, chat, live crew, arena, raids, awards |
+| `js/10-coach.js` | Coach (Overload AI) |
+| `js/11-data.js` | Backups, trash, cloud sync, export, push alerts |
+| `js/12-settings.js` | Settings, onboarding, welcome tour, privacy |
+| `js/13-extensions.js` | Later versions' extensions to earlier functions, then all event wiring (order matters) |
+| `js/14-startup.js` | Runs last and starts the app |
 | `sw.js` | Service worker: offline caching and lock-screen rest alerts |
 | `icon.png` | App icon |
+
+The scripts are plain scripts loaded in number order and share their top-level names, so a function in one file can call one in any other. Code that runs while the page is loading can only use files loaded before it. When adding a new file, add it to `index.html` and to the `CODE` list in `sw.js` (so it works offline), and bump the cache version in `sw.js`.
+
+When uploading through GitHub, upload the whole folder so `js/` and `styles.css` stay in step with `index.html`.
 
 There's no build step. Serve the folder over HTTPS (GitHub Pages works) and open `index.html`. A copy served from a path containing `/overload-beta/` runs as the beta and shows its version as "beta".
 

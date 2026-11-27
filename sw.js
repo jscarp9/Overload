@@ -1,8 +1,26 @@
 /* Overload offline helper. © 2026 Jake Scarpa. All rights reserved. */
 const BETA = /overload-beta/i.test(self.registration.scope);
-const CACHE = (BETA ? 'overload-beta' : 'overload') + '-v20';
+const CACHE = (BETA ? 'overload-beta' : 'overload') + '-v21';
 const DBN = BETA ? 'overload-beta' : 'overload';
-const SHELL = ['./', './index.html', './icon.png'];
+// Everything the app needs to open offline. Add new files here.
+const CODE = [
+  './styles.css',
+  './js/01-core.js',
+  './js/02-rendering.js',
+  './js/03-plates.js',
+  './js/04-today.js',
+  './js/05-plan.js',
+  './js/06-stats.js',
+  './js/07-rewards.js',
+  './js/08-profile.js',
+  './js/09-crew.js',
+  './js/10-coach.js',
+  './js/11-data.js',
+  './js/12-settings.js',
+  './js/13-extensions.js',
+  './js/14-startup.js',
+];
+const SHELL = ['./', './index.html', './icon.png', ...CODE];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).catch(() => {}));
@@ -26,17 +44,22 @@ self.addEventListener('fetch', e => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
   const isPage = req.mode === 'navigate' || (url.origin === location.origin && /\/(index\.html)?$/.test(url.pathname));
+  const isCode = url.origin === location.origin && /\.(js|css)$/.test(url.pathname) && !/\/sw\.js$/.test(url.pathname);
 
-  if (isPage) {
-    // Newest version first when online, saved copy when offline or slow
+  if (isPage || isCode) {
+    // Newest version first when online, saved copy when offline or slow.
+    // The page, styles and scripts all work this way so they always come from the same version.
+    const key = isPage ? './index.html' : req;
     e.respondWith(
       Promise.race([fetch(req, { cache: 'no-cache' }), timeout(4000)])
         .then(res => {
-          const copy = res.clone();
-          caches.open(CACHE).then(c => c.put('./index.html', copy));
+          if (res.ok) {
+            const copy = res.clone();
+            caches.open(CACHE).then(c => c.put(key, copy));
+          }
           return res;
         })
-        .catch(() => caches.match('./index.html').then(r => r || caches.match('./')))
+        .catch(() => caches.match(key, { ignoreSearch: true }).then(r => r || (isPage ? caches.match('./') : r)))
     );
     return;
   }
