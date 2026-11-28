@@ -1145,7 +1145,7 @@ function renderCrew14() {
     const posts = st.cs.posts || [];
     h += raidCard() + liveStrip() + recapHTML();
     const s = lastFinished();
-    h += s && !s.posted ? `<button class="card postnudge" id="postlast"><span>📣</span><div><b>Post your ${esc(postData(s).day)}</b><div class="sub">Share your breakdown with the crew</div></div></button>` : '';
+    h += s && !s.posted ? `<button class="card postnudge" id="postlast"><span class="pn27">📸</span><div><b>Post your ${esc(postData(s).day)}</b><div class="sub">Add a selfie and share it with the crew</div></div></button>` : '';
     h += posts.length ? feed17(posts) : `<div class="card"><p class="sub">No posts yet. Finish a workout and tap Post to crew, or share the code <b>${esc(c.code)}</b> so friends can join.</p></div>`
   } else h += arena15();
   return h

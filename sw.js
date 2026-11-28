@@ -1,6 +1,6 @@
 /* Overload offline helper. © 2026 Jake Scarpa. All rights reserved. */
 const BETA = /overload-beta/i.test(self.registration.scope);
-const CACHE = (BETA ? 'overload-beta' : 'overload') + '-v21';
+const CACHE = (BETA ? 'overload-beta' : 'overload') + '-v23';
 const DBN = BETA ? 'overload-beta' : 'overload';
 // Everything the app needs to open offline. Add new files here.
 const CODE = [
@@ -18,7 +18,9 @@ const CODE = [
   './js/11-data.js',
   './js/12-settings.js',
   './js/13-extensions.js',
-  './js/14-startup.js',
+  './js/14-polish.js',
+  './js/15-profile-showcase.js',
+  './js/16-startup.js',
 ];
 const SHELL = ['./', './index.html', './icon.png', ...CODE];
 

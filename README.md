@@ -38,6 +38,11 @@ Use the home-screen icon from then on. Workouts logged in a normal browser tab a
 - Post workouts, react, comment, and see who's lifting right now. Send hype to friends who are live.
 - **The Arena:** a crew rank board with a podium, Rank Power, titles you can steal, rivals, lift boards and crew challenges. Stats are checked by the server.
 - Monday recaps, crew levels and banners, monthly awards, Gym Buddies, and copying a friend's plan.
+- Post a selfie with your workout. Your stats go on the photo, and every selfie is also kept on your phone in Progress photos.
+
+**Profile**
+- Rank progress and what's unlocked next, then vs now, Big 3 total, strength levels, PRs, this month vs last, recent achievements, badges you're closest to and a consistency heatmap.
+- Pick which sections show, and crewmates see your showcase.
 
 **Your data**
 - Everything is saved on your phone first. A second copy is kept, and you can restore from the last 7 days.
@@ -64,7 +69,9 @@ Use the home-screen icon from then on. Workouts logged in a normal browser tab a
 | `js/11-data.js` | Backups, trash, cloud sync, export, push alerts |
 | `js/12-settings.js` | Settings, onboarding, welcome tour, privacy |
 | `js/13-extensions.js` | Later versions' extensions to earlier functions, then all event wiring (order matters) |
-| `js/14-startup.js` | Runs last and starts the app |
+| `js/14-polish.js` | Line icons in place of UI emojis, selfie crew posts and Progress photos |
+| `js/15-profile-showcase.js` | Profile progress sections, crew showcase, monthly coach note, Profile settings |
+| `js/16-startup.js` | Runs last and starts the app |
 | `sw.js` | Service worker: offline caching and lock-screen rest alerts |
 | `icon.png` | App icon |
 

@@ -129,6 +129,8 @@ main.addEventListener('click', async e => {
   const b = e.target.closest('button');
   if (!b) return;
   const d = st.plan && st.plan.days[st.pday];
+  if (await click28(b)) return;
+  if (await click27(b)) return;
   if (await click25(b)) return;
   if (await click24(b)) return;
   if (await click23(b)) return;
@@ -817,6 +819,8 @@ $('sheet').addEventListener('click', async e => {
     renderSheet();
     return
   }
+  if (await sheetClick28(b)) return;
+  if (await sheetClick27(b)) return;
   if (await sheetClick25(b)) return;
   if (await sheetClick24(b)) return;
   if (await sheetClick23(b)) return;

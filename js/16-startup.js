@@ -67,6 +67,8 @@ boot23();
 boot24();
 boot25();
 boot26();
+boot27();
+boot28();
 loadCounter();
 crewLoop();
 if (crewOn()) {

@@ -18,8 +18,8 @@ function counts() {
   }));
   return[dn, tot]
 }
-const VERSION = BETA ? '0.25.1 beta' : '0.25.1';
-const NEWS = [['Meet Coach ✦', 'Tap ✦ Coach on your plan and just ask: swap an exercise, short on time, deload week, change your split. Coach shows the change and you tap Apply.'], ['Form tips', 'Tap ⋯ on any exercise for quick AI form tips.'], ['Weekly crew recap', 'Every Monday your crew gets an AI recap post with the MVP, a little roast and a challenge.']];
+const VERSION = BETA ? '0.27 beta' : '0.27';
+const NEWS = [['A real profile','Your Profile now shows your progress: rank and what it unlocks next, then vs now, your Big 3 total, strength levels, PRs, this month vs last, recent achievements and the badges you’re closest to.'],['Profile settings','Customizing moved off the Profile. Tap the pencil for plates, themes, pinned medals, bodyweight and which sections show.'],['Coach on your profile','If Coach is on, you get a short note about your last 30 days once a month.'],['Your crew sees it too','Tap a crewmate to see their showcase. Use Preview as crew in Profile settings to see yours.']];
 const isDark = () => document.documentElement.dataset.mode === 'dark';
 function applyTheme() {
   const t = st.set.theme || 'auto', mq = window.matchMedia && matchMedia('(prefers-color-scheme: dark)');
